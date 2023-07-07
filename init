@@ -1,0 +1,60 @@
+#!/bin/bash
+
+INIT=$(realpath -s "$0")
+DOTS=$(dirname "$INIT")
+DEPS=$DOTS/deps
+OS="$(uname -s)"
+
+source $DEPS/util.sh
+
+# deps
+case "$OS" in
+Linux)
+	if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
+		$DEPS/pacman.sh $DEPS
+	elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
+		$DEPS/dnf.sh $DEPS
+	elif [ -f "/etc/gentoo-release" ]; then
+		$DEPS/emerge.sh $DEPS
+	else
+		# assume apt
+		$DEPS/apt.sh $DEPS
+	fi
+	;;
+FreeBSD)
+	$DEPS/pkg.sh $DEPS
+	;;
+NetBSD)
+	$DEPS/pkgin.sh $DEPS
+	;;
+OpenBSD)
+	$DEPS/pkg_add.sh $DEPS
+	;;
+Darwin)
+	$DEPS/brew.sh $DEPS
+	;;
+*)
+	message "$OS is not supported, exit..."
+	exit 1
+	;;
+esac
+
+# zsh theme
+git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
+echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
+
+# rust
+install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
+install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
+source "$HOME/.cargo/env"
+install_or_skip "cargo install fd-find" "fd"
+install_or_skip "cargo install ripgrep" "rg"
+install_or_skip "cargo install --locked bat" "bat"
+
+# go
+# see: https://github.com/kerolloz/go-installer
+bash <(curl -sL https://git.io/go-installer)
+go install github.com/jesseduffield/lazygit@latest
+
+# python
+sudo pip3 install ranger-fm file chardet sudo
