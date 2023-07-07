@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+# set -x
 
 INIT=$(realpath "$0")
 DOTS=$(dirname "$INIT")
@@ -55,7 +55,7 @@ install_or_skip "cargo install --locked bat" "bat"
 
 # go
 # see: https://github.com/kerolloz/go-installer
-bash <(curl -sL https://git.io/go-installer)
+install_or_skip "bash <(curl -sL https://git.io/go-installer)" "go"
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # python
