@@ -24,7 +24,6 @@ install_or_skip "sudo apt-get install -y atool" "atool"
 
 install_or_skip "sudo apt-get install -y xsel" "xsel"
 install_or_skip "sudo apt-get install -y xclip" "xclip"
-install_or_skip "sudo apt-get install -y wl-clipboard" "wl-copy"
 
 install_or_skip "sudo apt-get install -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
 install_or_skip "sudo apt-get install -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"

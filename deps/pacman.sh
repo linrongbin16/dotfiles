@@ -24,7 +24,6 @@ install_or_skip "yes | sudo pacman -S atool" "atool"
 
 install_or_skip "yes | sudo pacman -S xsel" "xsel"
 install_or_skip "yes | sudo pacman -S xclip" "xclip"
-install_or_skip "yes | sudo pacman -S wl-clipboard" "wl-copy"
 
 install_or_skip "yes | sudo pacman -S python python-pip" "python3"
 

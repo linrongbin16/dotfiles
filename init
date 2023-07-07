@@ -41,10 +41,6 @@ Darwin)
 	;;
 esac
 
-# zsh theme
-git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
-echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
-
 # rust
 install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
 install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
@@ -61,3 +57,31 @@ install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # python
 install_or_skip "sudo pip3 install ranger-fm file chardet sudo" "ranger"
+
+# prompt
+echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
+git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
+echo '' >>~/.zshrc
+echo '# mzpt prompt theme' >>~/.zshrc
+echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
+
+# alias
+echo '' >>~/.zshrc
+echo '# ls' >>~/.zshrc
+echo 'alias l="exa -lh"' >>~/.zshrc
+echo 'alias ll="exa -alh"' >>~/.zshrc
+
+echo '' >>~/.zshrc
+echo '# lazygit' >>~/.zshrc
+echo 'alias lg="lazygit"' >>~/.zshrc
+
+echo '' >>~/.zshrc
+echo '# git alias' >>~/.zshrc
+echo 'alias gs="git status"' >>~/.zshrc
+echo 'alias gp="git pull"' >>~/.zshrc
+echo 'alias gP="git push"' >>~/.zshrc
+echo 'alias ga="git add"' >>~/.zshrc
+echo 'alias gc="git commit"' >>~/.zshrc
+echo 'alias gck="git checkout"' >>~/.zshrc
+echo 'alias gb="git branch"' >>~/.zshrc
+echo 'alias gm="git merge"' >>~/.zshrc
