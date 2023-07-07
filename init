@@ -1,6 +1,8 @@
 #!/bin/bash
 
-INIT=$(realpath -s "$0")
+set -x
+
+INIT=$(realpath "$0")
 DOTS=$(dirname "$INIT")
 DEPS=$DOTS/deps
 OS="$(uname -s)"
@@ -54,7 +56,7 @@ install_or_skip "cargo install --locked bat" "bat"
 # go
 # see: https://github.com/kerolloz/go-installer
 bash <(curl -sL https://git.io/go-installer)
-go install github.com/jesseduffield/lazygit@latest
+install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # python
-sudo pip3 install ranger-fm file chardet sudo
+install_or_skip "sudo pip3 install ranger-fm file chardet sudo" "ranger"
