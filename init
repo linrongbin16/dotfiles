@@ -55,7 +55,6 @@ install_or_skip "bash <(curl -sL https://git.io/go-installer)" "go"
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # prompt
-echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
 git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
 echo '' >>~/.zshrc
 echo '# mzpt prompt theme' >>~/.zshrc
