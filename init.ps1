@@ -30,6 +30,8 @@ Message "install dependencies for windows"
 scoop install coreutils
 scoop install mingw
 InstallOrSkip -command "scoop install which" -target "which"
+InstallOrSkip -command "scoop install gawk" -target "awk"
+InstallOrSkip -command "scoop install sed" -target "sed"
 InstallOrSkip -command "scoop install llvm" -target "clang"
 InstallOrSkip -command "scoop install llvm" -target "clang++"
 InstallOrSkip -command "scoop install make" -target "make"
@@ -40,6 +42,9 @@ InstallOrSkip -command "scoop install curl" -target "curl"
 InstallOrSkip -command "scoop install wget" -target "wget"
 
 InstallOrSkip -command "scoop install 7zip" -target "7z"
+InstallOrSkip -command "scoop install gzip" -target "gzip"
+InstallOrSkip -command "scoop install unzip" -target "unzip"
+InstallOrSkip -command "scoop install unrar" -target "unrar"
 
 InstallOrSkip -command "scoop install python" -target "python3"
 
