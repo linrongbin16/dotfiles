@@ -55,7 +55,6 @@ InstallOrSkip -command "scoop install rustup" -target "cargo"
 InstallOrSkip -command "cargo install fd-find" -target "fd"
 InstallOrSkip -command "cargo install ripgrep" -target "rg"
 InstallOrSkip -command "cargo install --locked bat" -target "bat"
-InstallOrSkip -command "cargo install exa" -target "exa"
 
 # go
 # see: https://github.com/kerolloz/go-installer
@@ -63,36 +62,18 @@ InstallOrSkip -command "scoop install go" -target "go"
 InstallOrSkip -command "go install github.com/jesseduffield/lazygit@latest" -target "lazygit"
 
 # prompt
-git clone https://github.com/linrongbin16/mzpt.git $env:USERPROFILE\.mzpt
+if (!(Test-Path -Path $env:USERPROFILE\.mzpt)) {
+    git clone https://github.com/linrongbin16/mzpt.git $env:USERPROFILE\.mzpt
+}
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder)) {
     New-Item -ItemType Directory $ProfileFolder
 }
 Write-Output '' >>$PROFILE
+Write-Output '# ======== .dotfiles start ========' >>$PROFILE
 Write-Output '# mzpt prompt theme' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.mzpt\mzpt.ps1' >>$PROFILE
-
-# alias
+Write-Output '# path' >>$PROFILE
+Write-Output '$env:PATH="$env:PATH;$env:USERPROFILE\.dotfiles\bin"' >>$PROFILE
+Write-Output '# ======== .dotfiles end ========' >>$PROFILE
 Write-Output '' >>$PROFILE
-Write-Output '# remove builtin alias' >>$PROFILE
-Write-Output 'Get-Alias | Where-Object { $_.Options -NE "Constant" } | Remove-Alias -Force' >>$PROFILE
-
-Write-Output '' >>$PROFILE
-Write-Output '# ls' >>$PROFILE
-Write-Output 'New-Alias -Name l -Value "ls -lh"' >>$PROFILE
-Write-Output 'New-Alias -Name ll -Value "ls -alh"' >>$PROFILE
-
-Write-Output '' >>$PROFILE
-Write-Output '# lazygit' >>$PROFILE
-Write-Output 'New-Alias -Name lg -Value "lazygit"' >>$PROFILE
-
-Write-Output '' >>$PROFILE
-Write-Output '# git' >>$PROFILE
-Write-Output 'New-Alias -Name gs -Value "git status"' >>$PROFILE
-Write-Output 'New-Alias -Name gp -Value "git pull"' >>$PROFILE
-Write-Output 'New-Alias -Name gP -Value "git push"' >>$PROFILE
-Write-Output 'New-Alias -Name ga -Value "git add"' >>$PROFILE
-Write-Output 'New-Alias -Name gc -Value "git commit"' >>$PROFILE
-Write-Output 'New-Alias -Name gck -Value "git checkout"' >>$PROFILE
-Write-Output 'New-Alias -Name gb -Value "git branch"' >>$PROFILE
-Write-Output 'New-Alias -Name gm -Value "git merge"' >>$PROFILE
