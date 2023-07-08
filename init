@@ -42,7 +42,6 @@ Darwin)
 esac
 
 # rust
-install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
 install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
 source "$HOME/.cargo/env"
 install_or_skip "cargo install fd-find" "fd"
@@ -54,9 +53,6 @@ install_or_skip "cargo install exa" "exa"
 # see: https://github.com/kerolloz/go-installer
 install_or_skip "bash <(curl -sL https://git.io/go-installer)" "go"
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
-
-# python
-install_or_skip "sudo pip3 install ranger-fm file chardet sudo" "ranger"
 
 # prompt
 echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
