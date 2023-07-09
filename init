@@ -44,6 +44,8 @@ esac
 # git config
 git config --global user.email "linrongbin16@outlook.com"
 git config --global user.name "linrongbin16"
+git config --global core.fsmonitor true
+git config --global core.untrackedcache true
 
 # rust
 install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
