@@ -41,6 +41,10 @@ Darwin)
 	;;
 esac
 
+# git config
+git config --global user.email "linrongbin16@outlook.com"
+git config --global user.name "linrongbin16"
+
 # rust
 install_or_skip "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
 source "$HOME/.cargo/env"
@@ -51,7 +55,10 @@ install_or_skip "cargo install exa" "exa"
 
 # go
 # see: https://github.com/kerolloz/go-installer
-install_or_skip "bash <(curl -sL https://git.io/go-installer)" "go"
+if [ -d go-installer ]; then
+    rm -rf go-installer
+fi
+install_or_skip "git clone --depth=1 https://github.com/kerolloz/go-installer.git && ./go-installer/go.sh" "go"
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # prompt
