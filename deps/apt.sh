@@ -17,9 +17,10 @@ install_or_skip "sudo apt-get install -y git" "git"
 install_or_skip "sudo apt-get install -y curl" "curl"
 install_or_skip "sudo apt-get install -y wget" "wget"
 
-install_or_skip "sudo apt-get install -y unzip" "unzip"
 install_or_skip "sudo apt-get install -y gzip" "gzip"
 install_or_skip "sudo apt-get install -y p7zip" "7z"
+install_or_skip "sudo apt-get install -y unzip" "unzip"
+install_or_skip "sudo apt-get install -y unrar" "unrar"
 install_or_skip "sudo apt-get install -y atool" "atool"
 
 install_or_skip "sudo apt-get install -y xsel" "xsel"
