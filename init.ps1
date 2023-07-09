@@ -28,6 +28,7 @@ Message "install dependencies for windows"
 
 # git
 scoop install mingw
+scoop install uutils-coreutils
 InstallOrSkip -command "scoop install which" -target "which"
 InstallOrSkip -command "scoop install gawk" -target "awk"
 InstallOrSkip -command "scoop install sed" -target "sed"
