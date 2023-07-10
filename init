@@ -58,13 +58,15 @@ install_or_skip "cargo install exa" "exa"
 # go
 # see: https://github.com/kerolloz/go-installer
 if [ -d go-installer ]; then
-    rm -rf go-installer
+	rm -rf go-installer
 fi
 install_or_skip "git clone --depth=1 https://github.com/kerolloz/go-installer.git && ./go-installer/go.sh" "go"
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # prompt
-git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
+if [ ! -d ~/.mzpt ]; then
+	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
+fi
 echo '' >>~/.zshrc
 echo '# mzpt prompt theme' >>~/.zshrc
 echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
