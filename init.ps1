@@ -26,7 +26,7 @@ function InstallOrSkip([string]$command, [string]$target)
 
 Message "install dependencies for windows"
 
-# git
+# deps
 scoop install mingw
 scoop install uutils-coreutils
 InstallOrSkip -command "scoop install which" -target "which"
@@ -50,6 +50,13 @@ InstallOrSkip -command "scoop install python" -target "python3"
 
 InstallOrSkip -command "scoop install vim" -target "vim"
 InstallOrSkip -command "scoop install neovim" -target "nvim"
+
+# git config
+git config --global user.email "linrongbin16@outlook.com"
+git config --global user.name "linrongbin16"
+git config --global pull.rebase false
+git config --global core.fsmonitor true
+git config --global core.untrackedcache true
 
 # rust
 InstallOrSkip -command "scoop install rustup" -target "cargo"
