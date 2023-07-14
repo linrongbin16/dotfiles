@@ -21,7 +21,7 @@ Zsh/Bash:
 cd ~
 git clone git@github.com:linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
-./init
+./install
 ```
 
 ### Windows
@@ -51,5 +51,5 @@ irm get.scoop.sh | iex
 cd $env:USERPROFILE
 git clone git@github.com:linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
-.\init.ps1
+.\install.ps1
 ```

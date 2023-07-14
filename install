@@ -73,37 +73,7 @@ install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 if [ ! -d ~/.mzpt ]; then
 	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
 fi
-echo '' >>~/.zshrc
-echo '# ======== .dotfiles start ========' >>~/.zshrc
-echo '' >>~/.zshrc
-echo '# performance ' >>~/.zshrc
-echo 'ulimit -n 200000' >>~/.zshrc
-echo 'ulimit -u 2048' >>~/.zshrc
 
 echo '' >>~/.zshrc
-echo '# mzpt prompt theme' >>~/.zshrc
-echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
-
-# alias
-echo '' >>~/.zshrc
-echo '# ls' >>~/.zshrc
-echo 'alias l="exa -lh"' >>~/.zshrc
-echo 'alias ll="exa -alh"' >>~/.zshrc
-
-echo '' >>~/.zshrc
-echo '# lazygit' >>~/.zshrc
-echo 'alias lg="lazygit"' >>~/.zshrc
-
-echo '' >>~/.zshrc
-echo '# git' >>~/.zshrc
-echo 'alias gs="git status"' >>~/.zshrc
-echo 'alias gp="git pull"' >>~/.zshrc
-echo 'alias gP="git push"' >>~/.zshrc
-echo 'alias ga="git add"' >>~/.zshrc
-echo 'alias gc="git commit"' >>~/.zshrc
-echo 'alias gck="git checkout"' >>~/.zshrc
-echo 'alias gb="git branch"' >>~/.zshrc
-echo 'alias gm="git merge"' >>~/.zshrc
-
-echo '' >>~/.zshrc
-echo '# ======== .dotfiles end ========' >>~/.zshrc
+echo '# dotfiles ' >>~/.zshrc
+echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
