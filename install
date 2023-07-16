@@ -44,6 +44,7 @@ esac
 # zsh
 if [ "$(basename $SHELL)" != "zsh" ]; then
 	chsh -s $(which zsh)
+    zsh
 fi
 
 # git config
@@ -67,6 +68,7 @@ if [ -d go-installer ]; then
 	sudo rm -rf go-installer
 fi
 install_or_skip "git clone --depth=1 https://github.com/kerolloz/go-installer.git && ./go-installer/go.sh" "go"
+export PATH=$PATH:$HOME/.go/bin:$HOME/go/bin
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # prompt
