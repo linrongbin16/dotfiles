@@ -42,7 +42,7 @@ Darwin)
 esac
 
 # zsh
-if [ $SHELL -ne "zsh" ]; then
+if [ "$(basename $SHELL)" != "zsh" ]; then
 	chsh -s $(which zsh)
 fi
 
