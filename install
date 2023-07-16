@@ -76,4 +76,4 @@ fi
 
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
-echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+echo '[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh' >>~/.zshrc
