@@ -57,6 +57,7 @@ git config --global user.name "linrongbin16"
 git config --global pull.rebase false
 git config --global core.fsmonitor true
 git config --global core.untrackedcache true
+git config --global init.defaultBranch main
 
 # rust
 InstallOrSkip -command "scoop install rustup" -target "cargo"
