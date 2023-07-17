@@ -72,6 +72,39 @@ install_or_skip "git clone --depth=1 https://github.com/kerolloz/go-installer.gi
 export PATH=$PATH:$HOME/.go/bin:$HOME/go/bin
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
+# patched font
+nerdfont_latest_release_tag() {
+	local org="$1"
+	local repo="$2"
+	local uri="https://github.com/$org/$repo/releases/latest"
+	curl -f -L $uri | grep "href=\"/$org/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
+}
+
+install_nerdfont() {
+	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+	local org="ryanoasis"
+	local repo="nerd-fonts"
+	local font_file=$1
+	local font_version=$(nerdfont_latest_release_tag $org $repo)
+	local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
+	message "install $font_file($font_version) nerd font from github"
+	if [ -f $font_file ]; then
+		rm -rf $font_file
+	fi
+	curl -L $font_url -o $font_file
+	if [ $? -ne 0 ]; then
+		message "failed to download $font_file, skip..."
+	else
+		unzip -o $font_file
+		message "install $font_file($font_version) nerd font from github - done"
+	fi
+}
+
+if [ "$OS" != "Darwin" ]; then
+	install_nerdfont "Hack.zip"
+	install_nerdfont "Noto.zip"
+fi
+
 # prompt
 if [ ! -d ~/.mzpt ]; then
 	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt

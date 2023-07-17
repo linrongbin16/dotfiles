@@ -31,3 +31,8 @@ install_or_skip "brew install bat" "bat"
 install_or_skip "brew install exa" "exa"
 
 install_or_skip "brew install lazygit" "lazygit"
+
+# nerd-font
+brew tap homebrew/cask-fonts
+brew install --cask font-hack-nerd-font
+brew install --cask font-noto-nerd-font
