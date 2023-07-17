@@ -24,3 +24,10 @@ install_or_skip "brew install python3" "python3"
 
 install_or_skip "brew install vim" "vim"
 install_or_skip "brew install zsh" "zsh"
+
+install_or_skip "brew install fd" "fd"
+install_or_skip "brew install rg" "rg"
+install_or_skip "brew install bat" "bat"
+install_or_skip "brew install exa" "exa"
+
+install_or_skip "brew install lazygit" "lazygit"
