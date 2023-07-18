@@ -14,7 +14,7 @@ GIT_CONFIG = f"{HOME}/.gitconfig"
 
 
 def debug(msg):
-    print(f"[gitproxy] DEBUG: {msg}")
+    print(f"[gitproxy] (Debug) {msg}")
 
 
 def info(msg):
