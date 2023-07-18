@@ -23,3 +23,6 @@ alias gc="git commit"
 alias gck="git checkout"
 alias gb="git branch"
 alias gm="git merge"
+
+# path
+export PATH="$PATH:$HOME/.dotfiles/bin"

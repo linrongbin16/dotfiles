@@ -1,3 +1,4 @@
 .DS_Store
 go-installer
 go*tar.gz
+gitproxy.db
