@@ -14,7 +14,7 @@ GIT_CONFIG = f"{HOME}/.gitconfig"
 
 
 def debug(msg):
-    print(f"[gitproxy] (Debug) {msg}")
+    print(f"[gitproxy] (debug) {msg}")
 
 
 def info(msg):
@@ -22,7 +22,7 @@ def info(msg):
 
 
 def err(msg):
-    print(f"[gitproxy] Error! {msg}")
+    print(f"[gitproxy] error! {msg}")
 
 
 def unknown_option():
@@ -69,24 +69,21 @@ def get_saved_proxies(debug_opt):
     return saved_proxies
 
 
-def add_proxy(args, debug_opt):
+def add_proxy(add_opt, debug_opt):
     if debug_opt:
-        debug(f"add proxy({type(args)}):{args}")
-    if not args:
-        err(f"error input '{args}', must be 'NAME=PROTOCOL://domain:port' format.")
+        debug(f"add proxy({type(add_opt)}):{add_opt}")
+    if not isinstance(add_opt, str) or len(add_opt.strip()) <= 0:
+        err(f"error input '{add_opt}', must be 'NAME=PROTOCOL://domain:port' format.")
         return
-    for a in args:
-        try:
-            if not isinstance(a, str) or len(a.strip()) <= 0:
-                continue
-            parts = a.strip().split("=")
-            name = parts[0].strip()
-            url = parts[1].strip()
-            parsed_url = urllib.parse.urlparse(url)
-            append_file(DATABASE, f"{name}={url}")
-            info(f"add proxy '{name}={url}' - done")
-        except:
-            err("error input '{args}', must be 'NAME=PROTOCOL://domain:port' format.")
+    try:
+        parts = add_opt.strip().split("=")
+        name = parts[0].strip()
+        url = parts[1].strip()
+        parsed_url = urllib.parse.urlparse(url)
+        append_file(DATABASE, f"{name}={url}\n")
+        info(f"add proxy '{name}={url}' - done")
+    except:
+        err(f"error input '{add_opt}', must be 'NAME=PROTOCOL://domain:port' format.")
 
 
 def remove_proxy(name, debug_opt):
@@ -94,12 +91,16 @@ def remove_proxy(name, debug_opt):
         debug(f"remove proxy, name:{name}")
     saved_proxies = get_saved_proxies(debug_opt)
     saved = []
+    found = False
     for p in saved_proxies:
         if p.strip().startswith(name):
             info(f"remove proxy '{p.strip()}' - done")
+            found = True
             continue
         saved.append(p.strip() + "\n")
     write_file(DATABASE, saved)
+    if not found:
+        err(f"proxy '{name}' not found.")
 
 
 def list_git_config_proxies(debug_opt):
@@ -204,15 +205,53 @@ def print_for_command_prompt(name, debug_opt):
     info(f'set HTTP_PROXY="{proxy}" && set HTTPS_PROXY="{proxy}"')
 
 
+HELP = """
+    Git proxy management
+
+    \b
+    ```
+    # add proxy
+    $ gitproxy -a v2raya=http://127.0.0.1:20171
+    [gitproxy] add proxy 'v2raya=http://127.0.0.1:20171' - done
+
+    \b
+    # list saved and git proxies
+    $ gitproxy -l
+    [gitproxy] stored proxies:
+    [gitproxy]   1. v2raya=http://127.0.0.1:20171
+    [gitproxy] current git proxy (~/.gitconfig):
+    [gitproxy]   1. http=http://127.0.0.1:20171
+    [gitproxy]   2. https=http://127.0.0.1:20171
+
+    \b
+    # set git proxy in ~/.gitconfig
+    $ gitproxy --set v2raya
+    [gitproxy] set git proxy 'test=socks5://127.0.0.1:7890' (~/.gitconfig) - done
+
+    \b
+    # reset/clear git proxy in ~/.gitconfig
+    $ gitproxy --reset
+    [gitproxy] reset git proxy (~/.gitconfig) - done
+
+    \b
+    # remove proxy
+    $ gitproxy -r v2raya
+    [gitproxy] remove proxy 'v2raya=http://127.0.0.1:20171' - done
+
+    ```
+"""
+
+
 @click.command()
 @click.option(
     "-a",
     "--add",
     "add_opt",
-    is_flag=True,
     help="add proxy in 'name=protocol://domain:port' format",
 )
-@click.option("-l", "--list", "list_opt", is_flag=True, help="list current git proxy")
+@click.option(
+    "-l", "--list", "list_opt", is_flag=True, help="list saved and git proxies"
+)
 @click.option("-r", "--remove", "remove_opt", help="remove proxy by name")
 @click.option("--set", "set_opt", help="enable git proxy by name")
 @click.option("--reset", "reset_opt", is_flag=True, help="clear git proxy")
@@ -249,43 +288,39 @@ def vproxy(
     Git proxy management
 
     \b
-    To add new proxy: `gitproxy -a/--add NAME=PROTOCOL://DOMAIN:PORT`.
-    \b
-    To list stored proxies: `gitproxy -l/--list`.
-    \b
-    To remove stored proxy: `gitproxy -r/--remove NAME`.
-
-    \b
-    To set/enable git proxy: `gitproxy --set NAME`.
-    \b
-    To reset/disable git proxy: `gitproxy --reset`.
-
-    \b
-    Example:
-
-    \b
     ```
+    # add proxy
     $ gitproxy -a v2raya=http://127.0.0.1:20171
     [gitproxy] add proxy 'v2raya=http://127.0.0.1:20171' - done
 
+    # list saved and git proxies
     $ gitproxy -l
     [gitproxy] stored proxies:
     [gitproxy]   1. v2raya=http://127.0.0.1:20171
     [gitproxy] current git proxy (~/.gitconfig):
-    [gitproxy]   1. v2raya=http://127.0.0.1:20171
+    [gitproxy]   1. http=http://127.0.0.1:20171
+    [gitproxy]   2. https=http://127.0.0.1:20171
 
+    # set git proxy in ~/.gitconfig
     $ gitproxy --set v2raya
     [gitproxy] set git proxy 'test=socks5://127.0.0.1:7890' (~/.gitconfig) - done
+
+    # reset/clear git proxy in ~/.gitconfig
     $ gitproxy --reset
     [gitproxy] reset git proxy (~/.gitconfig) - done
-    ```
-    """
+
+    # remove proxy
+    $ gitproxy -r v2raya
+    [gitproxy] remove proxy 'v2raya=http://127.0.0.1:20171' - done
+
+    ```"""
+
     if debug_opt:
         print(
-            f"add:{add_opt}, list_opt:{list_opt}, remove:{remove_opt}, set_opt:{set_opt}, reset_opt:{reset_opt}, sh_opt:{sh_opt}, pwsh_opt:{pwsh_opt}, cmd_opt:{cmd_opt}, args:{args}, type:{type(args)}"
+            f"add_opt:{add_opt}, list_opt:{list_opt}, remove:{remove_opt}, set_opt:{set_opt}, reset_opt:{reset_opt}, sh_opt:{sh_opt}, pwsh_opt:{pwsh_opt}, cmd_opt:{cmd_opt}, args:{args}, type:{type(args)}"
         )
     if add_opt:
-        add_proxy(args, debug_opt)
+        add_proxy(add_opt, debug_opt)
     elif list_opt:
         list_proxies(debug_opt)
     elif remove_opt:
