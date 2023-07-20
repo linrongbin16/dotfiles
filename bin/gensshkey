@@ -9,15 +9,15 @@ import click
 
 
 def debug(msg):
-    print(f"[sshkey] (Debug) {msg}")
+    print(f"[gensshkey] (Debug) {msg}")
 
 
 def info(msg):
-    print(f"[sshkey] {msg}")
+    print(f"[gensshkey] {msg}")
 
 
 def err(msg):
-    print(f"[sshkey] Error! {msg}")
+    print(f"[gensshkey] Error! {msg}")
 
 
 def unknown_option():
@@ -30,14 +30,14 @@ def unknown_option():
     "--email",
     "email_opt",
     required=True,
-    help="generate ssh key with email",
+    help="email",
 )
 @click.option("--debug", "debug_opt", is_flag=True, help="debug")
-def sshkey(email_opt, debug_opt):
+def gensshkey(email_opt, debug_opt):
     """
     SSH key generator
 
-    It helps generate the `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub` with 4096 RSA method, implemented via below commands:
+    It helps generate `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub` with 4096 RSA method, implemented by:
 
     \b
     ```
@@ -59,4 +59,4 @@ def sshkey(email_opt, debug_opt):
 
 
 if __name__ == "__main__":
-    sshkey()
+    gensshkey()
