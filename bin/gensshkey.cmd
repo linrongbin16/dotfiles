@@ -1,3 +1,3 @@
 @echo off
 
-python3 %USERPROFILE%\.dotfiles\bin\sshkey %*
+python3 %USERPROFILE%\.dotfiles\bin\gensshkey %*
