@@ -1,5 +1,3 @@
-# ======== .dotfiles start ========
-
 # mzpt prompt theme
 . $env:USERPROFILE\.mzpt\mzpt.ps1
 
