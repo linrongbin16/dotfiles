@@ -79,12 +79,5 @@ if (!(Test-Path -Path $ProfileFolder)) {
     New-Item -ItemType Directory $ProfileFolder
 }
 Write-Output '' >>$PROFILE
-Write-Output '# ======== .dotfiles start ========' >>$PROFILE
-Write-Output '' >>$PROFILE
-Write-Output '# mzpt prompt theme' >>$PROFILE
-Write-Output '. $env:USERPROFILE\.mzpt\mzpt.ps1' >>$PROFILE
-Write-Output '' >>$PROFILE
-Write-Output '# path' >>$PROFILE
-Write-Output '$env:PATH="$env:PATH;$env:USERPROFILE\.dotfiles\bin"' >>$PROFILE
-Write-Output '# ======== .dotfiles end ========' >>$PROFILE
-Write-Output '' >>$PROFILE
+Write-Output '# dotfiles' >>$PROFILE
+Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
