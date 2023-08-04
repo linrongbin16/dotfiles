@@ -101,7 +101,7 @@ install_nerdfont() {
 		unzip -o $font_file
 		message "install $font_file($font_version) nerd font from github - done"
 	fi
-    fc-cache -f -v
+    sudo fc-cache -f -v
 }
 
 if [ "$OS" != "Darwin" ]; then
