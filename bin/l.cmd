@@ -1,3 +1,3 @@
 @echo off
 
-ls -lh %*
+eza -lh %*
