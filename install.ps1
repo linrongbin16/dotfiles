@@ -64,6 +64,7 @@ InstallOrSkip -command "scoop install rustup" -target "cargo"
 InstallOrSkip -command "cargo install fd-find" -target "fd"
 InstallOrSkip -command "cargo install ripgrep" -target "rg"
 InstallOrSkip -command "cargo install --locked bat" -target "bat"
+InstallOrSkip -command "cargo install eza" -target "eza"
 
 # go
 # see: https://github.com/kerolloz/go-installer

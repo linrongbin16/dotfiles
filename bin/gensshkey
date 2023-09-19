@@ -50,6 +50,13 @@ def gensshkey(email_opt, debug_opt):
     ```"""
     if debug_opt:
         debug(f"email_opt:{email_opt}, debug_opt:{debug_opt}")
+    if os.path.exists(os.path.expanduser("~/.ssh/id_rsa")) or os.path.exists(
+        os.path.expanduser("~/.ssh/id_rsa.pub")
+    ):
+        user_confirm = input("'~/.ssh/id_rsa' already exist, overwrite [y/n]?")
+        if not user_confirm.lower().startswith("y"):
+            info("user deniied, exit...")
+            exit(0)
     os.system(f"ssh-keygen -t rsa -b 4096 -C '{email_opt}'")
     os.system("touch ~/.ssh/authorized_keys")
     os.system("chmod -R 700 ~/.ssh")

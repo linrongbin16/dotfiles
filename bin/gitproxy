@@ -79,7 +79,7 @@ def add_proxy(add_opt, debug_opt):
         parts = add_opt.strip().split("=")
         name = parts[0].strip()
         url = parts[1].strip()
-        parsed_url = urllib.parse.urlparse(url)
+        urllib.parse.urlparse(url)
         append_file(DATABASE, f"{name}={url}\n")
         info(f"add proxy '{name}={url}' - done")
     except:
@@ -131,11 +131,11 @@ def list_git_config_proxies(debug_opt):
             ):
                 proxies.append(f"{title}={current_line.split('=')[-1].strip()}")
     if len(proxies) > 0:
-        info(f"git proxies (~/.gitconfig):")
+        info("git proxies (~/.gitconfig):")
         for i, p in enumerate(proxies):
             info(f"  {i+1}. {p}")
     else:
-        info(f"git proxies (~/.gitconfig): empty")
+        info("git proxies (~/.gitconfig): empty")
 
 
 def list_proxies(debug_opt):
@@ -143,17 +143,17 @@ def list_proxies(debug_opt):
 
     saved_proxies = get_saved_proxies(debug_opt)
     if isinstance(saved_proxies, list) and len(saved_proxies) > 0:
-        info(f"saved proxies (~/.dotfiles/bin/gitproxy.db):")
+        info("saved proxies (~/.dotfiles/bin/gitproxy.db):")
         for i, p in enumerate(saved_proxies):
             info(f"  {i+1}. {p.strip()}")
     else:
-        info(f"saved proxies (~/.dotfiles/bin/gitproxy.db): empty")
+        info("saved proxies (~/.dotfiles/bin/gitproxy.db): empty")
 
 
 def reset_git_proxy():
     os.system("git config --global --unset https.proxy")
     os.system("git config --global --unset http.proxy")
-    info(f"reset git proxy (~/.gitconfig) - done")
+    info("reset git proxy (~/.gitconfig) - done")
 
 
 def find_proxy_by_name(name, debug_opt):
@@ -252,9 +252,9 @@ HELP = """
 @click.option(
     "-l", "--list", "list_opt", is_flag=True, help="list saved and git proxies"
 )
-@click.option("-r", "--remove", "remove_opt", help="remove proxy by name")
-@click.option("--set", "set_opt", help="enable git proxy by name")
-@click.option("--reset", "reset_opt", is_flag=True, help="clear git proxy")
+@click.option("--remove", "remove_opt", help="remove proxy by name")
+@click.option("-s", "--set", "set_opt", help="enable git proxy by name")
+@click.option("-r", "--reset", "reset_opt", is_flag=True, help="clear git proxy")
 @click.option(
     "--sh",
     "sh_opt",

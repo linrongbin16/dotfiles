@@ -8,8 +8,16 @@ ulimit -u 2048
 [ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh
 
 # ls
-alias l="exa -lh"
-alias ll="exa -alh"
+if [ -x "$(command -v eza)" ]; then
+	alias l="eza -lh"
+	alias ll="eza -alh"
+elif [ -x "$(command -v exa)" ]; then
+	alias l="exa -lh"
+	alias ll="exa -alh"
+else
+	alias l="ls -lh"
+	alias ll="ls -alh"
+fi
 
 # lazygit
 alias lg="lazygit"

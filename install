@@ -61,7 +61,7 @@ source "$HOME/.cargo/env"
 install_or_skip "cargo install fd-find" "fd"
 install_or_skip "cargo install ripgrep" "rg"
 install_or_skip "cargo install --locked bat" "bat"
-install_or_skip "cargo install exa" "exa"
+install_or_skip "cargo install eza" "eza"
 
 # go
 # see: https://github.com/kerolloz/go-installer
@@ -101,6 +101,7 @@ install_nerdfont() {
 		unzip -o $font_file
 		message "install $font_file($font_version) nerd font from github - done"
 	fi
+	sudo fc-cache -f -v
 }
 
 if [ "$OS" != "Darwin" ]; then
