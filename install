@@ -109,11 +109,12 @@ if [ "$OS" != "Darwin" ]; then
 	install_nerdfont "Noto.zip"
 fi
 
-# prompt
-if [ ! -d ~/.mzpt ]; then
-	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
-fi
-
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh' >>~/.zshrc
+
+# prompt
+if [ ! -d ~/.mzpt ]; then
+	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
+	echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
+fi

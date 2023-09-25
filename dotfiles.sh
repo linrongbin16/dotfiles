@@ -4,9 +4,6 @@
 ulimit -n 200000
 ulimit -u 2048
 
-# mzpt prompt theme
-[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh
-
 # ls
 if [ -x "$(command -v eza)" ]; then
 	alias l="eza -lh"

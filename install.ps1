@@ -71,10 +71,6 @@ InstallOrSkip -command "cargo install eza" -target "eza"
 InstallOrSkip -command "scoop install go" -target "go"
 InstallOrSkip -command "go install github.com/jesseduffield/lazygit@latest" -target "lazygit"
 
-# prompt
-if (!(Test-Path -Path $env:USERPROFILE\.mzpt)) {
-    git clone https://github.com/linrongbin16/mzpt.git $env:USERPROFILE\.mzpt
-}
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder)) {
     New-Item -ItemType Directory $ProfileFolder
@@ -82,3 +78,9 @@ if (!(Test-Path -Path $ProfileFolder)) {
 Write-Output '' >>$PROFILE
 Write-Output '# dotfiles' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
+
+# prompt
+if (!(Test-Path -Path $env:USERPROFILE\.mzpt)) {
+    git clone https://github.com/linrongbin16/mzpt.git $env:USERPROFILE\.mzpt
+    Write-Output '. $env:USERPROFILE\.mzpt\mzpt.ps1' >>$PROFILE
+}
