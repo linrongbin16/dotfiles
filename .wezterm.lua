@@ -37,8 +37,8 @@ local function get_current_working_dir(tab)
 	if current_dir:find("^" .. home_dir) ~= nil then
 		return "~" .. current_dir:sub(#home_dir + 1, #current_dir)
 	else
-		return current_dir
-		-- return current_dir:sub(#"file:///", #current_dir)
+		-- return current_dir
+		return current_dir:sub(#"file:////", #current_dir)
 	end
 end
 
