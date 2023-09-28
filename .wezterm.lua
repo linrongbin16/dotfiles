@@ -11,12 +11,12 @@ local NotoSansMonoFont = "NotoSansMono NFM"
 local IosevakaFont = "Iosevka Nerd Font Mono"
 
 local CatppuccinMochaTheme = "Catppuccin Mocha"
-local CatppuccinMochaTheme = "Catppuccin Mocha"
+local GruvboxDarkTheme = "Gruvbox Dark (Gogh)"
 
 config.font = wezterm.font(CodeNewRomanFont)
 -- config.font = wezterm.font("Monaco Nerd Font Mono")
 config.font_size = 14.0
-config.color_scheme = CatppuccinMochaTheme
+config.color_scheme = GruvboxDarkTheme
 config.use_fancy_tab_bar = true
 config.window_frame = {
 	font = wezterm.font(CodeNewRomanFont),
