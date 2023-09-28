@@ -118,3 +118,8 @@ if [ ! -d ~/.mzpt ]; then
 	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
 	echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
 fi
+
+# wezterm
+if [ ! -f ~/.wezterm ]; then
+	ln -s $HOME/.dotfiles/.wezterm $HOME/.wezterm
+fi
