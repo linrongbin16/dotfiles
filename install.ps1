@@ -7,8 +7,9 @@ function Message([string]$content)
     Write-Host "[dotfiles] - $content"
 }
 
-function SkipMessage([string]$content) {
-	Message "'$content' already exist, skip..."
+function SkipMessage([string]$content)
+{
+    Message "'$content' already exist, skip..."
 }
 
 function InstallOrSkip([string]$command, [string]$target)
@@ -16,8 +17,7 @@ function InstallOrSkip([string]$command, [string]$target)
     if (Get-Command -Name $target -ErrorAction SilentlyContinue)
     {
         SkipMessage $target
-    }
-    else
+    } else
     {
         Message "install '${target}' with command: '${command}'"
         Invoke-Expression $command
@@ -72,7 +72,8 @@ InstallOrSkip -command "scoop install go" -target "go"
 InstallOrSkip -command "go install github.com/jesseduffield/lazygit@latest" -target "lazygit"
 
 $ProfileFolder = Split-Path $PROFILE
-if (!(Test-Path -Path $ProfileFolder)) {
+if (!(Test-Path -Path $ProfileFolder))
+{
     New-Item -ItemType Directory $ProfileFolder
 }
 Write-Output '' >>$PROFILE
@@ -80,7 +81,14 @@ Write-Output '# dotfiles' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
 
 # prompt
-if (!(Test-Path -Path $env:USERPROFILE\.mzpt)) {
+if (!(Test-Path -Path $env:USERPROFILE\.mzpt))
+{
     git clone https://github.com/linrongbin16/mzpt.git $env:USERPROFILE\.mzpt
     Write-Output '. $env:USERPROFILE\.mzpt\mzpt.ps1' >>$PROFILE
+}
+
+# wezterm
+if (!(Test-Path -Path $env:USERPROFILE\.wezterm.lua))
+{
+    cp $env:USERPROFILE\.dotfiles\.wezterm.lua $env:USERPROFILE\.wezterm.lua
 }

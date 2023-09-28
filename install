@@ -121,6 +121,6 @@ if [ ! -d ~/.mzpt ]; then
 fi
 
 # wezterm
-if [ ! -f ~/.wezterm ]; then
+if [ ! -f ~/.wezterm.lua ]; then
 	ln -s $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
 fi

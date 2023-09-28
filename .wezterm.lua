@@ -51,5 +51,10 @@ end)
 
 config.default_cwd = wezterm.home_dir
 
+local is_windows = package.config:sub(1, 1) == "\\"
+if is_windows then
+	config.default_prog = { "pwsh.exe" }
+end
+
 -- and finally, return the configuration to wezterm
 return config
