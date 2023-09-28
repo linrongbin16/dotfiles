@@ -8,11 +8,15 @@ local FiraCodeFont = "FiraCode Nerd Font"
 local CodeNewRomanFont = "CodeNewRoman Nerd Font"
 local MonacoFont = "Monaco"
 local NotoSansMonoFont = "NotoSansMono NFM"
+local IosevakaFont = "Iosevka Nerd Font Mono"
 
-config.font = wezterm.font(NotoSansMonoFont)
+local CatppuccinMochaTheme = "Catppuccin Mocha"
+local CatppuccinMochaTheme = "Catppuccin Mocha"
+
+config.font = wezterm.font(CodeNewRomanFont)
 -- config.font = wezterm.font("Monaco Nerd Font Mono")
 config.font_size = 14.0
-config.color_scheme = "Catppuccin Mocha"
+config.color_scheme = CatppuccinMochaTheme
 config.use_fancy_tab_bar = true
 config.window_frame = {
 	font = wezterm.font(CodeNewRomanFont),
