@@ -36,3 +36,4 @@ install_or_skip "brew install lazygit" "lazygit"
 brew tap homebrew/cask-fonts
 brew install --cask font-hack-nerd-font
 brew install --cask font-noto-nerd-font
+brew install --cask font-code-new-roman-nerd-font

@@ -107,6 +107,7 @@ install_nerdfont() {
 if [ "$OS" != "Darwin" ]; then
 	install_nerdfont "Hack.zip"
 	install_nerdfont "Noto.zip"
+	install_nerdfont "CodeNewRoman.zip"
 fi
 
 echo '' >>~/.zshrc
