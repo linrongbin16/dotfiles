@@ -11,9 +11,12 @@ function run_command(cmd, raw)
 	return s
 end
 
-local os_name = run_command("uname")
-local is_linux = os_name:gmatch("^Linux") ~= nil
 local is_windows = package.config:sub(1, 1) == "\\"
+local is_linux = false
+if not is_windows then
+	local os_name = run_command("uname")
+	is_linux = os_name:gmatch("^Linux") ~= nil
+end
 
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
