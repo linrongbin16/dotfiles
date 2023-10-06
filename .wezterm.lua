@@ -1,13 +1,10 @@
-function run_command(cmd, raw)
+function run_command(cmd)
 	local f = assert(io.popen(cmd, "r"))
 	local s = assert(f:read("*a"))
 	f:close()
-	if raw then
-		return s
-	end
 	s = string.gsub(s, "^%s+", "")
 	s = string.gsub(s, "%s+$", "")
-	s = string.gsub(s, "[\n\r]+", " ")
+	s = string.gsub(s, "[\n\r]+", "")
 	return s
 end
 
@@ -15,7 +12,7 @@ local is_windows = package.config:sub(1, 1) == "\\"
 local is_linux = false
 if not is_windows then
 	local os_name = run_command("uname")
-	is_linux = os_name:gmatch("^Linux") ~= nil
+	is_linux = os_name ~= "Darwin"
 end
 
 -- Pull in the wezterm API
@@ -26,7 +23,7 @@ local config = {}
 
 local FiraCodeFont = "FiraCode Nerd Font"
 local CodeNewRomanFont = "CodeNewRoman Nerd Font"
-local MonacoFont = "Monaco"
+local MonacoFont = "Monaco Nerd Font Mono"
 local NotoSansMonoFont = "NotoSansMono NFM"
 local IosevakaFont = "Iosevka Nerd Font Mono"
 
