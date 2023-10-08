@@ -32,7 +32,10 @@ local GruvboxDarkTheme = "Gruvbox Dark (Gogh)"
 
 config.font = wezterm.font(CodeNewRomanFont)
 -- config.font = wezterm.font("Monaco Nerd Font Mono")
-config.font_size = 14.0
+config.font_size = 15.0
+if is_windows then
+	config.font_size = 14.0
+end
 if is_linux then
 	config.font_size = 11.0
 end
