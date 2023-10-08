@@ -45,6 +45,7 @@ config.window_frame = {
 	font = wezterm.font(CodeNewRomanFont),
 	font_size = 13,
 }
+config.enable_scroll_bar = true
 
 local function get_process(tab)
 	local process_name = string.gsub(tab.active_pane.foreground_process_name, "(.*[/\\])(.*)", "%2")
