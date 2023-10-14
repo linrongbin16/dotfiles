@@ -21,7 +21,7 @@ local wezterm = require("wezterm")
 -- This table will hold the configuration.
 local config = {}
 
-local FiraCodeFont = "FiraCode Nerd Font"
+local FiraCodeFont = "FiraCode Nerd Font Mono"
 local CodeNewRomanFont = "CodeNewRoman Nerd Font"
 local MonacoFont = "Monaco Nerd Font Mono"
 local NotoSansMonoFont = "NotoSansMono NFM"
