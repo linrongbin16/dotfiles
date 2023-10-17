@@ -27,6 +27,7 @@ function InstallOrSkip([string]$command, [string]$target)
 Message "install dependencies for windows"
 
 # deps
+scoop bucket add extras
 scoop install mingw
 scoop install uutils-coreutils
 InstallOrSkip -command "scoop install which" -target "which"
@@ -50,6 +51,18 @@ InstallOrSkip -command "scoop install python" -target "python3"
 
 InstallOrSkip -command "scoop install vim" -target "vim"
 InstallOrSkip -command "scoop install neovim" -target "nvim"
+
+# nerd fonts
+scoop install nerd-fonts/Hack-NF
+scoop install nerd-fonts/Hack-NF-Mono
+scoop install nerd-fonts/Noto-NF
+scoop install nerd-fonts/Noto-NF-Mono
+scoop install nerd-fonts/CodeNewRoman-NF
+scoop install nerd-fonts/CodeNewRoman-NF-Mono
+scoop install nerd-fonts/FiraCode-NF
+scoop install nerd-fonts/FiraCode-NF-Mono
+scoop install nerd-fonts/FantasqueSansMono-NF
+scoop install nerd-fonts/FantasqueSansMono-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"

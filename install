@@ -109,6 +109,7 @@ if [ "$OS" != "Darwin" ]; then
 	install_nerdfont "Noto.zip"
 	install_nerdfont "CodeNewRoman.zip"
 	install_nerdfont "FiraCode.zip"
+	install_nerdfont "FantasqueSansMono.zip"
 fi
 
 echo '' >>~/.zshrc
@@ -123,8 +124,8 @@ fi
 
 # powerlevel10k
 if [ ! -d ~/.powerlevel10k ]; then
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
-    echo 'source ~/.powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
+	echo 'source ~/.powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
 fi
 
 # wezterm
