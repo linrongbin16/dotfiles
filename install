@@ -130,5 +130,5 @@ fi
 
 # wezterm
 if [ ! -f ~/.wezterm.lua ]; then
-	ln -s $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
+	cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
 fi

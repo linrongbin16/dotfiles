@@ -27,19 +27,20 @@ local MonacoFont = "Monaco Nerd Font Mono"
 local NotoSansMonoFont = "NotoSansMono NFM"
 local IosevakaFont = "Iosevka Nerd Font Mono"
 local HackFont = "Hack Nerd Font Mono"
+local FantasqueSansMonoFont = "FantasqueSansMono NFM"
 
 local CatppuccinMochaTheme = "Catppuccin Mocha"
 local GruvboxDarkTheme = "Gruvbox Dark (Gogh)"
 
-config.font = wezterm.font(FiraCodeFont)
--- config.font = wezterm.font("Monaco Nerd Font Mono")
-config.font_size = 14.0
+config.font = wezterm.font(FantasqueSansMonoFont)
+config.font_size = 16.0
 if is_windows then
 	config.font_size = 14.0
 end
 if is_linux then
 	config.font_size = 11.0
 end
+
 -- config.color_scheme = GruvboxDarkTheme
 config.use_fancy_tab_bar = true
 config.window_frame = {
