@@ -40,7 +40,7 @@ end
 if is_linux then
 	config.font_size = 11.0
 end
-config.color_scheme = GruvboxDarkTheme
+-- config.color_scheme = GruvboxDarkTheme
 config.use_fancy_tab_bar = true
 config.window_frame = {
 	font = wezterm.font(CodeNewRomanFont),
