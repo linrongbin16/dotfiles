@@ -84,32 +84,38 @@ nerdfont_latest_release_tag() {
 }
 
 install_nerdfont() {
-	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-	local org="ryanoasis"
-	local repo="nerd-fonts"
-	local font_file=$1
-	local font_version=$(nerdfont_latest_release_tag $org $repo)
-	local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
-	message "install $font_file($font_version) nerd font from github"
-	if [ -f $font_file ]; then
-		rm -rf $font_file
-	fi
-	curl -L $font_url -o $font_file
-	if [ $? -ne 0 ]; then
-		message "failed to download $font_file, skip..."
+	if [ "$OS" == "Darwin" ]; then
+		local font_name=$2
+		message "install $font_name nerd fonts with brew"
+		brew tap homebrew/cask-fonts
+		brew install --cask $font_name
 	else
-		unzip -o $font_file
-		message "install $font_file($font_version) nerd font from github - done"
+		mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+		local org="ryanoasis"
+		local repo="nerd-fonts"
+		local font_file=$1
+		local font_version=$(nerdfont_latest_release_tag $org $repo)
+		local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
+		message "install $font_file($font_version) nerd fonts from github"
+		if [ -f $font_file ]; then
+			rm -rf $font_file
+		fi
+		curl -L $font_url -o $font_file
+		if [ $? -ne 0 ]; then
+			message "failed to download $font_file, skip..."
+		else
+			unzip -o $font_file
+			message "install $font_file($font_version) nerd font from github - done"
+		fi
+		sudo fc-cache -f -v
 	fi
-	sudo fc-cache -f -v
 }
 
 if [ "$OS" != "Darwin" ]; then
-	install_nerdfont "Hack.zip"
-	install_nerdfont "Noto.zip"
-	install_nerdfont "CodeNewRoman.zip"
-	install_nerdfont "FiraCode.zip"
-	install_nerdfont "FantasqueSansMono.zip"
+	install_nerdfont "Hack.zip" "font-hack-nerd-font"
+	install_nerdfont "Noto.zip" "font-noto-nerd-font"
+	install_nerdfont "CodeNewRoman.zip" "font-code-new-roman-nerd-font"
+	install_nerdfont "FiraCode.zip" "font-fira-code-nerd-font"
 fi
 
 echo '' >>~/.zshrc
