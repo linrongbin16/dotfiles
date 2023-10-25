@@ -43,6 +43,7 @@ end
 
 -- config.color_scheme = GruvboxDarkTheme
 config.use_fancy_tab_bar = true
+config.tab_max_width = 32
 config.window_frame = {
 	font = wezterm.font(CodeNewRomanFont),
 	font_size = 13,
