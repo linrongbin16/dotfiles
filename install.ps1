@@ -63,6 +63,8 @@ scoop install nerd-fonts/FiraCode-NF
 scoop install nerd-fonts/FiraCode-NF-Mono
 scoop install nerd-fonts/FantasqueSansMono-NF
 scoop install nerd-fonts/FantasqueSansMono-NF-Mono
+scoop install nerd-fonts/SourceCodePro-NF
+scoop install nerd-fonts/SourceCodePro-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
