@@ -116,6 +116,7 @@ if [ "$OS" != "Darwin" ]; then
 	install_nerdfont "Noto.zip" "font-noto-nerd-font"
 	install_nerdfont "CodeNewRoman.zip" "font-code-new-roman-nerd-font"
 	install_nerdfont "FiraCode.zip" "font-fira-code-nerd-font"
+	install_nerdfont "SourceCodePro.zip" "font-sauce-code-pro-nerd-font"
 fi
 
 echo '' >>~/.zshrc

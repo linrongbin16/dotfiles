@@ -51,6 +51,7 @@ InstallOrSkip -command "scoop install python" -target "python3"
 
 InstallOrSkip -command "scoop install vim" -target "vim"
 InstallOrSkip -command "scoop install neovim" -target "nvim"
+InstallOrSkip -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
 
 # nerd fonts
 scoop install nerd-fonts/Hack-NF
@@ -63,6 +64,8 @@ scoop install nerd-fonts/FiraCode-NF
 scoop install nerd-fonts/FiraCode-NF-Mono
 scoop install nerd-fonts/FantasqueSansMono-NF
 scoop install nerd-fonts/FantasqueSansMono-NF-Mono
+scoop install nerd-fonts/SourceCodePro-NF
+scoop install nerd-fonts/SourceCodePro-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
