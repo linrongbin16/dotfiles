@@ -162,7 +162,7 @@ def reset_gitconfig():
 
 def set_proxy(name):
     debug(f"set proxy: {name} ({type(name)})")
-    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
     if not p:
         err(f"proxy '{name}' not found, exit...")
         return
@@ -174,7 +174,7 @@ def set_proxy(name):
 
 
 def print_sh(name):
-    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
     if not p:
         err(f"proxy '{name}' not found, exit...")
         return
@@ -184,7 +184,7 @@ def print_sh(name):
 
 
 def print_pwsh(name):
-    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
     if not p:
         err(f"proxy '{name}' not found, exit...")
         return
@@ -192,7 +192,7 @@ def print_pwsh(name):
 
 
 def print_cmd(name):
-    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
     if not p:
         print(f"proxy '{name}' not found, exit...")
         return
