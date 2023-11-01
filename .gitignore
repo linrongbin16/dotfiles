@@ -2,3 +2,4 @@
 go-installer
 go*tar.gz
 gitproxy.db
+gitproxydb.json

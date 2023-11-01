@@ -63,17 +63,18 @@ install_or_skip "cargo install ripgrep" "rg"
 install_or_skip "cargo install --locked bat" "bat"
 install_or_skip "cargo install eza" "eza"
 
-# go
-# see: https://github.com/kerolloz/go-installer
-if [ -d go-installer ]; then
-	sudo rm -rf go-installer
+# golang
+# see: https://github.com/canha/golang-tools-install-script
+if [ -d golang-tools-install-script ]; then
+	rm -rf golang-tools-install-script
 fi
-install_or_skip "git clone --depth=1 https://github.com/kerolloz/go-installer.git && ./go-installer/go.sh" "go"
+install_or_skip "git clone --depth=1 https://github.com/canha/golang-tools-install-script && bash ./golang-tools-install-script/goinstall.sh" "go"
 export PATH=$PATH:$HOME/.go/bin:$HOME/go/bin
 install_or_skip "go install github.com/jesseduffield/lazygit@latest" "lazygit"
 
 # python3
 python3 -m pip install click --user
+python3 -m pip install tinydb --user
 
 # patched font
 nerdfont_latest_release_tag() {

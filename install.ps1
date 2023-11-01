@@ -53,6 +53,10 @@ InstallOrSkip -command "scoop install vim" -target "vim"
 InstallOrSkip -command "scoop install neovim" -target "nvim"
 InstallOrSkip -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
 
+# python3
+python3 -m pip install click --user
+python3 -m pip install tinydb --user
+
 # nerd fonts
 scoop install nerd-fonts/Hack-NF
 scoop install nerd-fonts/Hack-NF-Mono

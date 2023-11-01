@@ -7,14 +7,19 @@ import sys
 import urllib.parse
 
 import click
+import tinydb
 
 HOME = os.path.expanduser("~")
-DATABASE = f"{HOME}/.dotfiles/bin/gitproxy.db"
 GIT_CONFIG = f"{HOME}/.gitconfig"
+DATABASE_JSON = f"{HOME}/.dotfiles/bin/gitproxydb.json"
+DEBUG = False
 
+RELATIVE_GIT_CONFIG=f"~/{os.path.relpath(GIT_CONFIG, HOME)}"
+RELATIVE_DATABASE_JSON=f"~/{os.path.relpath(DATABASE_JSON, HOME)}"
 
 def debug(msg):
-    print(f"[gitproxy] (debug) {msg}")
+    if DEBUG:
+        print(f"[gitproxy] (debug) {msg}")
 
 
 def info(msg):
@@ -28,50 +33,66 @@ def err(msg):
 def unknown_option():
     err(f"unknown option, please try `{sys.argv[0]} --help` for more information.")
 
+class Item:
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
 
-def read_file_by_lines(filename):
-    try:
-        fp = open(filename, "r")
-        lines = fp.readlines()
-        fp.close()
-        return lines
-    except:
+    @staticmethod
+    def from_dict(d):
+        return Item(d['name'], d['url'])
+
+    def to_dict(self):
+        return {'name':self.name, 'url':self.url}
+
+    def __str__(self):
+        return f"{self.name}={self.url}"
+
+class DB:
+    handle = tinydb.TinyDB(DATABASE_JSON)
+
+    @staticmethod
+    def count():
+        results = DB.handle.all()
+        return len(results)
+
+    @staticmethod
+    def all():
+        results = DB.handle.all()
+        debug(f"{DB}:{results}")
+        return [Item.from_dict(i) for i in results]
+
+    @staticmethod
+    def first():
+        results = DB.handle.all()
+        debug(f"{DB}:{results}")
+        return Item.from_dict(results[0]) if len(results) > 0 else None
+
+    @staticmethod
+    def find(name):
+        proxies = DB.all()
+        for p in proxies:
+            if p.name == name:
+                return p
         return None
 
+    @staticmethod
+    def remove(name):
+        debug(f"remove:{name}")
+        Q = tinydb.Query()
+        DB.handle.remove(Q.name == name)
 
-def write_file(filename, content):
-    fp = open(filename, "w")
-    if isinstance(content, list):
-        fp.writelines(content)
-    else:
-        fp.write(content)
-    fp.close()
+    @staticmethod
+    def upsert(name, url):
+        Q = tinydb.Query()
+        old = DB.handle.search(Q.name == name)
+        if len(old) > 0:
+            DB.handle.update({'name':name, 'url':url}, Q.name==name)
+        else:
+            DB.handle.insert({'name':name, 'url':url})
 
-
-def append_file(filename, content):
-    fp = open(filename, "a+")
-    if isinstance(content, list):
-        fp.writelines(content)
-    else:
-        fp.write(content)
-    fp.close()
-
-
-def get_saved_proxies(debug_opt):
-    saved_proxies = read_file_by_lines(DATABASE)
-    if debug_opt:
-        debug(f"{DATABASE}:{saved_proxies}")
-    saved_proxies = (
-        [p.strip() for p in saved_proxies if isinstance(p, str) and len(p.strip()) > 0]
-        if saved_proxies
-        else []
-    )
-    return saved_proxies
-
-
-def add_proxy(add_opt, debug_opt):
-    if debug_opt:
-        debug(f"add proxy({type(add_opt)}):{add_opt}")
+def add(add_opt):
+    debug(f"add proxy({type(add_opt)}):{add_opt}")
     if not isinstance(add_opt, str) or len(add_opt.strip()) <= 0:
         err(f"error input '{add_opt}', must be 'NAME=PROTOCOL://domain:port' format.")
         return
@@ -80,43 +101,26 @@ def add_proxy(add_opt, debug_opt):
         name = parts[0].strip()
         url = parts[1].strip()
         urllib.parse.urlparse(url)
-        append_file(DATABASE, f"{name}={url}\n")
+        DB.upsert(name, url)
         info(f"add proxy '{name}={url}' - done")
     except:
         err(f"error input '{add_opt}', must be 'NAME=PROTOCOL://domain:port' format.")
 
 
-def remove_proxy(name, debug_opt):
-    if debug_opt:
-        debug(f"remove proxy, name:{name}")
-    saved_proxies = get_saved_proxies(debug_opt)
-    saved = []
-    found = False
-    for p in saved_proxies:
-        if p.strip().startswith(name):
-            info(f"remove proxy '{p.strip()}' - done")
-            found = True
-            continue
-        saved.append(p.strip() + "\n")
-    write_file(DATABASE, saved)
-    if not found:
-        err(f"proxy '{name}' not found.")
-
-
-def list_git_config_proxies(debug_opt):
-    gitconfigs = read_file_by_lines(GIT_CONFIG)
-    if debug_opt:
-        print(f"{GIT_CONFIG}:{gitconfigs}")
+def list_gitconfig():
+    f = open(GIT_CONFIG)
+    lines = f.readlines()
+    debug(f"{GIT_CONFIG}:{lines}")
+    f.close()
     current_line = None
     title = None
     proxies = []
-    if gitconfigs:
-        for i, line in enumerate(gitconfigs):
+    if lines:
+        for i, line in enumerate(lines):
             current_line = line.strip()
-            if debug_opt:
-                debug(
-                    f"line[{i}]:{current_line}, title:{title}, start with 'proxy':{current_line.startswith('proxy')}"
-                )
+            debug(
+                f"line[{i}]:{current_line}, title:{title}, start with 'proxy':{current_line.startswith('proxy')}"
+            )
             if len(current_line) <= 0:
                 continue
             if current_line.startswith("[") and current_line.endswith("]"):
@@ -131,115 +135,69 @@ def list_git_config_proxies(debug_opt):
             ):
                 proxies.append(f"{title}={current_line.split('=')[-1].strip()}")
     if len(proxies) > 0:
-        info("git proxies (~/.gitconfig):")
+        info(f"git proxies ({RELATIVE_GIT_CONFIG}):")
         for i, p in enumerate(proxies):
             info(f"  {i+1}. {p}")
     else:
-        info("git proxies (~/.gitconfig): empty")
+        info(f"git proxies ({RELATIVE_GIT_CONFIG}): empty")
 
 
-def list_proxies(debug_opt):
-    list_git_config_proxies(debug_opt)
+def list_all():
+    list_gitconfig()
 
-    saved_proxies = get_saved_proxies(debug_opt)
-    if isinstance(saved_proxies, list) and len(saved_proxies) > 0:
-        info("saved proxies (~/.dotfiles/bin/gitproxy.db):")
-        for i, p in enumerate(saved_proxies):
-            info(f"  {i+1}. {p.strip()}")
+    proxies = DB.all()
+    if isinstance(proxies, list) and len(proxies) > 0:
+        info(f"stored proxies ({RELATIVE_DATABASE_JSON}):")
+        for i, p in enumerate(proxies):
+            info(f"  {i+1}. {p}")
     else:
-        info("saved proxies (~/.dotfiles/bin/gitproxy.db): empty")
+        info(f"stored proxies ({RELATIVE_DATABASE_JSON}): empty")
 
 
-def reset_git_proxy():
+def reset_gitconfig():
     os.system("git config --global --unset https.proxy")
     os.system("git config --global --unset http.proxy")
-    info("reset git proxy (~/.gitconfig) - done")
+    info(f"reset git proxy ({RELATIVE_GIT_CONFIG}) - done")
 
 
-def find_proxy_by_name(name, debug_opt):
-    proxies = get_saved_proxies(debug_opt)
-    for proxy in proxies:
-        parts = [part.strip() for part in proxy.split("=")]
-        if parts[0] == name.strip():
-            return parts[1]
-    return None
-
-
-def set_git_proxy(name, debug):
-    proxy = find_proxy_by_name(name, debug)
-    if not proxy:
+def set_proxy(name):
+    debug(f"set proxy: {name} ({type(name)})")
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    if not p:
         err(f"proxy '{name}' not found, exit...")
         return
     os.system("git config --global --unset https.proxy")
     os.system("git config --global --unset http.proxy")
-    http_cmd = f"git config --global http.proxy {proxy}"
-    https_cmd = f"git config --global https.proxy {proxy}"
-    os.system(http_cmd)
-    os.system(https_cmd)
-    info(f"set git proxy '{proxy}' (~/.gitconfig) - done")
+    os.system(f"git config --global http.proxy {p}")
+    os.system(f"git config --global https.proxy {p}")
+    info(f"set git proxy '{p}' ({RELATIVE_GIT_CONFIG}) - done")
 
 
-def print_for_shell(name, debug_opt):
-    proxy = find_proxy_by_name(name, debug_opt)
-    if not proxy:
+def print_sh(name):
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    if not p:
         err(f"proxy '{name}' not found, exit...")
         return
     info(
-        f"export http_proxy={proxy};export https_proxy={proxy};export ALL_PROXY={proxy}"
+        f"export http_proxy={p};export https_proxy={p};export ALL_PROXY={p}"
     )
 
 
-def print_for_powershell(name, debug_opt):
-    proxy = find_proxy_by_name(name, debug_opt)
-    if not proxy:
+def print_pwsh(name):
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    if not p:
         err(f"proxy '{name}' not found, exit...")
         return
-    info(f'$env:HTTP_PROXY = $env:HTTPS_PROXY = "{proxy}"')
+    info(f'$env:HTTP_PROXY = $env:HTTPS_PROXY = "{p}"')
 
 
-def print_for_command_prompt(name, debug_opt):
-    proxy = find_proxy_by_name(name, debug_opt)
-    if not proxy:
+def print_cmd(name):
+    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name)
+    if not p:
         print(f"proxy '{name}' not found, exit...")
         return
-    info(f'set HTTP_PROXY="{proxy}" && set HTTPS_PROXY="{proxy}"')
+    info(f'set HTTP_PROXY="{p}" && set HTTPS_PROXY="{p}"')
 
-
-HELP = """
-    Git proxy management
-
-    \b
-    ```
-    # add proxy
-    $ gitproxy -a v2raya=http://127.0.0.1:20171
-    [gitproxy] add proxy 'v2raya=http://127.0.0.1:20171' - done
-
-    \b
-    # list saved and git proxies
-    $ gitproxy -l
-    [gitproxy] stored proxies:
-    [gitproxy]   1. v2raya=http://127.0.0.1:20171
-    [gitproxy] current git proxy (~/.gitconfig):
-    [gitproxy]   1. http=http://127.0.0.1:20171
-    [gitproxy]   2. https=http://127.0.0.1:20171
-
-    \b
-    # set git proxy in ~/.gitconfig
-    $ gitproxy --set v2raya
-    [gitproxy] set git proxy 'test=socks5://127.0.0.1:7890' (~/.gitconfig) - done
-
-    \b
-    # reset/clear git proxy in ~/.gitconfig
-    $ gitproxy --reset
-    [gitproxy] reset git proxy (~/.gitconfig) - done
-
-    \b
-    # remove proxy
-    $ gitproxy -r v2raya
-    [gitproxy] remove proxy 'v2raya=http://127.0.0.1:20171' - done
-
-    ```
-"""
 
 
 @click.command()
@@ -253,21 +211,24 @@ HELP = """
     "-l", "--list", "list_opt", is_flag=True, help="list saved and git proxies"
 )
 @click.option("--remove", "remove_opt", help="remove proxy by name")
-@click.option("-s", "--set", "set_opt", help="enable git proxy by name")
+@click.option("-s", "--set", "set_opt", is_flag=True, help="enable git proxy by name")
 @click.option("-r", "--reset", "reset_opt", is_flag=True, help="clear git proxy")
 @click.option(
     "--sh",
     "sh_opt",
+    is_flag=True, 
     help="print 'http(s)_proxy' environment variable for linux shell",
 )
 @click.option(
     "--pwsh",
     "pwsh_opt",
+    is_flag=True, 
     help="print '$env:HTTP(S)_PROXY' environment variable for windows powershell",
 )
 @click.option(
     "--cmd",
     "cmd_opt",
+    is_flag=True, 
     help="print '%HTTP(S)_PROXY%' environment variable for windows command line prompt",
 )
 @click.option("--debug", "debug_opt", is_flag=True, help="debug")
@@ -286,57 +247,34 @@ def vproxy(
 ):
     """
     Git proxy management
+    """
 
-    \b
-    ```
-    # add proxy
-    $ gitproxy -a v2raya=http://127.0.0.1:20171
-    [gitproxy] add proxy 'v2raya=http://127.0.0.1:20171' - done
-
-    # list saved and git proxies
-    $ gitproxy -l
-    [gitproxy] stored proxies:
-    [gitproxy]   1. v2raya=http://127.0.0.1:20171
-    [gitproxy] current git proxy (~/.gitconfig):
-    [gitproxy]   1. http=http://127.0.0.1:20171
-    [gitproxy]   2. https=http://127.0.0.1:20171
-
-    # set git proxy in ~/.gitconfig
-    $ gitproxy --set v2raya
-    [gitproxy] set git proxy 'test=socks5://127.0.0.1:7890' (~/.gitconfig) - done
-
-    # reset/clear git proxy in ~/.gitconfig
-    $ gitproxy --reset
-    [gitproxy] reset git proxy (~/.gitconfig) - done
-
-    # remove proxy
-    $ gitproxy -r v2raya
-    [gitproxy] remove proxy 'v2raya=http://127.0.0.1:20171' - done
-
-    ```"""
-
+    global DEBUG
     if debug_opt:
+        DEBUG = True
+
+    if DEBUG:
         print(
             f"add_opt:{add_opt}, list_opt:{list_opt}, remove:{remove_opt}, set_opt:{set_opt}, reset_opt:{reset_opt}, sh_opt:{sh_opt}, pwsh_opt:{pwsh_opt}, cmd_opt:{cmd_opt}, args:{args}, type:{type(args)}"
         )
     if add_opt:
-        add_proxy(add_opt, debug_opt)
+        add(add_opt)
     elif list_opt:
-        list_proxies(debug_opt)
+        list_all()
     elif remove_opt:
-        remove_proxy(remove_opt, debug_opt)
+        DB.remove(remove_opt)
     elif set_opt:
-        set_git_proxy(set_opt, debug_opt)
+        set_proxy(args)
     elif reset_opt:
-        reset_git_proxy()
+        reset_gitconfig()
     elif sh_opt:
-        print_for_shell(sh_opt, debug_opt)
+        print_sh(args)
     elif pwsh_opt:
-        print_for_powershell(pwsh_opt, debug_opt)
+        print_pwsh(args)
     elif cmd_opt:
-        print_for_command_prompt(cmd_opt, debug_opt)
+        print_cmd(args)
     else:
-        unknown_option()
+        list_all()
 
 
 if __name__ == "__main__":
