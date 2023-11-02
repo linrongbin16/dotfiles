@@ -5,7 +5,10 @@ ulimit -n 200000
 ulimit -u 2048
 
 # ls
-if [ -x "$(command -v eza)" ]; then
+if [ -x "$(command -v lsd)" ]; then
+	alias l="lsd -lh --header"
+	alias ll="lsd -alh --header"
+elif [ -x "$(command -v eza)" ]; then
 	alias l="eza -lh"
 	alias ll="eza -alh"
 elif [ -x "$(command -v exa)" ]; then
