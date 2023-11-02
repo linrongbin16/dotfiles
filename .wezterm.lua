@@ -1,3 +1,10 @@
+--- ========== Wezterm API ==========
+local wezterm = require("wezterm")
+local wezterm_action = wezterm.action
+
+-- This table will hold the configuration.
+local config = {}
+
 function run_command(cmd)
 	local f = assert(io.popen(cmd, "r"))
 	local s = assert(f:read("*a"))
@@ -15,12 +22,15 @@ if not is_windows then
 	is_linux = os_name ~= "Darwin"
 end
 
--- Pull in the wezterm API
-local wezterm = require("wezterm")
+--- ========== Keys ==========
+config.keys = {
+	{ key = "LeftArrow|LeftShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(-1) },
+	{ key = "LeftArrow|RightShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(-1) },
+	{ key = "RightArrow|LeftShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(1) },
+	{ key = "RightArrow|RightShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(1) },
+}
 
--- This table will hold the configuration.
-local config = {}
-
+--- ========== Fonts & Themes ==========
 local FiraCodeFont = "FiraCode Nerd Font Mono"
 local CodeNewRomanFont = "CodeNewRoman Nerd Font"
 local MonacoFont = "Monaco Nerd Font Mono"
@@ -28,22 +38,24 @@ local NotoSansMonoFont = "NotoSansMono NFM"
 local IosevakaFont = "Iosevka Nerd Font Mono"
 local HackFont = "Hack Nerd Font Mono"
 local FantasqueSansMonoFont = "FantasqueSansMono NFM"
+local SauceCodeProFont = "SauceCodePro Nerd Font Mono"
 
 local CatppuccinMochaTheme = "Catppuccin Mocha"
 local GruvboxDarkTheme = "Gruvbox Dark (Gogh)"
 
-config.font = wezterm.font(FantasqueSansMonoFont)
-config.font_size = 16.0
+config.font = wezterm.font(SauceCodeProFont)
+config.font_size = 15.0
 if is_windows then
 	config.font_size = 14.0
 end
 if is_linux then
 	config.font_size = 11.0
 end
-
 -- config.color_scheme = GruvboxDarkTheme
+
+--- ========== Tabs ==========
 config.use_fancy_tab_bar = true
-config.tab_max_width = 32
+config.tab_max_width = 256
 config.window_frame = {
 	font = wezterm.font(CodeNewRomanFont),
 	font_size = 13,
@@ -82,11 +94,13 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 	}
 end)
 
+--- ========== CWD ==========
 config.default_cwd = wezterm.home_dir
 
+--- ========== Shell ==========
 if is_windows then
 	config.default_prog = { "pwsh.exe" }
 end
 
--- and finally, return the configuration to wezterm
+--- ========== Wezterm API ==========
 return config
