@@ -5,7 +5,7 @@ local wezterm_action = wezterm.action
 -- This table will hold the configuration.
 local config = {}
 
-function run_command(cmd)
+local function _run_command(cmd)
 	local f = assert(io.popen(cmd, "r"))
 	local s = assert(f:read("*a"))
 	f:close()
@@ -15,20 +15,36 @@ function run_command(cmd)
 	return s
 end
 
-local is_windows = package.config:sub(1, 1) == "\\"
-local is_linux = false
-if not is_windows then
-	local os_name = run_command("uname")
-	is_linux = os_name ~= "Darwin"
+local function _home_dir()
+	return string.format("file://%s", os.getenv("HOME"))
+end
+
+local function _current_dir(current_uri)
+	local homedir = _home_dir()
+	if current_uri:find("^" .. homedir) ~= nil then
+		return "~" .. current_uri:sub(#homedir + 1, #current_uri)
+	else
+		return current_uri:sub(#"file:///", #current_uri)
+	end
+end
+
+local IS_WINDOWS = package.config:sub(1, 1) == "\\"
+local IS_LINUX = false
+local IS_MACOS = false
+if not IS_WINDOWS then
+	local os_name = _run_command("uname")
+	IS_LINUX = os_name ~= "Darwin"
+	IS_MACOS = os_name ~= "Darwin"
 end
 
 --- ========== Keys ==========
-config.keys = {
-	{ key = "LeftArrow|LeftShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(-1) },
-	{ key = "LeftArrow|RightShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(-1) },
-	{ key = "RightArrow|LeftShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(1) },
-	{ key = "RightArrow|RightShift", mods = "ALT", action = wezterm_action.ActivateTabRelative(1) },
-}
+config.keys = {}
+table.insert(config.keys, { key = "<", mods = "ALT", action = wezterm_action.ActivateTabRelative(-1) })
+table.insert(config.keys, { key = ">", mods = "ALT", action = wezterm_action.ActivateTabRelative(1) })
+if IS_MACOS then
+	table.insert(config.keys, { key = "<", mods = "CMD", action = wezterm_action.ActivateTabRelative(-1) })
+	table.insert(config.keys, { key = ">", mods = "CMD", action = wezterm_action.ActivateTabRelative(1) })
+end
 
 --- ========== Fonts & Themes ==========
 local FiraCodeFont = "FiraCode Nerd Font Mono"
@@ -45,10 +61,10 @@ local GruvboxDarkTheme = "Gruvbox Dark (Gogh)"
 
 config.font = wezterm.font(SauceCodeProFont)
 config.font_size = 15.0
-if is_windows then
+if IS_WINDOWS then
 	config.font_size = 14.0
 end
-if is_linux then
+if IS_LINUX then
 	config.font_size = 11.0
 end
 -- config.color_scheme = GruvboxDarkTheme
@@ -57,9 +73,10 @@ end
 config.use_fancy_tab_bar = true
 config.tab_max_width = 256
 config.window_frame = {
-	font = wezterm.font(CodeNewRomanFont),
+	font = wezterm.font(FiraCodeFont),
 	font_size = 13,
 }
+config.scrollback_lines = 200000
 config.enable_scroll_bar = true
 config.window_padding = {
 	left = 0,
@@ -76,29 +93,76 @@ local function get_process(tab)
 	return wezterm.format({ { Text = string.format("[%s]", process_name) } })
 end
 
-local function get_current_working_dir(tab)
-	local current_dir = tab.active_pane.current_working_dir
-	local home_dir = string.format("file://%s", os.getenv("HOME"))
-	if current_dir:find("^" .. home_dir) ~= nil then
-		return "~" .. current_dir:sub(#home_dir + 1, #current_dir)
-	else
-		-- return current_dir
-		return current_dir:sub(#"file:///", #current_dir)
-	end
-end
-
 wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
-	local title = string.format(" %s %s ", get_process(tab), get_current_working_dir(tab))
+	local function _get_cwd(tab)
+		return _current_dir(tab.active_pane.current_working_dir)
+	end
+
+	local title = string.format(" %s %s ", get_process(tab), _get_cwd(tab))
 	return {
 		{ Text = title },
 	}
+end)
+
+--- ========== Right Status ==========
+
+wezterm.on("update-right-status", function(window, pane)
+	local SOLID_LEFT_ARROW = ""
+	local SOLID_RIGHT_ARROW = ""
+	local COLORS = {
+		"#3c1361",
+		"#52307c",
+		"#663a82",
+		"#7c5295",
+		"#b491c8",
+	}
+	local TEXT_FG = "#c0c0c0"
+
+	local cells = {}
+	local cwd_uri = pane:get_current_working_dir()
+	local cwd = nil
+	if type(cwd_uri) == "userdata" then
+		cwd = cwd_uri.file_path
+	else
+		cwd = _current_dir(cwd_uri)
+	end
+	table.insert(cells, cwd)
+
+	local date = wezterm.strftime("%a %b %-d %H:%M")
+	table.insert(cells, date)
+
+	local elements = {}
+	local num_cells = 0
+
+	table.insert(elements, { Foreground = { Color = "#3c1361" } })
+
+	table.insert(elements, { Text = SOLID_RIGHT_ARROW })
+
+	local function _push(text, is_last)
+		local cell_no = num_cells + 1
+		table.insert(elements, { Foreground = { Color = TEXT_FG } })
+		table.insert(elements, { Background = { Color = COLORS[cell_no] } })
+		table.insert(elements, { Text = " " .. text .. " " })
+		if not is_last then
+			table.insert(elements, { Foreground = { Color = COLORS[cell_no + 1] } })
+			table.insert(elements, { Text = SOLID_RIGHT_ARROW })
+		end
+		num_cells = num_cells + 1
+	end
+
+	while #cells > 0 do
+		local cell = table.remove(cells, 1)
+		_push(cell, #cells == 0)
+	end
+
+	window:set_right_status(wezterm.format(elements))
 end)
 
 --- ========== CWD ==========
 config.default_cwd = wezterm.home_dir
 
 --- ========== Shell ==========
-if is_windows then
+if IS_WINDOWS then
 	config.default_prog = { "pwsh.exe" }
 end
 
