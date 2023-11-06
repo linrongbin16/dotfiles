@@ -68,6 +68,9 @@ if IS_LINUX then
 	config.font_size = 11.0
 end
 -- config.color_scheme = GruvboxDarkTheme
+config.colors = {
+	scrollbar_thumb = "green",
+}
 
 --- ========== Tabs ==========
 config.use_fancy_tab_bar = true
