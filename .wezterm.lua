@@ -39,12 +39,8 @@ end
 
 --- ========== Keys ==========
 config.keys = {}
-table.insert(config.keys, { key = "<", mods = "ALT", action = wezterm_action.ActivateTabRelative(-1) })
-table.insert(config.keys, { key = ">", mods = "ALT", action = wezterm_action.ActivateTabRelative(1) })
-if IS_MACOS then
-	table.insert(config.keys, { key = "<", mods = "CMD", action = wezterm_action.ActivateTabRelative(-1) })
-	table.insert(config.keys, { key = ">", mods = "CMD", action = wezterm_action.ActivateTabRelative(1) })
-end
+table.insert(config.keys, { key = "LeftArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(-1) })
+table.insert(config.keys, { key = "RightArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(1) })
 
 --- ========== Fonts & Themes ==========
 local FiraCodeFont = "FiraCode Nerd Font Mono"
@@ -67,10 +63,10 @@ end
 if IS_LINUX then
 	config.font_size = 11.0
 end
--- config.color_scheme = GruvboxDarkTheme
 config.colors = {
 	scrollbar_thumb = "green",
 }
+-- config.color_scheme = GruvboxDarkTheme
 
 --- ========== Tabs ==========
 config.use_fancy_tab_bar = true
