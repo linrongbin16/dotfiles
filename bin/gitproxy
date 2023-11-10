@@ -182,7 +182,7 @@ def print_sh(name):
     if not p:
         err(f"proxy '{name}' not found, exit...")
         return
-    info(f"export http_proxy={p};export https_proxy={p};export ALL_PROXY={p}")
+    info(f"export http_proxy={p.url};export https_proxy={p.url};export ALL_PROXY={p.url}")
 
 
 def print_pwsh(name):
@@ -190,15 +190,7 @@ def print_pwsh(name):
     if not p:
         err(f"proxy '{name}' not found, exit...")
         return
-    info(f'$env:HTTP_PROXY = $env:HTTPS_PROXY = "{p}"')
-
-
-def print_cmd(name):
-    p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
-    if not p:
-        print(f"proxy '{name}' not found, exit...")
-        return
-    info(f'set HTTP_PROXY="{p}" && set HTTPS_PROXY="{p}"')
+    info(f'$env:HTTP_PROXY = $env:HTTPS_PROXY = "{p.url}"')
 
 
 @click.command()
@@ -226,12 +218,6 @@ def print_cmd(name):
     is_flag=True,
     help="print '$env:HTTP(S)_PROXY' environment variable for windows powershell",
 )
-@click.option(
-    "--cmd",
-    "cmd_opt",
-    is_flag=True,
-    help="print '%HTTP(S)_PROXY%' environment variable for windows command line prompt",
-)
 @click.option("--debug", "debug_opt", is_flag=True, help="debug")
 @click.argument("args", nargs=-1)
 def vproxy(
@@ -242,7 +228,6 @@ def vproxy(
     reset_opt,
     sh_opt,
     pwsh_opt,
-    cmd_opt,
     debug_opt,
     args,
 ):
@@ -256,7 +241,7 @@ def vproxy(
 
     if DEBUG:
         print(
-            f"add_opt:{add_opt}, list_opt:{list_opt}, remove:{remove_opt}, set_opt:{set_opt}, reset_opt:{reset_opt}, sh_opt:{sh_opt}, pwsh_opt:{pwsh_opt}, cmd_opt:{cmd_opt}, args:{args}, type:{type(args)}"
+            f"add_opt:{add_opt}, list_opt:{list_opt}, remove:{remove_opt}, set_opt:{set_opt}, reset_opt:{reset_opt}, sh_opt:{sh_opt}, pwsh_opt:{pwsh_opt}, args:{args}, type:{type(args)}"
         )
     if add_opt:
         add(add_opt)
@@ -272,8 +257,6 @@ def vproxy(
         print_sh(args)
     elif pwsh_opt:
         print_pwsh(args)
-    elif cmd_opt:
-        print_cmd(args)
     else:
         list_all()
 
