@@ -9,8 +9,8 @@ if [ -x "$(command -v lsd)" ]; then
 	alias l="lsd -lh --header --icon=never"
 	alias ll="lsd -alh --header --icon=never"
 elif [ -x "$(command -v eza)" ]; then
-	alias l="eza -lh --icons=never"
-	alias ll="eza -alh --icons=never"
+	alias l="eza -lh"
+	alias ll="eza -alh"
 elif [ -x "$(command -v exa)" ]; then
 	alias l="exa -lh"
 	alias ll="exa -alh"
