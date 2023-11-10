@@ -34,7 +34,7 @@ local IS_MACOS = false
 if not IS_WINDOWS then
 	local os_name = _run_command("uname")
 	IS_LINUX = os_name ~= "Darwin"
-	IS_MACOS = os_name ~= "Darwin"
+	IS_MACOS = os_name == "Darwin"
 end
 
 --- ========== Keys ==========
