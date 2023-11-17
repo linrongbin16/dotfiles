@@ -1,6 +1,7 @@
 --- ========== Wezterm API ==========
 local wezterm = require("wezterm")
 local wezterm_action = wezterm.action
+local wezterm_mux = wezterm.mux
 
 -- This table will hold the configuration.
 local config = {}
@@ -41,6 +42,16 @@ end
 config.keys = {}
 table.insert(config.keys, { key = "LeftArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(-1) })
 table.insert(config.keys, { key = "RightArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(1) })
+if IS_MACOS then
+	table.insert(
+		config.keys,
+		{ key = "ApplicationLeftArrow", mods = "CMD|SHIFT", action = wezterm_action.ActivateTabRelative(-1) }
+	)
+	table.insert(
+		config.keys,
+		{ key = "ApplicationRightArrow", mods = "CMD|SHIFT", action = wezterm_action.ActivateTabRelative(1) }
+	)
+end
 
 --- ========== Fonts & Themes ==========
 local FiraCodeFont = "FiraCode Nerd Font Mono"
@@ -51,11 +62,14 @@ local IosevakaFont = "Iosevka Nerd Font Mono"
 local HackFont = "Hack Nerd Font Mono"
 local FantasqueSansMonoFont = "FantasqueSansMono NFM"
 local SauceCodeProFont = "SauceCodePro Nerd Font Mono"
+local LemonadeFont = "Lemonade"
+local MaconFont = "Macon"
 
 local CatppuccinMochaTheme = "Catppuccin Mocha"
 local GruvboxDarkTheme = "Gruvbox Dark (Gogh)"
 
 config.font = wezterm.font(SauceCodeProFont)
+-- config.font = wezterm.font(MaconFont)
 config.font_size = 15.0
 if IS_WINDOWS then
 	config.font_size = 14.0
@@ -103,59 +117,66 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 	}
 end)
 
+--- ========== Gui Startup ==========
+
+wezterm.on("gui-startup", function(cmd)
+	local tab, pane, window = wezterm_mux.spawn_window(cmd or {})
+	window:gui_window():maximize()
+end)
+
 --- ========== Right Status ==========
 
-wezterm.on("update-right-status", function(window, pane)
-	local SOLID_LEFT_ARROW = ""
-	local SOLID_RIGHT_ARROW = ""
-	local COLORS = {
-		"#3c1361",
-		"#52307c",
-		"#663a82",
-		"#7c5295",
-		"#b491c8",
-	}
-	local TEXT_FG = "#c0c0c0"
-
-	local cells = {}
-	local cwd_uri = pane:get_current_working_dir()
-	local cwd = nil
-	if type(cwd_uri) == "userdata" then
-		cwd = cwd_uri.file_path
-	else
-		cwd = _current_dir(cwd_uri)
-	end
-	table.insert(cells, cwd)
-
-	local date = wezterm.strftime("%a %b %-d %H:%M")
-	table.insert(cells, date)
-
-	local elements = {}
-	local num_cells = 0
-
-	table.insert(elements, { Foreground = { Color = "#3c1361" } })
-
-	table.insert(elements, { Text = SOLID_RIGHT_ARROW })
-
-	local function _push(text, is_last)
-		local cell_no = num_cells + 1
-		table.insert(elements, { Foreground = { Color = TEXT_FG } })
-		table.insert(elements, { Background = { Color = COLORS[cell_no] } })
-		table.insert(elements, { Text = " " .. text .. " " })
-		if not is_last then
-			table.insert(elements, { Foreground = { Color = COLORS[cell_no + 1] } })
-			table.insert(elements, { Text = SOLID_RIGHT_ARROW })
-		end
-		num_cells = num_cells + 1
-	end
-
-	while #cells > 0 do
-		local cell = table.remove(cells, 1)
-		_push(cell, #cells == 0)
-	end
-
-	window:set_right_status(wezterm.format(elements))
-end)
+-- wezterm.on("update-right-status", function(window, pane)
+-- 	local SOLID_LEFT_ARROW = ""
+-- 	local SOLID_RIGHT_ARROW = ""
+-- 	local COLORS = {
+-- 		"#3c1361",
+-- 		"#52307c",
+-- 		"#663a82",
+-- 		"#7c5295",
+-- 		"#b491c8",
+-- 	}
+-- 	local TEXT_FG = "#c0c0c0"
+--
+-- 	local cells = {}
+-- 	local cwd_uri = pane:get_current_working_dir()
+-- 	local cwd = nil
+-- 	if type(cwd_uri) == "userdata" then
+-- 		cwd = cwd_uri.file_path
+-- 	else
+-- 		cwd = _current_dir(cwd_uri)
+-- 	end
+-- 	table.insert(cells, cwd)
+--
+-- 	local date = wezterm.strftime("%a %b %-d %H:%M")
+-- 	table.insert(cells, date)
+--
+-- 	local elements = {}
+-- 	local num_cells = 0
+--
+-- 	table.insert(elements, { Foreground = { Color = "#3c1361" } })
+--
+-- 	table.insert(elements, { Text = SOLID_RIGHT_ARROW })
+--
+-- 	local function _push(text, is_last)
+-- 		local cell_no = num_cells + 1
+-- 		table.insert(elements, { Foreground = { Color = TEXT_FG } })
+-- 		table.insert(elements, { Background = { Color = COLORS[cell_no] } })
+-- 		table.insert(elements, { Text = " " .. text .. " " })
+-- 		if not is_last then
+-- 			table.insert(elements, { Foreground = { Color = COLORS[cell_no + 1] } })
+-- 			table.insert(elements, { Text = SOLID_RIGHT_ARROW })
+-- 		end
+-- 		num_cells = num_cells + 1
+-- 	end
+--
+-- 	while #cells > 0 do
+-- 		local cell = table.remove(cells, 1)
+-- 		_push(cell, #cells == 0)
+-- 	end
+--
+-- 	window:set_right_status(wezterm.format(elements))
+-- end)
 
 --- ========== CWD ==========
 config.default_cwd = wezterm.home_dir
