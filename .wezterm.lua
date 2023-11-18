@@ -75,7 +75,7 @@ if IS_WINDOWS then
 	config.font_size = 14.0
 end
 if IS_LINUX then
-	config.font_size = 11.0
+	config.font_size = 10.0
 end
 config.colors = {
 	scrollbar_thumb = "green",
