@@ -89,6 +89,9 @@ config.window_frame = {
 	font = wezterm.font(FiraCodeFont),
 	font_size = 13,
 }
+if IS_LINUX then
+	config.window_frame.font_size = 10
+end
 config.scrollback_lines = 200000
 config.enable_scroll_bar = true
 config.window_padding = {
