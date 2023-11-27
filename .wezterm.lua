@@ -2,6 +2,7 @@
 
 local wezterm = require("wezterm")
 local wezterm_action = wezterm.action
+local wezterm_nerdfonts = wezterm.nerdfonts
 local wezterm_mux = wezterm.mux
 
 local function _execute(cmd)
@@ -25,21 +26,11 @@ end
 
 local config = {}
 
--- nvu.lua {
+-- utils.lua {
 -- utility functions extracted from Neovim
 -- see /usr/share/nvim/runtime/lua/vim/shared.lua
 
-local nvu = {}
-
-function nvu.run(cmd)
-	local f = assert(io.popen(cmd, "r"))
-	local s = assert(f:read("*a"))
-	f:close()
-	s = string.gsub(s, "^%s+", "")
-	s = string.gsub(s, "%s+$", "")
-	s = string.gsub(s, "[\n\r]+", "")
-	return s
-end
+local utils = {}
 
 --- Checks if a table is empty.
 ---
@@ -47,14 +38,14 @@ end
 ---
 ---@param t table Table to check
 ---@return boolean `true` if `t` is empty
-function nvu.tbl_isempty(t)
+function utils.tbl_isempty(t)
 	assert(type(t) == "table", string.format("Expected table, got %s", type(t)))
 	return next(t) == nil
 end
 
 --- We only merge empty tables or tables that are not an array (indexed by integers)
 local function can_merge(v)
-	return type(v) == "table" and (nvu.tbl_isempty(v) or not nvu.tbl_isarray(v))
+	return type(v) == "table" and (utils.tbl_isempty(v) or not utils.tbl_isarray(v))
 end
 
 local function tbl_extend(behavior, deep_extend, ...)
@@ -70,7 +61,7 @@ local function tbl_extend(behavior, deep_extend, ...)
 
 	for i = 1, select("#", ...) do
 		local tbl = select(i, ...)
-		nvu.validate({ ["after the second argument"] = { tbl, "t" } })
+		utils.validate({ ["after the second argument"] = { tbl, "t" } })
 		if tbl then
 			for k, v in pairs(tbl) do
 				if deep_extend and can_merge(v) and can_merge(ret[k]) then
@@ -96,7 +87,7 @@ end
 ---      - "force": use value from the rightmost map
 ---@param ... table Two or more tables
 ---@return table Merged table
-function nvu.tbl_extend(behavior, ...)
+function utils.tbl_extend(behavior, ...)
 	return tbl_extend(behavior, false, ...)
 end
 
@@ -110,7 +101,7 @@ end
 ---      - "force": use value from the rightmost map
 ---@param ... T2 Two or more tables
 ---@return T1|T2 (table) Merged table
-function nvu.tbl_deep_extend(behavior, ...)
+function utils.tbl_deep_extend(behavior, ...)
 	return tbl_extend(behavior, true, ...)
 end
 
@@ -134,7 +125,7 @@ do
 	}
 
 	local function _is_type(val, t)
-		return type(val) == t or (t == "callable" and nvu.is_callable(val))
+		return type(val) == t or (t == "callable" and utils.is_callable(val))
 	end
 
 	local function is_valid(opt)
@@ -155,7 +146,7 @@ do
 				types = { types }
 			end
 
-			if nvu.is_callable(types) then
+			if utils.is_callable(types) then
 				-- Check user-provided validation function
 				local valid, optional_message = types(val)
 				if not valid then
@@ -246,7 +237,7 @@ do
 	---               only if the argument is valid. Can optionally return an additional
 	---               informative error message as the second returned value.
 	---             - msg: (optional) error string if validation fails
-	function nvu.validate(opt)
+	function utils.validate(opt)
 		local ok, err_msg = is_valid(opt)
 		if not ok then
 			error(err_msg, 2)
@@ -258,7 +249,7 @@ end
 ---
 ---@param f any Any object
 ---@return boolean `true` if `f` is callable, else `false`
-function nvu.is_callable(f)
+function utils.is_callable(f)
 	if type(f) == "function" then
 		return true
 	end
@@ -280,7 +271,7 @@ end
 ---
 ---@param t table
 ---@return boolean `true` if array-like table, else `false`.
-function nvu.tbl_isarray(t)
+function utils.tbl_isarray(t)
 	if type(t) ~= "table" then
 		return false
 	end
@@ -309,8 +300,8 @@ end
 ---@param start (integer|nil) Start index on src. Defaults to 1
 ---@param finish (integer|nil) Final index on src. Defaults to `#src`
 ---@return T dst
-function nvu.list_extend(dst, src, start, finish)
-	nvu.validate({
+function utils.list_extend(dst, src, start, finish)
+	utils.validate({
 		dst = { dst, "t" },
 		src = { src, "t" },
 		start = { start, "n", true },
@@ -328,8 +319,8 @@ end
 ---@param func fun(value: T): any (function) Function
 ---@param t table<any, T> (table) Table
 ---@return table Table of transformed values
-function nvu.tbl_map(func, t)
-	nvu.validate({ func = { func, "c" }, t = { t, "t" } })
+function utils.tbl_map(func, t)
+	utils.validate({ func = { func, "c" }, t = { t, "t" } })
 
 	local rettab = {}
 	for k, v in pairs(t) do
@@ -445,7 +436,6 @@ config.font = wezterm.font_with_fallback({
 	"Noto Nerd Font Mono",
 	"Hack Nerd Font Mono",
 })
-config.font_size = 14
 config.font_size = 13.0
 if IS_WINDOWS then
 	config.font_size = 14.0
@@ -475,8 +465,6 @@ config.status_update_interval = 1000
 
 -- tab-bar.lua {
 
-local nf = wezterm.nerdfonts
-
 local theme = colors.color_schemes[config.color_scheme]
 
 config.use_fancy_tab_bar = false
@@ -505,11 +493,12 @@ config.tab_bar_style = {
 }
 
 local function tab_title(tab_info)
+	local tab_id = tab_info.tab_id
 	local title = tab_info.tab_title
 	if title and #title > 0 then
-		return title
+		return string.format("%d %s", tab_id + 1, title)
 	end
-	return tab_info.active_pane.title
+	return string.format("%d %s", tab_id + 1, tab_info.active_pane.title)
 end
 
 wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
@@ -535,13 +524,13 @@ wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
 	return {
 		{ Background = { Color = edge_background } },
 		{ Foreground = { Color = edge_foreground } },
-		{ Text = nf.ple_lower_right_triangle },
+		{ Text = wezterm_nerdfonts.ple_lower_right_triangle },
 		{ Background = { Color = background } },
 		{ Foreground = { Color = foreground } },
 		{ Text = title },
 		{ Background = { Color = edge_background } },
 		{ Foreground = { Color = edge_foreground } },
-		{ Text = nf.ple_lower_left_triangle },
+		{ Text = wezterm_nerdfonts.ple_lower_left_triangle },
 	}
 end)
 
@@ -557,7 +546,7 @@ wezterm.on("update-status", function(window)
 		{ Text = " ♥ " },
 		{ Foreground = { Color = left_background } },
 		{ Background = { Color = theme.background } },
-		{ Text = nf.ple_lower_left_triangle },
+		{ Text = wezterm_nerdfonts.ple_lower_left_triangle },
 		{ Text = " " },
 	}))
 end)
