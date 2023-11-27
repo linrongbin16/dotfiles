@@ -101,11 +101,6 @@ Write-Output '# dotfiles' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
 
 # prompt
-if (!(Test-Path -Path $env:USERPROFILE\.mzpt))
-{
-    git clone https://github.com/linrongbin16/mzpt.git $env:USERPROFILE\.mzpt
-    Write-Output '. $env:USERPROFILE\.mzpt\mzpt.ps1' >>$PROFILE
-}
 
 # wezterm
 if (!(Test-Path -Path $env:USERPROFILE\.wezterm.lua))
