@@ -493,10 +493,10 @@ config.tab_bar_style = {
 }
 
 local function tab_title(tab_info, max_width)
-	local tab_id = tab_info.tab_id
+	local tab_index = tab_info.tab_index
 	local title = tab_info.tab_title
 	local result = (title and #title > 0) and title or tab_info.active_pane.title
-	result = string.format("%d %s", tab_id + 1, wezterm.truncate_left(result, max_width - 6))
+	result = string.format("%d %s", tab_index + 1, wezterm.truncate_left(result, max_width - 6))
 	return result
 end
 
