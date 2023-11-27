@@ -492,13 +492,12 @@ config.tab_bar_style = {
 	}),
 }
 
-local function tab_title(tab_info)
+local function tab_title(tab_info, max_width)
 	local tab_id = tab_info.tab_id
 	local title = tab_info.tab_title
-	if title and #title > 0 then
-		return string.format("%d %s", tab_id + 1, title)
-	end
-	return string.format("%d %s", tab_id + 1, tab_info.active_pane.title)
+	local result = (title and #title > 0) and title or tab_info.active_pane.title
+	result = string.format("%d %s", tab_id + 1, wezterm.truncate_left(result, max_width - 6))
+	return result
 end
 
 wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
@@ -515,9 +514,7 @@ wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
 
 	local edge_foreground = background
 
-	local title = tab_title(tab)
-
-	title = wezterm.truncate_left(title, max_width - 4)
+	local title = tab_title(tab, max_width)
 
 	title = " " .. title .. " "
 
