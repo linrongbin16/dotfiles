@@ -125,11 +125,17 @@ echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh' >>~/.zshrc
 
 # prompt
+
+# mzpt
 if [ ! -d ~/.mzpt ]; then
 	git clone https://github.com/linrongbin16/mzpt.git ~/.mzpt
 	echo '[ -f ~/.mzpt/mzpt.zsh ] && source ~/.mzpt/mzpt.zsh' >>~/.zshrc
 fi
-
+# pure
+if [ ! -d ~/.zsh ]; then
+	mkdir -p "$HOME/.zsh"
+	git clone https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
+fi
 # powerlevel10k
 if [ ! -d ~/.powerlevel10k ]; then
 	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
