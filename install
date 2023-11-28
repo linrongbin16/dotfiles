@@ -120,10 +120,6 @@ if [ "$OS" != "Darwin" ]; then
 	install_nerdfont "SourceCodePro.zip" "font-sauce-code-pro-nerd-font"
 fi
 
-echo '' >>~/.zshrc
-echo '# dotfiles ' >>~/.zshrc
-echo '[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh' >>~/.zshrc
-
 # prompt
 
 # pure
@@ -141,3 +137,7 @@ fi
 if [ ! -f ~/.wezterm.lua ]; then
 	cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
 fi
+
+echo '' >>~/.zshrc
+echo '# dotfiles ' >>~/.zshrc
+echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc

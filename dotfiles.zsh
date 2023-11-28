@@ -37,3 +37,11 @@ alias gcf="git config"
 
 # path
 export PATH="$PATH:$HOME/.dotfiles/bin"
+
+# pure zsh theme
+fpath+=($HOME/.zsh/pure)
+zstyle :prompt:pure:git:branch color 'magenta'
+zstyle :prompt:pure:git:branch:cached color 'magenta'
+autoload -U promptinit
+promptinit
+prompt pure
