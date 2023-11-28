@@ -42,6 +42,7 @@ export PATH="$PATH:$HOME/.dotfiles/bin"
 fpath+=($HOME/.zsh/pure)
 zstyle :prompt:pure:git:branch color 'magenta'
 zstyle :prompt:pure:git:branch:cached color 'magenta'
+zstyle :prompt:pure:prompt:success color 'green'
 autoload -U promptinit
 promptinit
 prompt pure
