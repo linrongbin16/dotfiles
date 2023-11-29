@@ -15,6 +15,11 @@ local function _execute(cmd)
 	return s
 end
 
+local function _extract_path(p)
+	local dirname, filename = p:match("^(.*/)([^/]-)$")
+	return dirname, filename
+end
+
 local IS_WINDOWS = package.config:sub(1, 1) == "\\"
 local IS_LINUX = false
 local IS_MACOS = false
@@ -22,6 +27,12 @@ if not IS_WINDOWS then
 	local os_name = _execute("uname")
 	IS_LINUX = os_name ~= "Darwin"
 	IS_MACOS = os_name == "Darwin"
+end
+local SHELL = nil
+if IS_MACOS or IS_LINUX then
+	local shellname = _execute("echo $SHELL")
+	local _, shortname = _extract_path(shellname)
+	SHELL = shortname
 end
 
 local config = {}
@@ -542,10 +553,19 @@ wezterm.on("update-status", function(window)
 	if window:leader_is_active() then
 		left_background = theme.ansi[2]
 	end
+	local left_text = nil
+	if IS_WINDOWS then
+		left_text = "  "
+	elseif IS_MACOS then
+		left_text = "  " .. SHELL .. " "
+	else
+		left_text = "  " .. SHELL .. " "
+	end
 	window:set_left_status(wezterm.format({
 		{ Background = { Color = left_background } },
 		{ Foreground = { Color = left_foreground } },
-		{ Text = " ♥ " },
+		-- { Text = " ♥ " },
+		{ Text = left_text },
 		{ Foreground = { Color = left_background } },
 		{ Background = { Color = theme.background } },
 		{ Text = wezterm_nerdfonts.ple_lower_left_triangle },
