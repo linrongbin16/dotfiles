@@ -593,4 +593,10 @@ end
 
 -- key-mappings.lua }
 
+-- shell.lua {
+
+config.default_prog = { "pwsh.exe" }
+
+-- shell.lua }
+
 return config
