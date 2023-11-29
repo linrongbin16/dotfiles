@@ -461,6 +461,11 @@ config.window_padding = {
 
 config.status_update_interval = 1000
 
+wezterm.on("gui-startup", function()
+	local tab, pane, window = wezterm_mux.spawn_window({})
+	window:gui_window():maximize()
+end)
+
 -- ui.lua }
 
 -- tab-bar.lua {
@@ -533,13 +538,13 @@ end)
 
 wezterm.on("update-status", function(window)
 	local left_background = theme.brights[1]
-	local left_forground = theme.brights[8]
+	local left_foreground = theme.brights[8]
 	if window:leader_is_active() then
 		left_background = theme.ansi[2]
 	end
 	window:set_left_status(wezterm.format({
 		{ Background = { Color = left_background } },
-		{ Foreground = { Color = left_forground } },
+		{ Foreground = { Color = left_foreground } },
 		{ Text = " ♥ " },
 		{ Foreground = { Color = left_background } },
 		{ Background = { Color = theme.background } },
