@@ -558,10 +558,10 @@ wezterm.on("format-tab-title", function(tab, _, _, _, hover, max_width)
 end)
 
 wezterm.on("update-status", function(window)
-	local left_background = theme.brights[1]
-	local left_foreground = theme.brights[8]
+	local bg = theme.brights[1]
+	local fg = theme.brights[8]
 	if window:leader_is_active() then
-		left_background = theme.ansi[2]
+		bg = theme.ansi[2]
 	end
 	local text = nil
 	if IS_WINDOWS then
@@ -573,11 +573,11 @@ wezterm.on("update-status", function(window)
 	end
 	window:set_right_status(wezterm.format({
 		{ Background = { Color = theme.background } },
-		{ Foreground = { Color = left_background } },
+		{ Foreground = { Color = bg } },
 		{ Text = " " },
 		{ Text = wezterm_nerdfonts.ple_lower_right_triangle },
-		{ Background = { Color = left_background } },
-		{ Foreground = { Color = left_foreground } },
+		{ Background = { Color = bg } },
+		{ Foreground = { Color = fg } },
 		-- { Text = " ♥ " },
 		{ Text = text },
 	}))
