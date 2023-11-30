@@ -43,8 +43,12 @@ local FONTS = {
 	"Hack Nerd Font Mono",
 }
 local FONT_SIZE = 13.0
-local FONT_SIZE_WINDOWS = 14.0
-local FONT_SIZE_LINUX = 11.0
+if IS_WINDOWS then
+	FONT_SIZE = 14.0
+end
+if IS_LINUX then
+	FONT_SIZE = 11.0
+end
 
 local config = { colors = {} }
 
@@ -453,12 +457,6 @@ local colors = {
 
 config.font = wezterm.font_with_fallback(FONTS)
 config.font_size = FONT_SIZE
-if IS_WINDOWS then
-	config.font_size = FONT_SIZE_WINDOWS
-end
-if IS_LINUX then
-	config.font_size = FONT_SIZE_LINUX
-end
 
 config.color_scheme = "lavi"
 config.enable_scroll_bar = true
@@ -519,12 +517,6 @@ config.window_frame = {
 	inactive_titlebar_bg = theme.background,
 	inactive_titlebar_fg = theme.brights[8],
 }
-if IS_WINDOWS then
-	config.window_frame.font_size = FONT_SIZE_WINDOWS
-end
-if IS_LINUX then
-	config.window_frame.font_size = FONT_SIZE_LINUX
-end
 
 local function tab_title(tab_info, max_width)
 	local tab_index = tab_info.tab_index
