@@ -35,7 +35,18 @@ if IS_MACOS or IS_LINUX then
 	SHELL = shortname
 end
 
-local config = {}
+local FONTS = {
+	"Monaco Nerd Font Mono",
+	"CodeNewRoman Nerd Font Mono",
+	"SaurceCodePro Nerd Font Mono",
+	"Noto Nerd Font Mono",
+	"Hack Nerd Font Mono",
+}
+local FONT_SIZE = 13.0
+local FONT_SIZE_WINDOWS = 14.0
+local FONT_SIZE_LINUX = 11.0
+
+local config = { colors = {} }
 
 -- utils.lua {
 -- utility functions extracted from Neovim
@@ -440,26 +451,19 @@ local colors = {
 
 -- ui.lua {
 
-config.font = wezterm.font_with_fallback({
-	"Monaco Nerd Font Mono",
-	"CodeNewRoman Nerd Font Mono",
-	"SaurceCodePro Nerd Font Mono",
-	"Noto Nerd Font Mono",
-	"Hack Nerd Font Mono",
-})
-config.font_size = 13.0
+config.font = wezterm.font_with_fallback(FONTS)
+config.font_size = FONT_SIZE
 if IS_WINDOWS then
-	config.font_size = 14.0
+	config.font_size = FONT_SIZE_WINDOWS
 end
 if IS_LINUX then
-	config.font_size = 11.0
+	config.font_size = FONT_SIZE_LINUX
 end
 
 config.color_scheme = "lavi"
 config.enable_scroll_bar = true
-config.colors = {
-	scrollbar_thumb = "orange",
-}
+
+config.colors.scrollbar_thumb = "orange"
 
 -- https://wezfurlong.org/wezterm/config/lua/config/hyperlink_rules.html
 
@@ -483,7 +487,7 @@ end)
 
 local theme = colors.color_schemes[config.color_scheme]
 
-config.use_fancy_tab_bar = false
+config.use_fancy_tab_bar = true
 config.tab_bar_at_bottom = true
 config.tab_max_width = 24
 
@@ -507,6 +511,20 @@ config.tab_bar_style = {
 		{ Text = " " },
 	}),
 }
+config.window_frame = {
+	font = wezterm.font_with_fallback(FONTS),
+	font_size = FONT_SIZE,
+	active_titlebar_bg = theme.background,
+	active_titlebar_fg = theme.brights[8],
+	inactive_titlebar_bg = theme.background,
+	inactive_titlebar_fg = theme.brights[8],
+}
+if IS_WINDOWS then
+	config.window_frame.font_size = FONT_SIZE_WINDOWS
+end
+if IS_LINUX then
+	config.window_frame.font_size = FONT_SIZE_LINUX
+end
 
 local function tab_title(tab_info, max_width)
 	local tab_index = tab_info.tab_index
@@ -561,15 +579,15 @@ wezterm.on("update-status", function(window)
 	else
 		left_text = "  " .. SHELL .. " "
 	end
-	window:set_left_status(wezterm.format({
+	window:set_right_status(wezterm.format({
+		{ Background = { Color = theme.background } },
+		{ Foreground = { Color = left_background } },
+		{ Text = " " },
+		{ Text = wezterm_nerdfonts.ple_lower_right_triangle },
 		{ Background = { Color = left_background } },
 		{ Foreground = { Color = left_foreground } },
 		-- { Text = " ♥ " },
 		{ Text = left_text },
-		{ Foreground = { Color = left_background } },
-		{ Background = { Color = theme.background } },
-		{ Text = wezterm_nerdfonts.ple_lower_left_triangle },
-		{ Text = " " },
 	}))
 end)
 
@@ -595,7 +613,9 @@ end
 
 -- shell.lua {
 
-config.default_prog = { "pwsh.exe" }
+if IS_WINDOWS then
+	config.default_prog = { "pwsh.exe" }
+end
 
 -- shell.lua }
 
