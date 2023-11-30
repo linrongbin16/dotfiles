@@ -563,13 +563,13 @@ wezterm.on("update-status", function(window)
 	if window:leader_is_active() then
 		left_background = theme.ansi[2]
 	end
-	local left_text = nil
+	local text = nil
 	if IS_WINDOWS then
-		left_text = "  "
+		text = "  "
 	elseif IS_MACOS then
-		left_text = "  " .. SHELL .. " "
+		text = "  " .. SHELL .. " "
 	else
-		left_text = "  " .. SHELL .. " "
+		text = "  " .. SHELL .. " "
 	end
 	window:set_right_status(wezterm.format({
 		{ Background = { Color = theme.background } },
@@ -579,7 +579,7 @@ wezterm.on("update-status", function(window)
 		{ Background = { Color = left_background } },
 		{ Foreground = { Color = left_foreground } },
 		-- { Text = " ♥ " },
-		{ Text = left_text },
+		{ Text = text },
 	}))
 end)
 
