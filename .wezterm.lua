@@ -539,6 +539,10 @@ config.tab_bar_style = {
 config.window_frame = {
 	font = wezterm.font_with_fallback(FONTS),
 	font_size = FONT_SIZE,
+	active_titlebar_bg = theme.background,
+	active_titlebar_fg = theme.brights[8],
+	inactive_titlebar_bg = theme.background,
+	inactive_titlebar_fg = theme.brights[8],
 }
 
 local function tab_title(tab_info, max_width)
