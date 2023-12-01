@@ -20,6 +20,33 @@ local function _extract_path(p)
 	return dirname, filename
 end
 
+--- @param s string
+--- @param t string
+--- @param rstart integer?  by default rstart=#s
+--- @return integer?
+local function string_rfind(s, t, rstart)
+	rstart = rstart or #s
+	for i = rstart, 1, -1 do
+		local match = true
+		for j = 1, #t do
+			if i + j - 1 > #s then
+				match = false
+				break
+			end
+			local a = string.byte(s, i + j - 1)
+			local b = string.byte(t, j)
+			if a ~= b then
+				match = false
+				break
+			end
+		end
+		if match then
+			return i
+		end
+	end
+	return nil
+end
+
 local IS_WINDOWS = package.config:sub(1, 1) == "\\"
 local IS_LINUX = false
 local IS_MACOS = false
@@ -512,19 +539,18 @@ config.tab_bar_style = {
 config.window_frame = {
 	font = wezterm.font_with_fallback(FONTS),
 	font_size = FONT_SIZE,
-	active_titlebar_bg = theme.background,
-	active_titlebar_fg = theme.brights[8],
-	inactive_titlebar_bg = theme.background,
-	inactive_titlebar_fg = theme.brights[8],
 }
 
 local function tab_title(tab_info, max_width)
 	local tab_index = tab_info.tab_index
 	local title = tab_info.tab_title
 	local result = (title and #title > 0) and title or tab_info.active_pane.title
-	local _, shortfile = _extract_path(result)
-	result = shortfile
-	result = string.format("%d %s", tab_index + 1, wezterm.truncate_left(result, max_width - 6))
+	local last_slash_pos = string_rfind(result, "/")
+	last_slash_pos = last_slash_pos or string_rfind(result, "\\")
+	if last_slash_pos then
+		result = result:sub(last_slash_pos + 1)
+	end
+	result = string.format("%d %s", tab_index + 1, wezterm.truncate_left(result, max_width))
 	return result
 end
 
