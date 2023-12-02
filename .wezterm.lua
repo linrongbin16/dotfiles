@@ -56,6 +56,9 @@ if not IS_WINDOWS then
 	IS_MACOS = os_name == "Darwin"
 end
 local SHELL = nil
+if IS_WINDOWS then
+	SHELL = "pwsh"
+end
 if IS_MACOS or IS_LINUX then
 	local shellname = _execute("echo $SHELL")
 	local _, shortname = _extract_path(shellname)
@@ -70,10 +73,7 @@ local FONTS = {
 	"Hack Nerd Font Mono",
 }
 local FONT_SIZE = 13.0
-if IS_WINDOWS then
-	FONT_SIZE = 14.0
-end
-if IS_LINUX then
+if not IS_MACOS then
 	FONT_SIZE = 11.0
 end
 
@@ -597,7 +597,7 @@ wezterm.on("update-status", function(window)
 	end
 	local text = nil
 	if IS_WINDOWS then
-		text = "  "
+		text = "  " .. SHELL .. " "
 	elseif IS_MACOS then
 		text = "  " .. SHELL .. " "
 	else
