@@ -127,11 +127,12 @@ if [ ! -d ~/.zsh ]; then
 	mkdir -p "$HOME/.zsh"
 	git clone https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 fi
-# powerlevel10k
-if [ ! -d ~/.powerlevel10k ]; then
-	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
-	echo 'source ~/.powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
-fi
+
+# # powerlevel10k
+# if [ ! -d ~/.powerlevel10k ]; then
+# 	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.powerlevel10k
+# 	echo 'source ~/.powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+# fi
 
 # wezterm
 if [ ! -f ~/.wezterm.lua ]; then
