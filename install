@@ -214,7 +214,8 @@ depends_dnf() {
 
 # dnf }
 
-# deps
+# install dependencies
+
 case "$OS" in
 Linux)
 	if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then

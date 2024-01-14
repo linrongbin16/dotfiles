@@ -1,57 +1,64 @@
 # Set-PSDebug -Trace 1
 
-# utils
+# utils {
 
-function Message([string]$content)
+function Info([string]$content)
 {
     Write-Host "[dotfiles] - $content"
 }
 
-function SkipMessage([string]$content)
+function SkipInfo([string]$content)
 {
-    Message "'$content' already exist, skip..."
+    Info "'$content' already exist, skip..."
 }
 
-function InstallOrSkip([string]$command, [string]$target)
+function InstallWith([string]$command, [string]$target)
 {
     if (Get-Command -Name $target -ErrorAction SilentlyContinue)
     {
-        SkipMessage $target
+        SkipInfo $target
     } else
     {
-        Message "install '${target}' with command: '${command}'"
+        Info "install '${target}' with command: '${command}'"
         Invoke-Expression $command
     }
 }
 
-Message "install dependencies for windows"
+# utils }
+
+Info "install dependencies for windows"
 
 # deps
 scoop bucket add extras
 scoop install mingw
 scoop install uutils-coreutils
-InstallOrSkip -command "scoop install which" -target "which"
-InstallOrSkip -command "scoop install gawk" -target "awk"
-InstallOrSkip -command "scoop install sed" -target "sed"
-InstallOrSkip -command "scoop install llvm" -target "clang"
-InstallOrSkip -command "scoop install llvm" -target "clang++"
-InstallOrSkip -command "scoop install make" -target "make"
-InstallOrSkip -command "scoop install cmake" -target "cmake"
+InstallWith -command "scoop install which" -target "which"
+InstallWith -command "scoop install gawk" -target "awk"
+InstallWith -command "scoop install sed" -target "sed"
+InstallWith -command "scoop install llvm" -target "clang"
+InstallWith -command "scoop install llvm" -target "clang++"
+InstallWith -command "scoop install make" -target "make"
+InstallWith -command "scoop install cmake" -target "cmake"
 
-InstallOrSkip -command "scoop install git" -target "git"
-InstallOrSkip -command "scoop install curl" -target "curl"
-InstallOrSkip -command "scoop install wget" -target "wget"
+InstallWith -command "scoop install git" -target "git"
+InstallWith -command "scoop install curl" -target "curl"
+InstallWith -command "scoop install wget" -target "wget"
 
-InstallOrSkip -command "scoop install 7zip" -target "7z"
-InstallOrSkip -command "scoop install gzip" -target "gzip"
-InstallOrSkip -command "scoop install unzip" -target "unzip"
-InstallOrSkip -command "scoop install unrar" -target "unrar"
+InstallWith -command "scoop install 7zip" -target "7z"
+InstallWith -command "scoop install gzip" -target "gzip"
+InstallWith -command "scoop install unzip" -target "unzip"
 
-InstallOrSkip -command "scoop install python" -target "python3"
+InstallWith -command "scoop install fd" -target "fd"
+InstallWith -command "scoop install ripgrep" -target "rg"
+InstallWith -command "scoop install bat" -target "bat"
+InstallWith -command "scoop install eza" -target "eza"
+InstallWith -command "scoop install extras/lazygit" -target "lazygit"
 
-InstallOrSkip -command "scoop install vim" -target "vim"
-InstallOrSkip -command "scoop install neovim" -target "nvim"
-InstallOrSkip -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
+InstallWith -command "scoop install python" -target "python3"
+
+InstallWith -command "scoop install vim" -target "vim"
+InstallWith -command "scoop install neovim" -target "nvim"
+InstallWith -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
 
 # python3
 python3 -m pip install click --user
@@ -66,8 +73,6 @@ scoop install nerd-fonts/CodeNewRoman-NF
 scoop install nerd-fonts/CodeNewRoman-NF-Mono
 scoop install nerd-fonts/FiraCode-NF
 scoop install nerd-fonts/FiraCode-NF-Mono
-scoop install nerd-fonts/FantasqueSansMono-NF
-scoop install nerd-fonts/FantasqueSansMono-NF-Mono
 scoop install nerd-fonts/SourceCodePro-NF
 scoop install nerd-fonts/SourceCodePro-NF-Mono
 
@@ -80,16 +85,7 @@ git config --global core.untrackedcache true
 git config --global init.defaultBranch main
 
 # rust
-InstallOrSkip -command "scoop install rustup" -target "cargo"
-InstallOrSkip -command "cargo install fd-find" -target "fd"
-InstallOrSkip -command "cargo install ripgrep" -target "rg"
-InstallOrSkip -command "cargo install --locked bat" -target "bat"
-InstallOrSkip -command "cargo install eza" -target "eza"
-
-# go
-# see: https://github.com/kerolloz/go-installer
-InstallOrSkip -command "scoop install go" -target "go"
-InstallOrSkip -command "go install github.com/jesseduffield/lazygit@latest" -target "lazygit"
+InstallWith -command "scoop install rustup" -target "cargo"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
