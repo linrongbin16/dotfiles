@@ -19,6 +19,9 @@ else
 	alias ll="ls -alh"
 fi
 
+# neovide
+alias gnvim="neovide"
+
 # lazygit
 alias lg="lazygit"
 
