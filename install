@@ -315,6 +315,45 @@ depends_nerdfont_linux "CodeNewRoman.zip"
 depends_nerdfont_linux "FiraCode.zip"
 depends_nerdfont_linux "SourceCodePro.zip"
 
+depends_monaco_nerdfont_linux() {
+	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+	local font_dir="monaco-nerd-fonts"
+	local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
+	info "install Monaco nerd fonts from github"
+	if [ -d $font_dir ]; then
+		rm -rf $font_dir
+	fi
+	git clone --depth=1 $font_url
+	if [ $? -ne 0 ]; then
+		info "failed to download $font_dir, skip..."
+	else
+		info "install Monaco nerd fonts from github - done"
+		cp $font_dir/fonts/* .
+	fi
+	sudo fc-cache -f -v
+}
+
+depends_monaco_nerdfont_macos() {
+	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+	local org="ryanoasis"
+	local repo="nerd-fonts"
+	local font_file=$1
+	local font_version=$(get_nerdfont_latest_release_tag $org $repo)
+	local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
+	info "install $font_file($font_version) nerd fonts from github"
+	if [ -f $font_file ]; then
+		rm -rf $font_file
+	fi
+	curl -L $font_url -o $font_file
+	if [ $? -ne 0 ]; then
+		info "failed to download $font_file, skip..."
+	else
+		unzip -o $font_file
+		info "install $font_file($font_version) nerd font from github - done"
+	fi
+	sudo fc-cache -f -v
+}
+
 # prompt
 
 # pure
