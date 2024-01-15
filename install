@@ -7,13 +7,6 @@ DOTS=$(dirname "$INIT")
 DEPS=$DOTS/deps
 OS="$(uname -s)"
 
-IS_APT=0
-IS_DNF=0
-IS_PACMAN=0
-IS_BREW=0
-
-source $DEPS/util.sh
-
 # utils {
 
 info() {
@@ -334,25 +327,27 @@ depends_monaco_nerdfont_linux() {
 }
 
 depends_monaco_nerdfont_macos() {
-	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-	local org="ryanoasis"
-	local repo="nerd-fonts"
-	local font_file=$1
-	local font_version=$(get_nerdfont_latest_release_tag $org $repo)
-	local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
-	info "install $font_file($font_version) nerd fonts from github"
-	if [ -f $font_file ]; then
-		rm -rf $font_file
+	cd ~/Library/Fonts
+	local font_dir="monaco-nerd-fonts"
+	local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
+	info "install Monaco nerd fonts from github"
+	if [ -d $font_dir ]; then
+		rm -rf $font_dir
 	fi
-	curl -L $font_url -o $font_file
+	git clone --depth=1 $font_url
 	if [ $? -ne 0 ]; then
-		info "failed to download $font_file, skip..."
+		info "failed to download $font_dir, skip..."
 	else
-		unzip -o $font_file
-		info "install $font_file($font_version) nerd font from github - done"
+		info "install Monaco nerd fonts from github - done"
+		cp $font_dir/fonts/* .
 	fi
-	sudo fc-cache -f -v
 }
+
+if [ "$OS" == "Darwin" ]; then
+	depends_monaco_nerdfont_macos
+else
+	depends_monaco_nerdfont_linux
+fi
 
 # prompt
 
