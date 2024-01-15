@@ -487,8 +487,7 @@ config.font_size = FONT_SIZE
 
 config.color_scheme = "lavi"
 config.enable_scroll_bar = true
-
-config.colors.scrollbar_thumb = "orange"
+config.colors.scrollbar_thumb = "#A872FB"
 
 -- https://wezfurlong.org/wezterm/config/lua/config/hyperlink_rules.html
 
