@@ -77,7 +77,10 @@ if not IS_MACOS then
 	FONT_SIZE = 11.0
 end
 
-local config = { colors = {} }
+local config = {
+	front_end = "WebGpu",
+	colors = {}
+}
 
 -- utils.lua {
 -- utility functions extracted from Neovim
