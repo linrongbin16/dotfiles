@@ -49,8 +49,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
 
 cd $env:USERPROFILE
-ssh-keygen -t rsa -b 4096 -C 'linrongbin16@outlook.com'
-git clone git@github.com:linrongbin16/dotfiles.git .dotfiles
+git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
 .\install.ps1
 ```
