@@ -1,6 +1,6 @@
 # dotfiles
 
-My dotfiles.
+My dot files.
 
 ## Install
 
@@ -19,8 +19,7 @@ Zsh/Bash:
 
 ```bash
 cd ~
-ssh-keygen -t rsa -b 4096 -C 'linrongbin16@outlook.com'
-git clone git@github.com:linrongbin16/dotfiles.git .dotfiles
+git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
 ./install
 ```
