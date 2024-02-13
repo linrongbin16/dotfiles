@@ -78,10 +78,13 @@ if not IS_MACOS then
 end
 
 local config = {
-	front_end = "WebGpu",
-	webgpu_power_preference = "HighPerformance",
-	colors = {}
+	colors = {},
 }
+
+if IS_WINDOWS or IS_MACOS then
+	config.front_end = "WebGpu"
+	config.webgpu_power_preference = "HighPerformance"
+end
 
 -- utils.lua {
 -- utility functions extracted from Neovim
