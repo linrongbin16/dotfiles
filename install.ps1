@@ -61,8 +61,8 @@ InstallWith -command "scoop install neovim" -target "nvim"
 InstallWith -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
 
 # python3
-python3 -m pip install click --user
-python3 -m pip install tinydb --user
+python3 -m pip install click --user --break-system-packages
+python3 -m pip install tinydb --user --break-system-packages
 
 # nerd fonts
 scoop install nerd-fonts/Hack-NF
