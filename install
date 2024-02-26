@@ -270,8 +270,8 @@ install_with "cargo install --locked bat" "bat"
 install_with "cargo install eza" "eza"
 
 # python3
-python3 -m pip install click --user
-python3 -m pip install tinydb --user
+python3 -m pip install click --user --break-system-packages
+python3 -m pip install tinydb --user --break-system-packages
 
 # patched font
 get_nerdfont_latest_release_tag() {
