@@ -248,10 +248,12 @@ Darwin)
 esac
 
 # zsh
-if [ "$(basename $SHELL)" != "zsh" ]; then
-	chsh -s $(which zsh)
-	zsh
-fi
+if [ ! $GITHUB_ACTIONS ]; then
+    if [ "$(basename $SHELL)" != "zsh" ]; then
+        chsh -s $(which zsh)
+        zsh
+    fi
+end
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
