@@ -34,7 +34,7 @@ Enable [developer mode](https://learn.microsoft.com/en-us/windows/apps/get-start
 
 #### Visual Studio
 
-Install [Visual Studio](https://www.visualstudio.com/) with the below 2 components:
+Install [Visual Studio](https://www.visualstudio.com/) with MSVC components:
 
 - .NET Desktop Development
 - Desktop development with C++
