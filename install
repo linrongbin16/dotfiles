@@ -368,7 +368,7 @@ depends_monaco_nerdfont_macos() {
 	fi
 }
 
-if [ "$OS" == "Darwin" ]; then
+if [ "$OS" = "Darwin" ]; then
 	depends_monaco_nerdfont_macos
 	depends_nerdfont_macos "font-hack-nerd-font"
 	depends_nerdfont_macos "font-noto-nerd-font"
