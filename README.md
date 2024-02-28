@@ -1,5 +1,7 @@
 # dotfiles
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/linrongbin16/dotfiles/ci.yml?label=ci)
+
 My dot files.
 
 ## Install
@@ -34,7 +36,7 @@ Enable [developer mode](https://learn.microsoft.com/en-us/windows/apps/get-start
 
 #### Visual Studio
 
-Install [Visual Studio](https://www.visualstudio.com/) with the below 2 components:
+Install [Visual Studio](https://www.visualstudio.com/) with MSVC components:
 
 - .NET Desktop Development
 - Desktop development with C++

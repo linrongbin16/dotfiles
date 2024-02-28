@@ -2,10 +2,18 @@
 
 # set -x
 
-INIT=$(realpath "$0")
-DOTS=$(dirname "$INIT")
-DEPS=$DOTS/deps
 OS="$(uname -s)"
+
+GITHUB_ACTIONS=0
+
+for i in "$@"; do
+	case $i in
+	--github-actions)
+		GITHUB_ACTIONS=1
+		;;
+	*) ;;
+	esac
+done
 
 # utils {
 
@@ -84,8 +92,8 @@ depends_apt() {
 	install_with "sudo apt-get install -q -y xsel" "xsel"
 	install_with "sudo apt-get install -q -y xclip" "xclip"
 
-	install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils python3-pynvim" "python3"
-	install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils python3-pynvim" "pip3"
+	install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
+	install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
 
 	install_with "depends_apt_nvim" "nvim"
 	install_with "sudo apt-get install -q -y vim" "vim"
@@ -248,9 +256,13 @@ Darwin)
 esac
 
 # zsh
-if [ "$(basename $SHELL)" != "zsh" ]; then
-	chsh -s $(which zsh)
-	zsh
+if [ $GITHUB_ACTIONS -ne 1 ]; then
+	if [ "$(basename $SHELL)" != "zsh" ]; then
+		chsh -s $(which zsh)
+		zsh
+	else
+		info "\$SHELL is already zsh, skip..."
+	fi
 fi
 
 # git config
@@ -263,15 +275,27 @@ git config --global init.defaultBranch main
 
 # rust
 install_with "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
+install_with "curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash" "cargo-binstall"
 source "$HOME/.cargo/env"
-install_with "cargo install fd-find" "fd"
-install_with "cargo install ripgrep" "rg"
-install_with "cargo install --locked bat" "bat"
-install_with "cargo install eza" "eza"
+install_with "cargo binstall --no-confirm fd-find" "fd"
+install_with "cargo binstall --no-confirm ripgrep" "rg"
+install_with "cargo binstall --no-confirm bat" "bat"
+install_with "cargo binstall --no-confirm eza" "eza"
 
 # python3
-python3 -m pip install click --user --break-system-packages
-python3 -m pip install tinydb --user --break-system-packages
+
+python_has_pep668=$(python3 -c 'import sys; major=sys.version_info.major; minor=sys.version_info.minor; micro=sys.version_info.micro; r1=major >= 3 and minor > 11; r2=major >= 3 and minor == 11 and micro >= 1; print(1 if r1 or r2 else 0)')
+if [ $GITHUB_ACTIONS -eq 1 ]; then
+	python3 --version
+fi
+
+if [[ $python_has_pep668 -eq 1 ]]; then
+	python3 -m pip install click --user --break-system-packages
+	python3 -m pip install tinydb --user --break-system-packages
+else
+	python3 -m pip install click --user
+	python3 -m pip install tinydb --user
+fi
 
 # patched font
 get_nerdfont_latest_release_tag() {
@@ -302,11 +326,12 @@ depends_nerdfont_linux() {
 	sudo fc-cache -f -v
 }
 
-depends_nerdfont_linux "Hack.zip"
-depends_nerdfont_linux "Noto.zip"
-depends_nerdfont_linux "CodeNewRoman.zip"
-depends_nerdfont_linux "FiraCode.zip"
-depends_nerdfont_linux "SourceCodePro.zip"
+depends_nerdfont_macos() {
+	local font_name=$1
+	info "install $font_name nerd fonts with brew"
+	brew tap homebrew/cask-fonts
+	brew install --cask $font_name
+}
 
 depends_monaco_nerdfont_linux() {
 	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
@@ -343,10 +368,20 @@ depends_monaco_nerdfont_macos() {
 	fi
 }
 
-if [ "$OS" == "Darwin" ]; then
+if [ "$OS" = "Darwin" ]; then
 	depends_monaco_nerdfont_macos
+	depends_nerdfont_macos "font-hack-nerd-font"
+	depends_nerdfont_macos "font-noto-nerd-font"
+	depends_nerdfont_macos "font-code-new-roman-nerd-font"
+	depends_nerdfont_macos "font-fira-code-nerd-font"
+	depends_nerdfont_macos "font-sauce-code-pro-nerd-font"
 else
 	depends_monaco_nerdfont_linux
+	depends_nerdfont_linux "Hack.zip"
+	depends_nerdfont_linux "Noto.zip"
+	depends_nerdfont_linux "CodeNewRoman.zip"
+	depends_nerdfont_linux "FiraCode.zip"
+	depends_nerdfont_linux "SourceCodePro.zip"
 fi
 
 # prompt
