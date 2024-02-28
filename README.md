@@ -1,5 +1,7 @@
 # dotfiles
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/linrongbin16/dotfiles/ci.yml?label=ci)
+
 My dot files.
 
 ## Install
