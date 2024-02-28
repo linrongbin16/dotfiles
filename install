@@ -4,6 +4,17 @@
 
 OS="$(uname -s)"
 
+GITHUB_ACTIONS=0
+
+for i in "$@"; do
+	case $i in
+	--github-actions)
+		GITHUB_ACTIONS=1
+		;;
+	*) ;;
+	esac
+done
+
 # utils {
 
 info() {
@@ -245,9 +256,13 @@ Darwin)
 esac
 
 # zsh
-if [ "$(basename $SHELL)" != "zsh" ]; then
-	chsh -s $(which zsh)
-	zsh
+if [ $GITHUB_ACTIONS -ne 1 ]; then
+	if [ "$(basename $SHELL)" != "zsh" ]; then
+		chsh -s $(which zsh)
+		zsh
+	else
+		info "\$SHELL is already zsh, skip..."
+	fi
 fi
 
 # git config
@@ -269,7 +284,9 @@ install_with "cargo install eza" "eza"
 # python3
 
 python_has_pep668=$(python3 -c 'import sys; major=sys.version_info.major; minor=sys.version_info.minor; micro=sys.version_info.micro; r1=major >= 3 and minor > 11; r2=major >= 3 and minor == 11 and micro >= 1; print(1 if r1 or r2 else 0)')
-python3 --version
+if [ $GITHUB_ACTIONS -eq 1 ]; then
+	python3 --version
+fi
 
 if [[ $python_has_pep668 -eq 1 ]]; then
 	python3 -m pip install click --user --break-system-packages
