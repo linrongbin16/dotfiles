@@ -61,8 +61,15 @@ InstallWith -command "scoop install neovim" -target "nvim"
 InstallWith -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
 
 # python3
-python3 -m pip install click --user --break-system-packages
-python3 -m pip install tinydb --user --break-system-packages
+
+$PythonHasPep668 = python3 -c 'import sys; major=sys.version_info.major; minor=sys.version_info.minor; micro=sys.version_info.micro; r1=major >= 3 and minor > 11; r2=major >= 3 and minor == 11 and micro >= 1; print(1 if r1 or r2 else 0)'
+if ($PythonHasPep668 -eq 1) {
+    python3 -m pip install click --user --break-system-packages
+    python3 -m pip install tinydb --user --break-system-packages
+} else {
+    python3 -m pip install click --user
+    python3 -m pip install tinydb --user
+}
 
 # nerd fonts
 scoop install nerd-fonts/Hack-NF
@@ -84,8 +91,9 @@ git config --global core.fsmonitor true
 git config --global core.untrackedcache true
 git config --global init.defaultBranch main
 
-# rust
+# rust/cargo
 InstallWith -command "scoop install rustup" -target "cargo"
+Set-ExecutionPolicy Unrestricted -Scope Process; iex (iwr "https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.ps1").Content
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
