@@ -47,4 +47,4 @@ jobs:
           set -x
           echo '${{ steps.extract_branch.outputs.branch }}'
           echo ${{ steps.extract_branch.outputs.branch }}
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && bash -euxo pipefail ./install
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && zsh -euxo pipefail ./install
