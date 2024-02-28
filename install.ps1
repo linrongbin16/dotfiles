@@ -67,8 +67,8 @@ InstallWith -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh
 #     python3 -m pip install click --user --break-system-packages
 #     python3 -m pip install tinydb --user --break-system-packages
 # } else {
-    python3 -m pip install click --user
-    python3 -m pip install tinydb --user
+python3 -m pip install click --user
+python3 -m pip install tinydb --user
 # }
 
 # nerd fonts
