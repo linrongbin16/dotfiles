@@ -397,6 +397,12 @@ if [ ! -f ~/.wezterm.lua ]; then
 	cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
 fi
 
+# kitty
+if [ ! -f ~/.config/kitty/kitty.conf ]; then
+	mkdir -p $HOME/.config/kitty
+	cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
+fi
+
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
