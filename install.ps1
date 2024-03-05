@@ -93,7 +93,7 @@ git config --global init.defaultBranch main
 
 # rust/cargo
 InstallWith -command "scoop install rustup" -target "cargo"
-Set-ExecutionPolicy Unrestricted -Scope Process; iex (iwr "https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.ps1").Content
+InstallWith -command "scoop install cargo-binstall" -target "cargo-binstall"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))

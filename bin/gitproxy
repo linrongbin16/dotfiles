@@ -178,6 +178,14 @@ def set_proxy(name):
 
 
 def print_sh(name):
+    debug(f"name:{name}, DB.count():{DB.count()}")
+    if len(name) == 0:
+        if DB.count() < 1:
+            err(f"proxy '{name}' not found, exit...")
+            return
+        elif DB.count() > 1:
+            err(f"multiple proxies exist, please specify a proxy 'name', exit...")
+            return
     p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
     if not p:
         err(f"proxy '{name}' not found, exit...")
@@ -186,6 +194,14 @@ def print_sh(name):
 
 
 def print_pwsh(name):
+    debug(f"name:{name}, DB.count():{DB.count()}")
+    if len(name) == 0:
+        if DB.count() < 1:
+            err(f"proxy '{name}' not found, exit...")
+            return
+        elif DB.count() > 1:
+            err(f"multiple proxies exist, please specify a proxy 'name', exit...")
+            return
     p = DB.first() if (DB.count() == 1 and len(name) == 0) else DB.find(name[0])
     if not p:
         err(f"proxy '{name}' not found, exit...")
