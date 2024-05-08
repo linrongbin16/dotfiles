@@ -58,7 +58,7 @@ InstallWith -command "scoop install python" -target "python3"
 
 InstallWith -command "scoop install vim" -target "vim"
 InstallWith -command "scoop install neovim" -target "nvim"
-InstallWith -command "scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json" -target "oh-my-posh"
+InstallWith -command "scoop install starship" -target "starship"
 
 # python3
 
@@ -93,7 +93,6 @@ git config --global init.defaultBranch main
 
 # rust/cargo
 InstallWith -command "scoop install rustup" -target "cargo"
-InstallWith -command "scoop install cargo-binstall" -target "cargo-binstall"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
