@@ -30,6 +30,7 @@ Info "install dependencies for windows"
 
 # deps
 scoop bucket add extras
+scoop install mingw
 scoop install uutils-coreutils
 InstallWith -command "scoop install which" -target "which"
 InstallWith -command "scoop install gawk" -target "awk"
