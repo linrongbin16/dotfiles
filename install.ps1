@@ -71,6 +71,7 @@ python3 -m pip install tinydb --user
 # }
 
 # nerd fonts
+scoop bucket add nerd-fonts
 scoop install nerd-fonts/Hack-NF
 scoop install nerd-fonts/Hack-NF-Mono
 scoop install nerd-fonts/Noto-NF
