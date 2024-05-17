@@ -138,12 +138,8 @@ depends_brew() {
 	install_with "brew install lazygit" "lazygit"
 
 	# nerd-font
-	brew tap homebrew/cask-fonts
-	brew install --cask font-hack-nerd-font
-	brew install --cask font-noto-nerd-font
-	brew install --cask font-code-new-roman-nerd-font
-	brew install --cask font-sauce-code-pro-nerd-font
-	brew install --cask font-fira-code-nerd-font
+	brew install font-hack-nerd-font
+	brew install font-d2coding-nerd-font
 }
 
 # brew }
@@ -329,8 +325,7 @@ depends_nerdfont_linux() {
 depends_nerdfont_macos() {
 	local font_name=$1
 	info "install $font_name nerd fonts with brew"
-	brew tap homebrew/cask-fonts
-	brew install --cask $font_name
+	brew install $font_name
 }
 
 depends_monaco_nerdfont_linux() {
@@ -371,10 +366,7 @@ depends_monaco_nerdfont_macos() {
 if [ "$OS" = "Darwin" ]; then
 	depends_monaco_nerdfont_macos
 	depends_nerdfont_macos "font-hack-nerd-font"
-	depends_nerdfont_macos "font-noto-nerd-font"
-	depends_nerdfont_macos "font-code-new-roman-nerd-font"
-	depends_nerdfont_macos "font-fira-code-nerd-font"
-	depends_nerdfont_macos "font-sauce-code-pro-nerd-font"
+	depends_nerdfont_macos "font-d2coding-nerd-font"
 else
 	depends_monaco_nerdfont_linux
 	depends_nerdfont_linux "Hack.zip"
