@@ -378,12 +378,6 @@ fi
 
 # prompt
 
-# pure
-if [ ! -d ~/.zsh ]; then
-	mkdir -p "$HOME/.zsh"
-	git clone https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
-fi
-
 # wezterm
 if [ ! -f ~/.wezterm.lua ]; then
 	cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
