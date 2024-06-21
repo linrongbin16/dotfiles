@@ -134,10 +134,6 @@ depends_brew() {
 	install_with "brew install eza" "eza"
 
 	install_with "brew install lazygit" "lazygit"
-
-	# nerd-font
-	brew install font-hack-nerd-font
-	brew install font-d2coding-nerd-font
 }
 
 # brew }
