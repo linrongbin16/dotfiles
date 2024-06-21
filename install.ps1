@@ -74,14 +74,14 @@ python3 -m pip install tinydb --user
 scoop bucket add nerd-fonts
 scoop install nerd-fonts/Hack-NF
 scoop install nerd-fonts/Hack-NF-Mono
-scoop install nerd-fonts/Noto-NF
-scoop install nerd-fonts/Noto-NF-Mono
+scoop install nerd-fonts/D2Coding-NF
+scoop install nerd-fonts/D2Coding-NF-Mono
 scoop install nerd-fonts/CodeNewRoman-NF
 scoop install nerd-fonts/CodeNewRoman-NF-Mono
-scoop install nerd-fonts/FiraCode-NF
-scoop install nerd-fonts/FiraCode-NF-Mono
 scoop install nerd-fonts/SourceCodePro-NF
 scoop install nerd-fonts/SourceCodePro-NF-Mono
+scoop install nerd-fonts/Noto-NF
+scoop install nerd-fonts/Noto-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
