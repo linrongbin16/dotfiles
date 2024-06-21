@@ -363,13 +363,16 @@ if [ "$OS" = "Darwin" ]; then
 	depends_monaco_nerdfont_macos
 	depends_nerdfont_macos "font-hack-nerd-font"
 	depends_nerdfont_macos "font-d2coding-nerd-font"
+	depends_nerdfont_macos "font-code-new-roman-nerd-font"
+	depends_nerdfont_macos "font-sauce-code-pro-nerd-font"
+	depends_nerdfont_macos "font-noto-nerd-font"
 else
 	depends_monaco_nerdfont_linux
 	depends_nerdfont_linux "Hack.zip"
-	depends_nerdfont_linux "Noto.zip"
+	depends_nerdfont_linux "D2Coding.zip"
 	depends_nerdfont_linux "CodeNewRoman.zip"
-	depends_nerdfont_linux "FiraCode.zip"
 	depends_nerdfont_linux "SourceCodePro.zip"
+	depends_nerdfont_linux "Noto.zip"
 fi
 
 # prompt
