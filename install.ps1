@@ -56,7 +56,6 @@ InstallWith -command "scoop install extras/lazygit" -target "lazygit"
 
 InstallWith -command "scoop install python" -target "python3"
 
-InstallWith -command "scoop install vim" -target "vim"
 InstallWith -command "scoop install neovim" -target "nvim"
 InstallWith -command "scoop install starship" -target "starship"
 
