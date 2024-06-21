@@ -32,7 +32,6 @@ alias gb="git branch"
 alias gm="git merge"
 alias gcm="git commit"
 alias gck="git checkout"
-alias gcf="git config"
 
 # path
 export PATH="$PATH:$HOME/.dotfiles/bin"
