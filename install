@@ -7,38 +7,38 @@ OS="$(uname -s)"
 GITHUB_ACTIONS=0
 
 for i in "$@"; do
-	case $i in
-	--github-actions)
-		GITHUB_ACTIONS=1
-		;;
-	*) ;;
-	esac
+  case $i in
+  --github-actions)
+    GITHUB_ACTIONS=1
+    ;;
+  *) ;;
+  esac
 done
 
 # utils {
 
 info() {
-	local content="$*"
-	printf "[dotfiles] - %s\n" "$content"
+  local content="$*"
+  printf "[dotfiles] - %s\n" "$content"
 }
 
 skip_info() {
-	local old="$IFS"
-	IFS='/'
-	local target="'$*'"
-	info "$target already exist, skip..."
-	IFS=$old
+  local old="$IFS"
+  IFS='/'
+  local target="'$*'"
+  info "$target already exist, skip..."
+  IFS=$old
 }
 
 install_with() {
-	local command="$1"
-	local target="$2"
-	if ! type "$target" >/dev/null 2>&1; then
-		info "install '$target' with: '$command'"
-		eval "$command"
-	else
-		skip_info $target
-	fi
+  local command="$1"
+  local target="$2"
+  if ! type "$target" >/dev/null 2>&1; then
+    info "install '$target' with: '$command'"
+    eval "$command"
+  else
+    skip_info $target
+  fi
 }
 
 # utils }
@@ -46,57 +46,57 @@ install_with() {
 # apt {
 
 depends_apt_nvim() {
-	info "install 'nvim'(appimage) from github.com"
-	sudo apt-get -q -y install fuse
-	wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
-	sudo mkdir -p /usr/local/bin
-	chmod u+x nvim.appimage
-	sudo mv nvim.appimage /usr/local/bin/nvim
+  info "install 'nvim'(appimage) from github.com"
+  sudo apt-get -q -y install fuse
+  wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
+  sudo mkdir -p /usr/local/bin
+  chmod u+x nvim.appimage
+  sudo mv nvim.appimage /usr/local/bin/nvim
 }
 
 depends_apt_node() {
-	# see: https://github.com/nodesource/distributions
-	info "install nodejs from deb.nodesource.com"
-	sudo apt-get -q -y install ca-certificates gnupg
-	sudo mkdir -p /etc/apt/keyrings
-	curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-	NODE_MAJOR=20
-	echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-	sudo apt-get -q update
-	sudo apt-get -q -y install nodejs
+  # see: https://github.com/nodesource/distributions
+  info "install nodejs from deb.nodesource.com"
+  sudo apt-get -q -y install ca-certificates gnupg
+  sudo mkdir -p /etc/apt/keyrings
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+  NODE_MAJOR=20
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+  sudo apt-get -q update
+  sudo apt-get -q -y install nodejs
 }
 
 depends_apt() {
-	info "install dependencies with apt"
-	sudo apt-get -q -y update
+  info "install dependencies with apt"
+  sudo apt-get -q -y update
 
-	install_with "sudo apt-get install -q -y build-essential" "gcc"
-	install_with "sudo apt-get install -q -y build-essential" "make"
-	install_with "sudo apt-get install -q -y autoconf" "autoconf"
-	install_with "sudo apt-get install -q -y automake" "automake"
-	install_with "sudo apt-get install -q -y pkg-config" "pkg-config"
-	install_with "sudo apt-get install -q -y cmake" "cmake"
+  install_with "sudo apt-get install -q -y build-essential" "gcc"
+  install_with "sudo apt-get install -q -y build-essential" "make"
+  install_with "sudo apt-get install -q -y autoconf" "autoconf"
+  install_with "sudo apt-get install -q -y automake" "automake"
+  install_with "sudo apt-get install -q -y pkg-config" "pkg-config"
+  install_with "sudo apt-get install -q -y cmake" "cmake"
 
-	# install latest git from ppa
-	sudo apt-add-repository ppa:git-core/ppa
-	sudo apt-get -q -q -y update
-	# sudo apt-get install git
-	install_with "sudo apt-get install -q -y git" "git"
-	install_with "sudo apt-get install -q -y curl" "curl"
-	install_with "sudo apt-get install -q -y wget" "wget"
+  # install latest git from ppa
+  sudo apt-add-repository ppa:git-core/ppa
+  sudo apt-get -q -q -y update
+  # sudo apt-get install git
+  install_with "sudo apt-get install -q -y git" "git"
+  install_with "sudo apt-get install -q -y curl" "curl"
+  install_with "sudo apt-get install -q -y wget" "wget"
 
-	install_with "sudo apt-get install -q -y gzip" "gzip"
-	install_with "sudo apt-get install -q -y p7zip" "7z"
-	install_with "sudo apt-get install -q -y unzip" "unzip"
+  install_with "sudo apt-get install -q -y gzip" "gzip"
+  install_with "sudo apt-get install -q -y p7zip" "7z"
+  install_with "sudo apt-get install -q -y unzip" "unzip"
 
-	install_with "sudo apt-get install -q -y xsel" "xsel"
-	install_with "sudo apt-get install -q -y xclip" "xclip"
+  install_with "sudo apt-get install -q -y xsel" "xsel"
+  install_with "sudo apt-get install -q -y xclip" "xclip"
 
-	install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
-	install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
+  install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
+  install_with "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
 
-	install_with "depends_apt_nvim" "nvim"
-	install_with "sudo apt-get install -q -y zsh" "zsh"
+  install_with "depends_apt_nvim" "nvim"
+  install_with "sudo apt-get install -q -y zsh" "zsh"
 }
 
 # apt }
@@ -104,36 +104,36 @@ depends_apt() {
 # brew {
 
 depends_brew() {
-	info "install dependencies with brew"
+  info "install dependencies with brew"
 
-	install_with "xcode-select --install" "clang"
-	install_with "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
-	brew update
+  install_with "xcode-select --install" "clang"
+  install_with "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
+  brew update
 
-	install_with "brew install autoconf" "autoconf"
-	install_with "brew install automake" "automake"
-	install_with "brew install pkg-config" "pkg-config"
-	install_with "brew install cmake" "cmake"
+  install_with "brew install autoconf" "autoconf"
+  install_with "brew install automake" "automake"
+  install_with "brew install pkg-config" "pkg-config"
+  install_with "brew install cmake" "cmake"
 
-	install_with "brew install git" "git"
-	install_with "brew install curl" "curl"
-	install_with "brew install wget" "wget"
+  install_with "brew install git" "git"
+  install_with "brew install curl" "curl"
+  install_with "brew install wget" "wget"
 
-	install_with "brew install gzip" "gzip"
-	install_with "brew install p7zip" "7z"
-	install_with "brew install unzip" "unzip"
+  install_with "brew install gzip" "gzip"
+  install_with "brew install p7zip" "7z"
+  install_with "brew install unzip" "unzip"
 
-	install_with "brew install python3" "python3"
+  install_with "brew install python3" "python3"
 
-	install_with "brew install neovim" "nvim"
-	install_with "brew install zsh" "zsh"
+  install_with "brew install neovim" "nvim"
+  install_with "brew install zsh" "zsh"
 
-	install_with "brew install fd" "fd"
-	install_with "brew install rg" "rg"
-	install_with "brew install bat" "bat"
-	install_with "brew install eza" "eza"
+  install_with "brew install fd" "fd"
+  install_with "brew install rg" "rg"
+  install_with "brew install bat" "bat"
+  install_with "brew install eza" "eza"
 
-	install_with "brew install lazygit" "lazygit"
+  install_with "brew install lazygit" "lazygit"
 }
 
 # brew }
@@ -141,32 +141,32 @@ depends_brew() {
 # pacman {
 
 depends_pacman() {
-	info "install dependencies with pacman"
-	sudo pacman -Syy
+  info "install dependencies with pacman"
+  sudo pacman -Syy
 
-	install_with "yes | sudo pacman -S base-devel" "gcc"
-	install_with "yes | sudo pacman -S base-devel" "make"
-	install_with "yes | sudo pacman -S autoconf" "autoconf"
-	install_with "yes | sudo pacman -S automake" "automake"
-	install_with "yes | sudo pacman -S pkg-config" "pkg-config"
-	install_with "yes | sudo pacman -S cmake" "cmake"
+  install_with "yes | sudo pacman -S base-devel" "gcc"
+  install_with "yes | sudo pacman -S base-devel" "make"
+  install_with "yes | sudo pacman -S autoconf" "autoconf"
+  install_with "yes | sudo pacman -S automake" "automake"
+  install_with "yes | sudo pacman -S pkg-config" "pkg-config"
+  install_with "yes | sudo pacman -S cmake" "cmake"
 
-	install_with "yes | sudo pacman -S git" "git"
-	install_with "yes | sudo pacman -S curl" "curl"
-	install_with "yes | sudo pacman -S wget" "wget"
+  install_with "yes | sudo pacman -S git" "git"
+  install_with "yes | sudo pacman -S curl" "curl"
+  install_with "yes | sudo pacman -S wget" "wget"
 
-	install_with "yes | sudo pacman -S unzip" "unzip"
-	install_with "yes | sudo pacman -S gzip" "gzip"
-	install_with "yes | sudo pacman -S p7zip" "7z"
-	install_with "yes | sudo pacman -S atool" "atool"
+  install_with "yes | sudo pacman -S unzip" "unzip"
+  install_with "yes | sudo pacman -S gzip" "gzip"
+  install_with "yes | sudo pacman -S p7zip" "7z"
+  install_with "yes | sudo pacman -S atool" "atool"
 
-	install_with "yes | sudo pacman -S xsel" "xsel"
-	install_with "yes | sudo pacman -S xclip" "xclip"
+  install_with "yes | sudo pacman -S xsel" "xsel"
+  install_with "yes | sudo pacman -S xclip" "xclip"
 
-	install_with "yes | sudo pacman -S python python-pip" "python3"
+  install_with "yes | sudo pacman -S python python-pip" "python3"
 
-	install_with "yes | sudo pacman -S neovim" "nvim"
-	install_with "yes | sudo pacman -S zsh" "zsh"
+  install_with "yes | sudo pacman -S neovim" "nvim"
+  install_with "yes | sudo pacman -S zsh" "zsh"
 }
 
 # pacman }
@@ -174,31 +174,31 @@ depends_pacman() {
 # dnf {
 
 depends_dnf() {
-	info "install dependencies with dnf"
-	sudo dnf check-update
+  info "install dependencies with dnf"
+  sudo dnf check-update
 
-	install_with "sudo dnf group install -y \"Development Tools\"" "gcc"
-	install_with "sudo dnf group install -y \"Development Tools\"" "make"
-	install_with "sudo dnf install -y autoconf" "autoconf"
-	install_with "sudo dnf install -y automake" "automake"
-	install_with "sudo dnf install -y pkg-config" "pkg-config"
-	install_with "sudo dnf install -y cmake" "cmake"
+  install_with "sudo dnf group install -y \"Development Tools\"" "gcc"
+  install_with "sudo dnf group install -y \"Development Tools\"" "make"
+  install_with "sudo dnf install -y autoconf" "autoconf"
+  install_with "sudo dnf install -y automake" "automake"
+  install_with "sudo dnf install -y pkg-config" "pkg-config"
+  install_with "sudo dnf install -y cmake" "cmake"
 
-	install_with "sudo dnf install -y git" "git"
-	install_with "sudo dnf install -y curl" "curl"
-	install_with "sudo dnf install -y wget" "wget"
+  install_with "sudo dnf install -y git" "git"
+  install_with "sudo dnf install -y curl" "curl"
+  install_with "sudo dnf install -y wget" "wget"
 
-	install_with "sudo dnf install -y gzip" "gzip"
-	install_with "sudo dnf install -y p7zip" "7z"
-	install_with "sudo dnf install -y unzip" "unzip"
+  install_with "sudo dnf install -y gzip" "gzip"
+  install_with "sudo dnf install -y p7zip" "7z"
+  install_with "sudo dnf install -y unzip" "unzip"
 
-	install_with "sudo dnf install -y xsel" "xsel"
-	install_with "sudo dnf install -y xclip" "xclip"
+  install_with "sudo dnf install -y xsel" "xsel"
+  install_with "sudo dnf install -y xclip" "xclip"
 
-	install_with "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
+  install_with "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 
-	install_with "sudo dnf install -y neovim" "nvim"
-	install_with "sudo dnf install -y zsh" "zsh"
+  install_with "sudo dnf install -y neovim" "nvim"
+  install_with "sudo dnf install -y zsh" "zsh"
 }
 
 # dnf }
@@ -207,58 +207,56 @@ depends_dnf() {
 
 case "$OS" in
 Linux)
-	if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
-		depends_pacman
-	elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
-		depends_dnf
-	elif [ -f "/etc/gentoo-release" ]; then
-		# emerge
-		info "gentoo is not supported, exit..."
-		exit 1
-	else
-		depends_apt
-	fi
-	;;
+  if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
+    depends_pacman
+  elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
+    depends_dnf
+  elif [ -f "/etc/gentoo-release" ]; then
+    # emerge
+    info "gentoo is not supported, exit..."
+    exit 1
+  else
+    depends_apt
+  fi
+  ;;
 FreeBSD)
-	# pkg
-	info "FreeBSD is not supported, exit..."
-	exit 1
-	;;
+  # pkg
+  info "FreeBSD is not supported, exit..."
+  exit 1
+  ;;
 NetBSD)
-	# pkgin
-	info "NetBSD is not supported, exit..."
-	exit 1
-	;;
+  # pkgin
+  info "NetBSD is not supported, exit..."
+  exit 1
+  ;;
 OpenBSD)
-	# pkg_add
-	info "OpenBSD is not supported, exit..."
-	exit 1
-	;;
+  # pkg_add
+  info "OpenBSD is not supported, exit..."
+  exit 1
+  ;;
 Darwin)
-	depends_brew
-	;;
+  depends_brew
+  ;;
 *)
-	info "$OS is not supported, exit..."
-	exit 1
-	;;
+  info "$OS is not supported, exit..."
+  exit 1
+  ;;
 esac
 
 # zsh
 if [ $GITHUB_ACTIONS -ne 1 ]; then
-	if [ "$(basename $SHELL)" != "zsh" ]; then
-		chsh -s $(which zsh)
-		zsh
-	else
-		info "\$SHELL is already zsh, skip..."
-	fi
+  if [ "$(basename $SHELL)" != "zsh" ]; then
+    chsh -s $(which zsh)
+    zsh
+  else
+    info "\$SHELL is already zsh, skip..."
+  fi
 fi
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
 git config --global user.name "linrongbin16"
 git config --global pull.rebase false
-git config --global core.fsmonitor true
-git config --global core.untrackedcache true
 git config --global init.defaultBranch main
 
 # rust
@@ -274,120 +272,120 @@ install_with "cargo install eza" "eza"
 
 python_has_pep668=$(python3 -c 'import sys; major=sys.version_info.major; minor=sys.version_info.minor; micro=sys.version_info.micro; r1=major >= 3 and minor > 11; r2=major >= 3 and minor == 11 and micro >= 1; print(1 if r1 or r2 else 0)')
 if [ $GITHUB_ACTIONS -eq 1 ]; then
-	python3 --version
+  python3 --version
 fi
 
 if [[ $python_has_pep668 -eq 1 ]]; then
-	python3 -m pip install click --user --break-system-packages
-	python3 -m pip install tinydb --user --break-system-packages
+  python3 -m pip install click --user --break-system-packages
+  python3 -m pip install tinydb --user --break-system-packages
 else
-	python3 -m pip install click --user
-	python3 -m pip install tinydb --user
+  python3 -m pip install click --user
+  python3 -m pip install tinydb --user
 fi
 
 # patched font
 get_nerdfont_latest_release_tag() {
-	local org="$1"
-	local repo="$2"
-	local uri="https://github.com/$org/$repo/releases/latest"
-	curl -f -L $uri | grep "href=\"/$org/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
+  local org="$1"
+  local repo="$2"
+  local uri="https://github.com/$org/$repo/releases/latest"
+  curl -f -L $uri | grep "href=\"/$org/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
 }
 
 depends_nerdfont_linux() {
-	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-	local org="ryanoasis"
-	local repo="nerd-fonts"
-	local font_file=$1
-	local font_version=$(get_nerdfont_latest_release_tag $org $repo)
-	local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
-	info "install $font_file($font_version) nerd fonts from github"
-	if [ -f $font_file ]; then
-		rm -rf $font_file
-	fi
-	curl -L $font_url -o $font_file
-	if [ $? -ne 0 ]; then
-		info "failed to download $font_file, skip..."
-	else
-		unzip -o $font_file
-		info "install $font_file($font_version) nerd font from github - done"
-	fi
-	sudo fc-cache -f -v
+  mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+  local org="ryanoasis"
+  local repo="nerd-fonts"
+  local font_file=$1
+  local font_version=$(get_nerdfont_latest_release_tag $org $repo)
+  local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
+  info "install $font_file($font_version) nerd fonts from github"
+  if [ -f $font_file ]; then
+    rm -rf $font_file
+  fi
+  curl -L $font_url -o $font_file
+  if [ $? -ne 0 ]; then
+    info "failed to download $font_file, skip..."
+  else
+    unzip -o $font_file
+    info "install $font_file($font_version) nerd font from github - done"
+  fi
+  sudo fc-cache -f -v
 }
 
 depends_nerdfont_macos() {
-	local font_name=$1
-	info "install $font_name nerd fonts with brew"
-	brew install $font_name
+  local font_name=$1
+  info "install $font_name nerd fonts with brew"
+  brew install $font_name
 }
 
 depends_monaco_nerdfont_linux() {
-	mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-	local font_dir="monaco-nerd-fonts"
-	local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
-	info "install Monaco nerd fonts from github"
-	if [ -d $font_dir ]; then
-		rm -rf $font_dir
-	fi
-	git clone --depth=1 $font_url
-	if [ $? -ne 0 ]; then
-		info "failed to download $font_dir, skip..."
-	else
-		info "install Monaco nerd fonts from github - done"
-		cp $font_dir/fonts/* .
-	fi
-	sudo fc-cache -f -v
+  mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+  local font_dir="monaco-nerd-fonts"
+  local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
+  info "install Monaco nerd fonts from github"
+  if [ -d $font_dir ]; then
+    rm -rf $font_dir
+  fi
+  git clone --depth=1 $font_url
+  if [ $? -ne 0 ]; then
+    info "failed to download $font_dir, skip..."
+  else
+    info "install Monaco nerd fonts from github - done"
+    cp $font_dir/fonts/* .
+  fi
+  sudo fc-cache -f -v
 }
 
 depends_monaco_nerdfont_macos() {
-	cd ~/Library/Fonts
-	local font_dir="monaco-nerd-fonts"
-	local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
-	info "install Monaco nerd fonts from github"
-	if [ -d $font_dir ]; then
-		rm -rf $font_dir
-	fi
-	git clone --depth=1 $font_url
-	if [ $? -ne 0 ]; then
-		info "failed to download $font_dir, skip..."
-	else
-		info "install Monaco nerd fonts from github - done"
-		cp $font_dir/fonts/* .
-	fi
+  cd ~/Library/Fonts
+  local font_dir="monaco-nerd-fonts"
+  local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
+  info "install Monaco nerd fonts from github"
+  if [ -d $font_dir ]; then
+    rm -rf $font_dir
+  fi
+  git clone --depth=1 $font_url
+  if [ $? -ne 0 ]; then
+    info "failed to download $font_dir, skip..."
+  else
+    info "install Monaco nerd fonts from github - done"
+    cp $font_dir/fonts/* .
+  fi
 }
 
 if [ "$OS" = "Darwin" ]; then
-	depends_monaco_nerdfont_macos
-	depends_nerdfont_macos "font-hack-nerd-font"
-	depends_nerdfont_macos "font-d2coding-nerd-font"
-	depends_nerdfont_macos "font-code-new-roman-nerd-font"
-	depends_nerdfont_macos "font-sauce-code-pro-nerd-font"
-	depends_nerdfont_macos "font-noto-nerd-font"
+  depends_monaco_nerdfont_macos
+  depends_nerdfont_macos "font-hack-nerd-font"
+  depends_nerdfont_macos "font-d2coding-nerd-font"
+  depends_nerdfont_macos "font-code-new-roman-nerd-font"
+  depends_nerdfont_macos "font-sauce-code-pro-nerd-font"
+  depends_nerdfont_macos "font-noto-nerd-font"
 else
-	depends_monaco_nerdfont_linux
-	depends_nerdfont_linux "Hack.zip"
-	depends_nerdfont_linux "D2Coding.zip"
-	depends_nerdfont_linux "CodeNewRoman.zip"
-	depends_nerdfont_linux "SourceCodePro.zip"
-	depends_nerdfont_linux "Noto.zip"
+  depends_monaco_nerdfont_linux
+  depends_nerdfont_linux "Hack.zip"
+  depends_nerdfont_linux "D2Coding.zip"
+  depends_nerdfont_linux "CodeNewRoman.zip"
+  depends_nerdfont_linux "SourceCodePro.zip"
+  depends_nerdfont_linux "Noto.zip"
 fi
 
 # prompt
 # zsh pure theme
 mkdir -p "$HOME/.zsh"
 if [ -d "$HOME/.zsh/pure" ]; then
-	rm -rf "$HOME/.zsh/pure"
+  rm -rf "$HOME/.zsh/pure"
 fi
 git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 
 # wezterm config
 if [ ! -f ~/.wezterm.lua ]; then
-	cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
+  cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
 fi
 
 # kitty config
 if [ ! -f ~/.config/kitty/kitty.conf ]; then
-	mkdir -p $HOME/.config/kitty
-	cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
+  mkdir -p $HOME/.config/kitty
+  cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
 fi
 
 echo '' >>~/.zshrc

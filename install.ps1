@@ -87,8 +87,6 @@ scoop install nerd-fonts/Noto-NF-Mono
 git config --global user.email "linrongbin16@outlook.com"
 git config --global user.name "linrongbin16"
 git config --global pull.rebase false
-git config --global core.fsmonitor true
-git config --global core.untrackedcache true
 git config --global init.defaultBranch main
 
 # rust/cargo
