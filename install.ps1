@@ -48,10 +48,11 @@ InstallWith -command "scoop install 7zip" -target "7z"
 InstallWith -command "scoop install gzip" -target "gzip"
 InstallWith -command "scoop install unzip" -target "unzip"
 
-InstallWith -command "scoop install fd" -target "fd"
-InstallWith -command "scoop install ripgrep" -target "rg"
-InstallWith -command "scoop install bat" -target "bat"
-InstallWith -command "scoop install eza" -target "eza"
+# # don't use 'scoop' to install cargo commands, use 'cargo'
+# InstallWith -command "scoop install fd" -target "fd"
+# InstallWith -command "scoop install ripgrep" -target "rg"
+# InstallWith -command "scoop install bat" -target "bat"
+# InstallWith -command "scoop install eza" -target "eza"
 InstallWith -command "scoop install extras/lazygit" -target "lazygit"
 
 InstallWith -command "scoop install python" -target "python3"
@@ -91,6 +92,10 @@ git config --global init.defaultBranch main
 
 # rust/cargo
 InstallWith -command "scoop install rustup" -target "cargo"
+InstallWith -command "cargo install fd-find" -target "fd"
+InstallWith -command "cargo install ripgrep" -target "rg"
+InstallWith -command "cargo install --locked bat" -target "bat"
+InstallWith -command "cargo install eza" -target "eza"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
