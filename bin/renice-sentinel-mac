@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -x
-
-ps -x -ewo pid,user,command | grep 'sentineld' | grep -v 'grep' | while read -r pid user command; do
-	renice 20 -u $user -p $pid
-done

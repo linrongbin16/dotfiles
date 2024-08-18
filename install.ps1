@@ -48,10 +48,11 @@ InstallWith -command "scoop install 7zip" -target "7z"
 InstallWith -command "scoop install gzip" -target "gzip"
 InstallWith -command "scoop install unzip" -target "unzip"
 
-InstallWith -command "scoop install fd" -target "fd"
-InstallWith -command "scoop install ripgrep" -target "rg"
-InstallWith -command "scoop install bat" -target "bat"
-InstallWith -command "scoop install eza" -target "eza"
+# # don't use 'scoop' to install cargo commands, use 'cargo'
+# InstallWith -command "scoop install fd" -target "fd"
+# InstallWith -command "scoop install ripgrep" -target "rg"
+# InstallWith -command "scoop install bat" -target "bat"
+# InstallWith -command "scoop install eza" -target "eza"
 InstallWith -command "scoop install extras/lazygit" -target "lazygit"
 
 InstallWith -command "scoop install vim" -target "vim"
@@ -73,25 +74,27 @@ python3 -m pip install tinydb --user
 scoop bucket add nerd-fonts
 scoop install nerd-fonts/Hack-NF
 scoop install nerd-fonts/Hack-NF-Mono
-scoop install nerd-fonts/Noto-NF
-scoop install nerd-fonts/Noto-NF-Mono
+scoop install nerd-fonts/D2Coding-NF
+scoop install nerd-fonts/D2Coding-NF-Mono
 scoop install nerd-fonts/CodeNewRoman-NF
 scoop install nerd-fonts/CodeNewRoman-NF-Mono
-scoop install nerd-fonts/FiraCode-NF
-scoop install nerd-fonts/FiraCode-NF-Mono
 scoop install nerd-fonts/SourceCodePro-NF
 scoop install nerd-fonts/SourceCodePro-NF-Mono
+scoop install nerd-fonts/Noto-NF
+scoop install nerd-fonts/Noto-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
 git config --global user.name "linrongbin16"
 git config --global pull.rebase false
-git config --global core.fsmonitor true
-git config --global core.untrackedcache true
 git config --global init.defaultBranch main
 
 # rust/cargo
 InstallWith -command "scoop install rustup" -target "cargo"
+InstallWith -command "cargo install fd-find" -target "fd"
+InstallWith -command "cargo install ripgrep" -target "rg"
+InstallWith -command "cargo install --locked bat" -target "bat"
+InstallWith -command "cargo install eza" -target "eza"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))

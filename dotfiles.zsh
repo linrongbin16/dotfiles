@@ -19,9 +19,6 @@ else
 	alias ll="ls -alh"
 fi
 
-# neovide
-alias gnvim="neovide"
-
 # lazygit
 alias lg="lazygit"
 
@@ -29,14 +26,12 @@ alias lg="lazygit"
 alias gs="git status"
 alias gp="git pull"
 alias gP="git push"
-alias gps="git push"
 alias gf="git fetch"
 alias ga="git add"
 alias gb="git branch"
 alias gm="git merge"
 alias gcm="git commit"
 alias gck="git checkout"
-alias gcf="git config"
 
 # path
 export PATH="$PATH:$HOME/.dotfiles/bin"
@@ -44,8 +39,6 @@ export PATH="$PATH:$HOME/.dotfiles/bin"
 # pure zsh theme
 fpath+=($HOME/.zsh/pure)
 zstyle :prompt:pure:path color 'cyan'
-# zstyle :prompt:pure:git:branch color 'magenta'
-# zstyle :prompt:pure:git:branch:cached color 'magenta'
 zstyle :prompt:pure:prompt:success color 'green'
 autoload -U promptinit
 promptinit
