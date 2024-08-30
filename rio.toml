@@ -73,7 +73,7 @@ blinking-cursor = true
 # This configuration only has effect if use-fork is disabled.
 #
 # Example:
-# working-dir = "/Users/raphael/Documents/"
+# working-dir = "C:\\Users\\linrongbin"
 
 # Environment variables
 #
@@ -320,6 +320,18 @@ keys = [
   { key = "right", with = "super | shift", action = "SelectNextTab" },
   { key = "left", with = "alt | shift", action = "SelectPrevTab" },
   { key = "right", with = "alt | shift", action = "SelectNextTab" },
+  { key = "t", with = "control | shift", action = "CreateTab" },
+  { key = "t", with = "alt", action = "CreateTab" },
+  { key = "1", with = "alt", action = "SelectTab(1)" },
+  { key = "2", with = "alt", action = "SelectTab(2)" },
+  { key = "3", with = "alt", action = "SelectTab(3)" },
+  { key = "4", with = "alt", action = "SelectTab(4)" },
+  { key = "5", with = "alt", action = "SelectTab(5)" },
+  { key = "6", with = "alt", action = "SelectTab(6)" },
+  { key = "7", with = "alt", action = "SelectTab(7)" },
+  { key = "8", with = "alt", action = "SelectTab(8)" },
+  { key = "9", with = "alt", action = "SelectTab(9)" },
+  { key = "0", with = "alt", action = "SelectTab(0)" },
 ]
 
 # Log level
