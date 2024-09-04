@@ -38,8 +38,8 @@ export PATH="$PATH:$HOME/.dotfiles/bin"
 
 # pure zsh theme
 fpath+=($HOME/.zsh/pure)
-zstyle :prompt:pure:path color 'cyan'
-zstyle :prompt:pure:prompt:success color 'green'
+# zstyle :prompt:pure:path color 'cyan'
+# zstyle :prompt:pure:prompt:success color 'green'
 autoload -U promptinit
 promptinit
 prompt pure
