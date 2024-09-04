@@ -40,6 +40,5 @@ export PATH="$PATH:$HOME/.dotfiles/bin"
 fpath+=($HOME/.zsh/pure)
 # zstyle :prompt:pure:path color 'cyan'
 # zstyle :prompt:pure:prompt:success color 'green'
-autoload -U promptinit
-promptinit
+autoload -U promptinit; promptinit
 prompt pure
