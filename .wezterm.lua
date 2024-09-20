@@ -22,15 +22,17 @@ if not IS_WINDOWS then
 end
 
 local FONTS = {
-	"D2CodingLigature Nerd Font Mono",
+	-- "Pragmasevka Nerd Font",
+	-- "Mononoki Nerd Font Mono",
+	-- "D2CodingLigature Nerd Font Mono",
 	"Monaco Nerd Font Mono",
 	"CodeNewRoman Nerd Font Mono",
 	"SaurceCodePro Nerd Font Mono",
 	"Noto Nerd Font Mono",
 	"Hack Nerd Font Mono",
 }
-local FONT_SIZE = 16.0
-local TAB_BAR_FONT_SIZE = 14.0
+local FONT_SIZE = 15.0
+local TAB_BAR_FONT_SIZE = 12.0
 if not IS_MACOS then
 	FONT_SIZE = 11.0
 	TAB_BAR_FONT_SIZE = 10.0
@@ -42,10 +44,8 @@ local config = wezterm.config_builder()
 -- 	colors = {},
 -- }
 
-if IS_WINDOWS or IS_MACOS then
-	config.front_end = "WebGpu"
-	config.webgpu_power_preference = "HighPerformance"
-end
+config.webgpu_power_preference = "HighPerformance"
+config.max_fps = 100
 
 -- ui.lua {
 
@@ -84,41 +84,19 @@ wezterm.on("gui-startup", function()
 	window:gui_window():maximize()
 end)
 
-config.use_fancy_tab_bar = true
+config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = true
+config.tab_max_width = 120
 
--- The filled in variant of the < symbol
-local SOLID_LEFT_ARROW = wezterm.nerdfonts.pl_right_hard_divider
-
--- The filled in variant of the > symbol
-local SOLID_RIGHT_ARROW = wezterm.nerdfonts.pl_left_hard_divider
-
--- wezterm.on("format-tab-title", function(tab, tabs, panes, _, hover, max_width)
--- 	if tab.is_active then
--- 		background = theme.brights[1]
--- 		foreground = theme.brights[8]
--- 	elseif hover then
--- 		foreground = theme.brights[8]
--- 	end
---
--- 	local edge_foreground = background
---
--- 	local title = tab_title(tab, max_width)
---
--- 	title = " " .. title .. " "
---
--- 	return {
--- 		{ Background = { Color = edge_background } },
--- 		{ Foreground = { Color = edge_foreground } },
--- 		{ Text = wezterm_nerdfonts.ple_lower_right_triangle },
--- 		{ Background = { Color = background } },
--- 		{ Foreground = { Color = foreground } },
--- 		{ Text = title },
--- 		{ Background = { Color = edge_background } },
--- 		{ Foreground = { Color = edge_foreground } },
--- 		{ Text = wezterm_nerdfonts.ple_lower_left_triangle },
--- 	}
--- end)
+wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
+	-- Get the process name.
+	-- local process = string.gsub(tab.active_pane.foreground_process_name, "(.*[/\\])(.*)", "%2")
+	-- Current working directory.
+	local cwd = tab.active_pane.current_working_dir
+	cwd = cwd and string.format("%s ", cwd.file_path:gsub(os.getenv("HOME"), "~")) or ""
+	-- Format and return the title.
+	return string.format(" %d %s ", tab.tab_index + 1, cwd)
+end)
 
 -- key-mappings.lua {
 
