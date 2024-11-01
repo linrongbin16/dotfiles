@@ -26,12 +26,10 @@ alias lg="lazygit"
 alias gs="git status"
 alias gp="git pull"
 alias gP="git push"
-alias gf="git fetch"
 alias ga="git add"
 alias gb="git branch"
 alias gm="git merge"
-alias gcm="git commit"
-alias gck="git checkout"
+alias gc="git commit"
 
 # path
 export PATH="$PATH:$HOME/.dotfiles/bin"
