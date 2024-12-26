@@ -109,36 +109,36 @@ end)
 
 -- key-mappings.lua {
 
-config.keys = {}
-if not IS_WINDOWS then
-  table.insert(config.keys, { key = "LeftArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(-1) })
-  table.insert(config.keys, { key = "RightArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(1) })
-end
-if IS_MACOS then
-  table.insert(
-    config.keys,
-    { key = "ApplicationLeftArrow", mods = "CMD|SHIFT", action = wezterm_action.ActivateTabRelative(-1) }
-  )
-  table.insert(
-    config.keys,
-    { key = "ApplicationRightArrow", mods = "CMD|SHIFT", action = wezterm_action.ActivateTabRelative(1) }
-  )
-end
-if IS_WINDOWS then
-  table.insert(config.keys, { key = "LeftArrow", mods = "SHIFT|ALT", action = wezterm_action.ActivateTabRelative(-1) })
-  table.insert(config.keys, { key = "RightArrow", mods = "SHIFT|ALT", action = wezterm_action.ActivateTabRelative(1) })
-  for i = 1, 8 do
-    table.insert(config.keys, {
-      key = tostring(i),
-      mods = 'ALT',
-      action = wezterm_action.ActivateTab(i - 1),
-    })
-  end
-  table.insert(
-    config.keys,
-    { key = "t", mods = "ALT", action = wezterm_action.SpawnTab('CurrentPaneDomain') }
-  )
-end
+-- config.keys = {}
+-- if not IS_WINDOWS then
+--   table.insert(config.keys, { key = "LeftArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(-1) })
+--   table.insert(config.keys, { key = "RightArrow", mods = "SHIFT|SUPER", action = wezterm_action.ActivateTabRelative(1) })
+-- end
+-- if IS_MACOS then
+--   table.insert(
+--     config.keys,
+--     { key = "ApplicationLeftArrow", mods = "CMD|SHIFT", action = wezterm_action.ActivateTabRelative(-1) }
+--   )
+--   table.insert(
+--     config.keys,
+--     { key = "ApplicationRightArrow", mods = "CMD|SHIFT", action = wezterm_action.ActivateTabRelative(1) }
+--   )
+-- end
+-- if IS_WINDOWS then
+--   table.insert(config.keys, { key = "LeftArrow", mods = "SHIFT|ALT", action = wezterm_action.ActivateTabRelative(-1) })
+--   table.insert(config.keys, { key = "RightArrow", mods = "SHIFT|ALT", action = wezterm_action.ActivateTabRelative(1) })
+--   for i = 1, 8 do
+--     table.insert(config.keys, {
+--       key = tostring(i),
+--       mods = 'ALT',
+--       action = wezterm_action.ActivateTab(i - 1),
+--     })
+--   end
+--   table.insert(
+--     config.keys,
+--     { key = "t", mods = "ALT", action = wezterm_action.SpawnTab('CurrentPaneDomain') }
+--   )
+-- end
 
 -- key-mappings.lua }
 
