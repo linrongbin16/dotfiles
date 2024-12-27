@@ -372,14 +372,6 @@ else
   depends_nerdfont_linux "Noto.zip"
 fi
 
-# prompt
-# zsh pure theme
-mkdir -p "$HOME/.zsh"
-if [ -d "$HOME/.zsh/pure" ]; then
-  rm -rf "$HOME/.zsh/pure"
-fi
-git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
-
 # wezterm config
 if [ ! -f ~/.wezterm.lua ]; then
   cp $HOME/.dotfiles/.wezterm.lua $HOME/.wezterm.lua
