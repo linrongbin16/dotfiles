@@ -54,15 +54,13 @@ Install -command "scoop install neovim" -target "nvim"
 Install -command "scoop install starship" -target "starship"
 
 # python3
-
-# $PythonHasPep668 = python3 -c 'import sys; major=sys.version_info.major; minor=sys.version_info.minor; micro=sys.version_info.micro; r1=major >= 3 and minor > 11; r2=major >= 3 and minor == 11 and micro >= 1; print(1 if r1 or r2 else 0)'
-# if ($PythonHasPep668 -eq 1) {
-#     python3 -m pip install click --user --break-system-packages
-#     python3 -m pip install tinydb --user --break-system-packages
-# } else {
 python3 -m pip install click --user
 python3 -m pip install tinydb --user
-# }
+python3 -m pip install pynvim --user
+
+# node.js
+npm install --silent -g neovim
+npm install --silent -g trash-cli
 
 # nerd fonts
 scoop bucket add nerd-fonts
