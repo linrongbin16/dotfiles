@@ -292,11 +292,11 @@ get_nerdfont_latest_release_tag() {
   curl -f -L $uri | grep "href=\"/$org/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
 }
 
-depends_nerdfont_linux() {
+download_font_for_linux() {
   mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-  local org="ryanoasis"
-  local repo="nerd-fonts"
-  local font_file=$1
+  local org=$1
+  local repo=$2
+  local font_file=$3
   local font_version=$(get_nerdfont_latest_release_tag $org $repo)
   local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
   info "install $font_file($font_version) nerd fonts from github"
@@ -313,45 +313,45 @@ depends_nerdfont_linux() {
   sudo fc-cache -f -v
 }
 
+depends_nerdfont_linux() {
+  download_font_for_linux "ryanoasis" "nerd-fonts" "$1"
+}
+
+depends_monaco_nerdfont_linux() {
+  download_font_for_linux "thep0y" "monaco-nerd-font" "MonacoNerdFont.zip"
+  download_font_for_linux "thep0y" "monaco-nerd-font" "MonacoNerdFontMono.zip"
+}
+
+download_font_for_macos() {
+  cd ~/Library/Fonts
+  local org=$1
+  local repo=$2
+  local font_file=$3
+  local font_version=$(get_nerdfont_latest_release_tag $org $repo)
+  local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
+  info "install $font_file($font_version) nerd fonts from github"
+  if [ -f $font_file ]; then
+    rm -rf $font_file
+  fi
+  curl -L $font_url -o $font_file
+  if [ $? -ne 0 ]; then
+    info "failed to download $font_file, skip..."
+  else
+    unzip -o $font_file
+    rm $font_file
+    info "install $font_file($font_version) nerd font from github - done"
+  fi
+}
+
+depends_monaco_nerdfont_macos() {
+  download_font_for_macos "thep0y" "monaco-nerd-font" "MonacoNerdFont.zip"
+  download_font_for_macos "thep0y" "monaco-nerd-font" "MonacoNerdFontMono.zip"
+}
+
 depends_nerdfont_macos() {
   local font_name=$1
   info "install $font_name nerd fonts with brew"
   brew install $font_name
-}
-
-depends_monaco_nerdfont_linux() {
-  mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-  local font_dir="monaco-nerd-fonts"
-  local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
-  info "install Monaco nerd fonts from github"
-  if [ -d $font_dir ]; then
-    rm -rf $font_dir
-  fi
-  git clone --depth=1 $font_url
-  if [ $? -ne 0 ]; then
-    info "failed to download $font_dir, skip..."
-  else
-    info "install Monaco nerd fonts from github - done"
-    cp $font_dir/fonts/* .
-  fi
-  sudo fc-cache -f -v
-}
-
-depends_monaco_nerdfont_macos() {
-  cd ~/Library/Fonts
-  local font_dir="monaco-nerd-fonts"
-  local font_url="https://github.com/Karmenzind/monaco-nerd-fonts.git"
-  info "install Monaco nerd fonts from github"
-  if [ -d $font_dir ]; then
-    rm -rf $font_dir
-  fi
-  git clone --depth=1 $font_url
-  if [ $? -ne 0 ]; then
-    info "failed to download $font_dir, skip..."
-  else
-    info "install Monaco nerd fonts from github - done"
-    cp $font_dir/fonts/* .
-  fi
 }
 
 if [ "$OS" = "Darwin" ]; then
