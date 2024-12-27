@@ -14,4 +14,4 @@ set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 set jumpoptions=stack,view
-nnoremap <leader>q :qa!<CR>
+nnoremap <leader>qq :qa!<CR>
