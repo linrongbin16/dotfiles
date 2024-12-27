@@ -12,7 +12,7 @@ function SkipInfo([string]$content)
     Info "'$content' already exist, skip..."
 }
 
-function InstallWith([string]$command, [string]$target)
+function Install([string]$command, [string]$target)
 {
     if (Get-Command -Name $target -ErrorAction SilentlyContinue)
     {
@@ -32,32 +32,26 @@ Info "install dependencies for windows"
 scoop bucket add extras
 scoop install mingw
 scoop install uutils-coreutils
-InstallWith -command "scoop install which" -target "which"
-InstallWith -command "scoop install gawk" -target "awk"
-InstallWith -command "scoop install sed" -target "sed"
-InstallWith -command "scoop install llvm" -target "clang"
-InstallWith -command "scoop install llvm" -target "clang++"
-InstallWith -command "scoop install make" -target "make"
-InstallWith -command "scoop install cmake" -target "cmake"
+Install -command "scoop install which" -target "which"
+Install -command "scoop install gawk" -target "awk"
+Install -command "scoop install sed" -target "sed"
+Install -command "scoop install llvm" -target "clang"
+Install -command "scoop install llvm" -target "clang++"
+Install -command "scoop install make" -target "make"
+Install -command "scoop install cmake" -target "cmake"
 
-InstallWith -command "scoop install git" -target "git"
-InstallWith -command "scoop install curl" -target "curl"
-InstallWith -command "scoop install wget" -target "wget"
+Install -command "scoop install git" -target "git"
+Install -command "scoop install curl" -target "curl"
+Install -command "scoop install wget" -target "wget"
+Install -command "scoop install extras/lazygit" -target "lazygit"
 
-InstallWith -command "scoop install 7zip" -target "7z"
-InstallWith -command "scoop install gzip" -target "gzip"
-InstallWith -command "scoop install unzip" -target "unzip"
+Install -command "scoop install 7zip" -target "7z"
+Install -command "scoop install gzip" -target "gzip"
+Install -command "scoop install unzip" -target "unzip"
 
-# # don't use 'scoop' to install cargo commands, use 'cargo'
-# InstallWith -command "scoop install fd" -target "fd"
-# InstallWith -command "scoop install ripgrep" -target "rg"
-# InstallWith -command "scoop install bat" -target "bat"
-# InstallWith -command "scoop install eza" -target "eza"
-InstallWith -command "scoop install extras/lazygit" -target "lazygit"
-
-InstallWith -command "scoop install vim" -target "vim"
-InstallWith -command "scoop install neovim" -target "nvim"
-InstallWith -command "scoop install starship" -target "starship"
+Install -command "scoop install vim" -target "vim"
+Install -command "scoop install neovim" -target "nvim"
+Install -command "scoop install starship" -target "starship"
 
 # python3
 
@@ -90,11 +84,11 @@ git config --global pull.rebase false
 git config --global init.defaultBranch main
 
 # rust/cargo
-InstallWith -command "scoop install rustup" -target "cargo"
-InstallWith -command "cargo install fd-find" -target "fd"
-InstallWith -command "cargo install ripgrep" -target "rg"
-InstallWith -command "cargo install --locked bat" -target "bat"
-InstallWith -command "cargo install eza" -target "eza"
+Install -command "scoop install rustup" -target "cargo"
+Install -command "cargo install fd-find" -target "fd"
+Install -command "cargo install ripgrep" -target "rg"
+Install -command "cargo install --locked bat" -target "bat"
+Install -command "cargo install eza" -target "eza"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
