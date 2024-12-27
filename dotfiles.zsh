@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # performance
 ulimit -n 200000
