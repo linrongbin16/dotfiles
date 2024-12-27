@@ -87,6 +87,7 @@ Install -command "cargo install fd-find" -target "fd"
 Install -command "cargo install ripgrep" -target "rg"
 Install -command "cargo install --locked bat" -target "bat"
 Install -command "cargo install eza" -target "eza"
+Install -command "cargo install --locked zoxide" -target "zoxide"
 
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
@@ -95,12 +96,5 @@ if (!(Test-Path -Path $ProfileFolder))
 }
 Write-Output '' >>$PROFILE
 Write-Output '# dotfiles' >>$PROFILE
+Write-Output 'Invoke-Expression (& { (zoxide init powershell | Out-String) })' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
-
-# prompt
-
-# wezterm
-if (!(Test-Path -Path $env:USERPROFILE\.wezterm.lua))
-{
-    cp $env:USERPROFILE\.dotfiles\.wezterm.lua $env:USERPROFILE\.wezterm.lua
-}
