@@ -14,4 +14,8 @@ set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 set jumpoptions=stack,view
-nnoremap <leader>qq :qa!<CR>
+set laststatus=0
+
+" easy quit
+nnoremap <ESC> :qa!<CR>
+nnoremap q :qa!<CR>
