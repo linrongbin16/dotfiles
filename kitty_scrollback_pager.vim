@@ -1,3 +1,5 @@
+set nonumber
+set nolist
 set clipboard^=unnamedplus
 set hlsearch
 set incsearch
@@ -14,7 +16,11 @@ set mouse=a
 set selection=exclusive
 set selectmode=mouse,key
 set jumpoptions=stack,view
+set showtabline=0
+set foldcolumn=0
 set laststatus=0
+set noshowcmd
+set shortmess+=F
 
 " easy quit
 nnoremap <ESC> :qa!<CR>
