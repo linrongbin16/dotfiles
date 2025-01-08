@@ -33,3 +33,6 @@ alias gc="git commit"
 
 # path
 export PATH="$PATH:$HOME/.dotfiles/bin"
+
+# zoxide
+eval "$(zoxide init zsh)"

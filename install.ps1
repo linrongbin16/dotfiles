@@ -96,5 +96,4 @@ if (!(Test-Path -Path $ProfileFolder))
 }
 Write-Output '' >>$PROFILE
 Write-Output '# dotfiles' >>$PROFILE
-Write-Output 'Invoke-Expression (& { (zoxide init powershell | Out-String) })' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE

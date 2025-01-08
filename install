@@ -409,5 +409,4 @@ fi
 
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
-echo 'eval "$(zoxide init zsh)"' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
