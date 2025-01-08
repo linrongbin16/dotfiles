@@ -301,6 +301,7 @@ install "cargo install fd-find" "fd"
 install "cargo install ripgrep" "rg"
 install "cargo install --locked bat" "bat"
 install "cargo install eza" "eza"
+install "cargo install git-delta" "delta"
 install "cargo install --locked zoxide" "zoxide"
 
 # python3

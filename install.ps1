@@ -88,6 +88,7 @@ Install -command "cargo install fd-find" -target "fd"
 Install -command "cargo install ripgrep" -target "rg"
 Install -command "cargo install --locked bat" -target "bat"
 Install -command "cargo install eza" -target "eza"
+Install -command "cargo install git-delta" -target "delta"
 Install -command "cargo install --locked zoxide" -target "zoxide"
 
 $ProfileFolder = Split-Path $PROFILE
