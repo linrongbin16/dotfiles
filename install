@@ -77,6 +77,13 @@ install_lazygit_for_apt() {
   sudo install lazygit -D -t /usr/local/bin/
 }
 
+install_moar_for_apt() {
+  MOAR_VERSION=$(curl -s "https://api.github.com/repos/walles/moar/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+  curl -Lo moar "https://github.com/walles/moar/releases/download/v${MOAR_VERSION}/moar-v${MOAR_VERSION}-linux-amd64"
+  chmod a+x moar
+  sudo mv moar /usr/local/bin/moar
+}
+
 apt_depends() {
   info "install dependencies with apt"
   sudo apt-get -q -y update
@@ -92,6 +99,7 @@ apt_depends() {
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
   install "install_lazygit_for_apt" "lazygit"
+  install "install_moar_for_apt" "moar"
 
   install "sudo apt-get install -q -y gzip" "gzip"
   install "sudo apt-get install -q -y p7zip" "7z"
@@ -129,6 +137,7 @@ pacman_depends() {
   install "yes | sudo pacman -S curl" "curl"
   install "yes | sudo pacman -S wget" "wget"
   install "yes | sudo pacman -S lazygit" "lazygit"
+  install "yes | sudo pacman -S moar" "moar"
 
   install "yes | sudo pacman -S unzip" "unzip"
   install "yes | sudo pacman -S gzip" "gzip"
@@ -155,6 +164,10 @@ install_lazygit_for_dnf() {
   sudo dnf install lazygit
 }
 
+install_moar_for_dnf() {
+  install_moar_for_apt
+}
+
 dnf_depends() {
   info "install dependencies with dnf"
   sudo dnf check-update
@@ -170,6 +183,7 @@ dnf_depends() {
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
   install "install_lazygit_for_dnf" "lazygit"
+  install "install_moar_for_dnf" "moar"
 
   install "sudo dnf install -y gzip" "gzip"
   install "sudo dnf install -y p7zip" "7z"
@@ -190,7 +204,7 @@ dnf_depends() {
 
 # brew {
 
-depends_brew() {
+brew_depends() {
   info "install dependencies with brew"
 
   install "xcode-select --install" "clang"
@@ -206,6 +220,7 @@ depends_brew() {
   install "brew install curl" "curl"
   install "brew install wget" "wget"
   install "brew install jesseduffield/lazygit/lazygit" "lazygit"
+  install "brew install moar" "moar"
 
   install "brew install gzip" "gzip"
   install "brew install p7zip" "7z"
@@ -252,7 +267,7 @@ OpenBSD)
   exit 1
   ;;
 Darwin)
-  depends_brew
+  brew_depends
   ;;
 *)
   info "$OS is not supported, exit..."

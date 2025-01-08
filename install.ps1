@@ -44,6 +44,7 @@ Install -command "scoop install git" -target "git"
 Install -command "scoop install curl" -target "curl"
 Install -command "scoop install wget" -target "wget"
 Install -command "scoop install extras/lazygit" -target "lazygit"
+Install -command "scoop install extras/moar" -target "moar"
 
 Install -command "scoop install 7zip" -target "7z"
 Install -command "scoop install gzip" -target "gzip"
