@@ -423,6 +423,21 @@ if [ ! -f ~/.config/kitty/kitty.conf ]; then
   cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
 fi
 
+# zsh plugins
+if [ ! -d "$HOME/.zsh" ]; then
+  mkdir -p "$HOME/.zsh"
+fi
+# pure prompt theme
+if [ -d "$HOME/.zsh/pure" ]; then
+  rm -rf "$HOME/.zsh/pure"
+fi
+git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
+# fzf-tab
+if [ -d "$HOME/.zsh/fzf-tab" ]; then
+  rm -rf "$HOME/.zsh/fzf-tab"
+fi
+git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$HOME/.zsh/fzf-tab"
+
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc

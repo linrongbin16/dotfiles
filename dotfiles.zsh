@@ -5,19 +5,8 @@ ulimit -n 200000
 ulimit -u 2048
 
 # ls
-if [ -x "$(command -v lsd)" ]; then
-	alias l="lsd -lh --header --icon=never"
-	alias ll="lsd -alh --header --icon=never"
-elif [ -x "$(command -v eza)" ]; then
-	alias l="eza -lh"
-	alias ll="eza -alh"
-elif [ -x "$(command -v exa)" ]; then
-	alias l="exa -lh"
-	alias ll="exa -alh"
-else
-	alias l="ls -lh"
-	alias ll="ls -alh"
-fi
+alias l="eza -lh"
+alias ll="eza -alh"
 
 # lazygit
 alias lg="lazygit"
@@ -36,3 +25,28 @@ export PATH="$PATH:$HOME/.dotfiles/bin"
 
 # zoxide
 eval "$(zoxide init zsh)"
+
+# pure
+fpath+=($HOME/.zsh/pure)
+autoload -U promptinit; promptinit
+zstyle :prompt:pure:prompt:success color green
+zstyle :prompt:pure:git:stash show yes
+prompt pure
+
+# fzf-tab
+autoload -U compinit; compinit
+source $HOME/.zsh/fzf-tab/fzf-tab.plugin.zsh
+# disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+# set list-colors to enable filename colorizing
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
+zstyle ':completion:*' menu no
+# preview directory's content with eza when completing cd/z
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:z:*' fzf-preview 'eza -1 --color=always $realpath'
+# NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
+zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
+# To make fzf-tab follow FZF_DEFAULT_OPTS.
+# NOTE: This may lead to unexpected behavior since some flags break this plugin. See Aloxaf/fzf-tab#455.
+zstyle ':fzf-tab:*' use-fzf-default-opts yes
