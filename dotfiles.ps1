@@ -8,4 +8,4 @@ Set-Alias -name lg -value lazygit
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
 # starship
-$env:STARSHIP_CONFIG = "$HOME\dotfiles\starship.toml"
+$env:STARSHIP_CONFIG = "$HOME\.dotfiles\starship.toml"
