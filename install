@@ -161,7 +161,7 @@ pacman_depends() {
 
 install_lazygit_for_dnf() {
   sudo dnf copr enable atim/lazygit -y
-  sudo dnf install lazygit
+  sudo dnf install -y lazygit
 }
 
 install_moar_for_dnf() {
