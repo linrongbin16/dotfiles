@@ -73,8 +73,6 @@ scoop install nerd-fonts/CodeNewRoman-NF
 scoop install nerd-fonts/CodeNewRoman-NF-Mono
 scoop install nerd-fonts/SourceCodePro-NF
 scoop install nerd-fonts/SourceCodePro-NF-Mono
-scoop install nerd-fonts/Noto-NF
-scoop install nerd-fonts/Noto-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
