@@ -24,6 +24,7 @@ jobs:
     name: Ubuntu Installer
     runs-on: ubuntu-latest
     steps:
+      - uses: Swatinem/rust-cache@v2
       - name: Get branch
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
@@ -42,6 +43,7 @@ jobs:
         with:
           xcode-version: latest-stable
       - uses: Homebrew/actions/setup-homebrew@master
+      - uses: Swatinem/rust-cache@v2
       - name: Get branch
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
