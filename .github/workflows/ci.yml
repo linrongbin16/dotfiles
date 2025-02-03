@@ -62,6 +62,9 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: Swatinem/rust-cache@v2
       - uses: mozilla-actions/sccache-action@v0.0.7
+      - uses: MinoruSekine/setup-scoop@v4.0.1
+        with:
+          buckets: extras
       - name: Get branch
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         shell: bash
