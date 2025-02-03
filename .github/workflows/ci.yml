@@ -69,6 +69,9 @@ jobs:
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         shell: bash
         id: extract_branch
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_x86
       - name: Install dotfiles
         run: |
           echo '${{ steps.extract_branch.outputs.branch }}'
