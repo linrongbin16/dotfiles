@@ -87,10 +87,8 @@ install_moar_for_apt() {
 install_fzf_for_apt() {
 	git clone --depth=1 https://github.com/junegunn/fzf
 	bash ./fzf/install --bin
-        tree
-	sudo mv ./bin/fzf /usr/local/bin/fzf
+	sudo mv ./fzf/bin/fzf /usr/local/bin/fzf
 	rm -rf ./fzf
-	rm -rf ./bin
 }
 
 apt_depends() {
