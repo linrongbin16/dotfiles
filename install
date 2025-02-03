@@ -48,10 +48,15 @@ install() {
 install_nvim_for_apt() {
 	info "install 'nvim'(appimage) from github.com"
 	sudo apt-get -q -y install fuse
-	wget https://github.com/neovim/neovim/releases/download/stable/nvim.appimage
-	sudo mkdir -p /usr/local/bin
-	chmod u+x nvim.appimage
-	sudo mv nvim.appimage /usr/local/bin/nvim
+	local arch=$(uname -m)
+	if [ "$arch" == "x86_64" ]; then
+		local appname="nvim-linux-x86_64.appimage"
+	else
+		local appname="nvim-linux-arm64.appimage"
+	fi
+	wget -q https://github.com/neovim/neovim/releases/download/stable/$appname
+	chmod u+x $appname
+	sudo mv $appname /usr/local/bin/nvim
 }
 
 install_nodejs_for_apt() {
@@ -87,9 +92,8 @@ install_moar_for_apt() {
 install_fzf_for_apt() {
 	git clone --depth=1 https://github.com/junegunn/fzf
 	bash ./fzf/install --bin
-	sudo mv ./bin/fzf /usr/local/bin/fzf
+	sudo mv ./fzf/bin/fzf /usr/local/bin/fzf
 	rm -rf ./fzf
-	rm -rf ./bin
 }
 
 apt_depends() {
