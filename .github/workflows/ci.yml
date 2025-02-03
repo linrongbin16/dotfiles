@@ -53,3 +53,19 @@ jobs:
           echo '${{ steps.extract_branch.outputs.branch }}'
           echo ${{ steps.extract_branch.outputs.branch }}
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && bash -euxo pipefail ./install --github-actions
+  windows_installer:
+    name: Windows Installer
+    runs-on: windows-latest
+    steps:
+      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: Swatinem/rust-cache@v2
+      - name: Get branch
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        shell: bash
+        id: extract_branch
+      - name: Install dotfiles
+        run: |
+          set -x
+          echo '${{ steps.extract_branch.outputs.branch }}'
+          echo ${{ steps.extract_branch.outputs.branch }}
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles && cd $env:USERPROFILE\.dotfiles && pwsh .\install.ps1
