@@ -9,13 +9,6 @@ My dot files.
 ### MacOS/Linux
 
 > MacOS please install [xcode](https://developer.apple.com/support/xcode/) and [homebrew](https://brew.sh/) as pre-requirements.
->
-> ```bash
-> # xcode
-> xcode-select --install
-> # homebrew
-> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-> ```
 
 Zsh/Bash:
 
