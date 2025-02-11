@@ -39,6 +39,7 @@ Install -command "scoop install llvm" -target "clang"
 Install -command "scoop install llvm" -target "clang++"
 Install -command "scoop install make" -target "make"
 Install -command "scoop install cmake" -target "cmake"
+Install -command "scoop install go" -target "go"
 
 Install -command "scoop install git" -target "git"
 Install -command "scoop install curl" -target "curl"

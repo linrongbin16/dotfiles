@@ -22,6 +22,10 @@ alias gc="git commit"
 
 # path
 export PATH="$PATH:$HOME/.dotfiles/bin"
+export GOROOT="$HOME/.go" # where go is installed
+export GOPATH="$HOME/go"  # user workspace
+export PATH="$PATH:$GOROOT/bin"
+export PATH="$PATH:$GOPATH/bin"
 
 # zoxide
 eval "$(zoxide init zsh)"

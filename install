@@ -75,11 +75,24 @@ install_git_for_apt() {
   install "sudo apt-get install -q -y git" "git"
 }
 
+install_golang_for_apt() {
+  git clone --depth=1 https://github.com/kerolloz/go-installer
+  export GOROOT="$HOME/.go" # where go is installed
+  export GOPATH="$HOME/go"  # user workspace
+  bash ./go-installer/go.sh
+  export PATH="$PATH:$GOROOT/bin"
+  export PATH="$PATH:$GOPATH/bin"
+}
+
 install_lazygit_for_apt() {
-  LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-  tar xf lazygit.tar.gz lazygit
-  sudo install lazygit -D -t /usr/local/bin/
+  if type "go" >/dev/null 2>&1; then
+    go install github.com/jesseduffield/lazygit@latest
+  else
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+    tar xf lazygit.tar.gz lazygit
+    sudo install lazygit -D -t /usr/local/bin/
+  fi
 }
 
 install_moar_for_apt() {
@@ -106,6 +119,7 @@ apt_depends() {
   install "sudo apt-get install -q -y automake" "automake"
   install "sudo apt-get install -q -y pkg-config" "pkg-config"
   install "sudo apt-get install -q -y cmake" "cmake"
+  install "install_golang_for_apt" "go"
 
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
@@ -145,6 +159,7 @@ pacman_depends() {
   install "yes | sudo pacman -S automake" "automake"
   install "yes | sudo pacman -S pkg-config" "pkg-config"
   install "yes | sudo pacman -S cmake" "cmake"
+  install "yes | sudo pacman -S go" "go"
 
   install "yes | sudo pacman -S git" "git"
   install "yes | sudo pacman -S curl" "curl"
@@ -173,6 +188,15 @@ pacman_depends() {
 
 # dnf {
 
+install_golang_for_dnf() {
+  git clone --depth=1 https://github.com/kerolloz/go-installer
+  export GOROOT="$HOME/.go" # where go is installed
+  export GOPATH="$HOME/go"  # user workspace
+  bash ./go-installer/go.sh
+  export PATH="$PATH:$GOROOT/bin"
+  export PATH="$PATH:$GOPATH/bin"
+}
+
 install_lazygit_for_dnf() {
   sudo dnf copr enable atim/lazygit -y
   sudo dnf install -y lazygit
@@ -192,6 +216,7 @@ dnf_depends() {
   install "sudo dnf install -y automake" "automake"
   install "sudo dnf install -y pkg-config" "pkg-config"
   install "sudo dnf install -y cmake" "cmake"
+  install "install_golang_for_dnf" "go"
 
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
@@ -230,6 +255,7 @@ brew_depends() {
   install "brew install automake" "automake"
   install "brew install pkg-config" "pkg-config"
   install "brew install cmake" "cmake"
+  install "brew install go" "go"
 
   install "brew install git" "git"
   install "brew install curl" "curl"
