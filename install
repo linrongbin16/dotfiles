@@ -79,10 +79,7 @@ install_lazygit_for_apt() {
 }
 
 install_moar_for_apt() {
-  MOAR_VERSION=$(curl -s "https://api.github.com/repos/walles/moar/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  curl -Lo moar "https://github.com/walles/moar/releases/download/v${MOAR_VERSION}/moar-v${MOAR_VERSION}-linux-amd64"
-  chmod a+x moar
-  sudo mv moar /usr/local/bin/moar
+  go install github.com/walles/moar@latest
 }
 
 install_fzf_for_apt() {
