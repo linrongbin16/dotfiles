@@ -46,17 +46,7 @@ install() {
 # apt {
 
 install_nvim_for_apt() {
-  info "install 'nvim'(appimage) from github.com"
-  sudo apt-get -q -y install fuse
-  local arch=$(uname -m)
-  if [ "$arch" == "x86_64" ]; then
-    local appname="nvim-linux-x86_64.appimage"
-  else
-    local appname="nvim-linux-arm64.appimage"
-  fi
-  wget -q https://github.com/neovim/neovim/releases/download/stable/$appname
-  chmod u+x $appname
-  sudo mv $appname /usr/local/bin/nvim
+  sudo snap install nvim --classic
 }
 
 install_nodejs_for_apt() {
@@ -85,14 +75,7 @@ install_golang_for_apt() {
 }
 
 install_lazygit_for_apt() {
-  if type "go" >/dev/null 2>&1; then
-    go install github.com/jesseduffield/lazygit@latest
-  else
-    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-    tar xf lazygit.tar.gz lazygit
-    sudo install lazygit -D -t /usr/local/bin/
-  fi
+  go install github.com/jesseduffield/lazygit@latest
 }
 
 install_moar_for_apt() {
