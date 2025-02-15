@@ -36,9 +36,9 @@ Install [Visual Studio](https://www.visualstudio.com/) with MSVC components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install Python 3.x
+#### Install [7-Zip](https://www.7-zip.org/) (for all users)
 
-Install [Python 3.x](https://www.python.org/downloads/) only for current user.
+#### Install [Python 3.x](https://www.python.org/downloads/) (only for current user)
 
 <details>
 <summary>Click here to see how to install python3 only for current user.</summary>
@@ -67,9 +67,7 @@ Install [Python 3.x](https://www.python.org/downloads/) only for current user.
 
 </details>
 
-#### Install Node.js
-
-Install [Node.js](https://nodejs.org/) only for current user.
+#### Install [Node.js](https://nodejs.org/) (only for current user)
 
 <details>
 <summary>Click here to see how to install node only for current user.</summary>
