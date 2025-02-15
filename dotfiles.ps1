@@ -1,5 +1,4 @@
 # path
-$env:PATH="$env:PATH;$env:USERPROFILE\.dotfiles\bin"
 $env:PATH="$env:PATH;$env:USERPROFILE\go\bin"
 $env:PATH="$env:PATH;$env:USERPROFILE\.go\bin"
 
