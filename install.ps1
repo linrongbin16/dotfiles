@@ -4,24 +4,24 @@
 
 function Info([string]$content)
 {
-    Write-Host "[dotfiles] - $content"
+  Write-Host "[dotfiles] - $content"
 }
 
 function SkipInfo([string]$content)
 {
-    Info "'$content' already exist, skip..."
+  Info "'$content' already exist, skip..."
 }
 
 function Install([string]$command, [string]$target)
 {
-    if (Get-Command -Name $target -ErrorAction SilentlyContinue)
-    {
-        SkipInfo $target
-    } else
-    {
-        Info "install '${target}' with command: '${command}'"
-        Invoke-Expression $command
-    }
+  if (Get-Command -Name $target -ErrorAction SilentlyContinue)
+  {
+    SkipInfo $target
+  } else
+  {
+    Info "install '${target}' with command: '${command}'"
+    Invoke-Expression $command
+  }
 }
 
 # utils }
@@ -55,6 +55,7 @@ Install -command "scoop install unzip" -target "unzip"
 Install -command "scoop install vim" -target "vim"
 Install -command "scoop install neovim" -target "nvim"
 Install -command "scoop install starship" -target "starship"
+Install -command "scoop install mise" -target "mise"
 
 # python3
 python3 -m pip install click --user
@@ -94,7 +95,7 @@ Install -command "cargo install --locked zoxide" -target "zoxide"
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
 {
-    New-Item -ItemType Directory $ProfileFolder
+  New-Item -ItemType Directory $ProfileFolder
 }
 Write-Output '' >>$PROFILE
 Write-Output '# dotfiles' >>$PROFILE
