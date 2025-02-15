@@ -27,9 +27,9 @@ cd .dotfiles
 
 Please see: [active developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development#activate-developer-mode).
 
-#### Install Visual Studio
+#### Install [Visual Studio](https://www.visualstudio.com/)
 
-Install [Visual Studio](https://www.visualstudio.com/) with MSVC components:
+Install with MSVC components:
 
 - .NET Desktop Development
 - Desktop development with C++
