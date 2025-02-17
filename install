@@ -327,10 +327,12 @@ if [[ $python_has_pep668 -eq 1 ]]; then
   python3 -m pip install click --user --break-system-packages
   python3 -m pip install tinydb --user --break-system-packages
   python3 -m pip install pynvim --user --break-system-packages
+  python3 -m pip install pipx --user --break-system-packages
 else
   python3 -m pip install click --user
   python3 -m pip install tinydb --user
   python3 -m pip install pynvim --user
+  python3 -m pip install pipx --user
 fi
 
 # node.js
@@ -420,6 +422,10 @@ else
   depends_nerdfont_linux "CodeNewRoman.zip"
   depends_nerdfont_linux "SourceCodePro.zip"
 fi
+
+# mise
+curl https://mise.run | sh
+echo 'eval "$(~/.local/bin/mise activate zsh)"' >>~/.zshrc
 
 # ghostty config
 if [ ! -f ~/.config/ghostty/config ]; then
