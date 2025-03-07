@@ -73,10 +73,17 @@ scoop install nerd-fonts/Hack-NF
 scoop install nerd-fonts/Hack-NF-Mono
 scoop install nerd-fonts/D2Coding-NF
 scoop install nerd-fonts/D2Coding-NF-Mono
-scoop install nerd-fonts/CodeNewRoman-NF
-scoop install nerd-fonts/CodeNewRoman-NF-Mono
 scoop install nerd-fonts/SourceCodePro-NF
 scoop install nerd-fonts/SourceCodePro-NF-Mono
+scoop install nerd-fonts/Recursive-NF
+scoop install nerd-fonts/Recursive-NF-Propo
+scoop install nerd-fonts/Recursive-NF-Mono
+scoop install nerd-fonts/CascadiaCode-NF
+scoop install nerd-fonts/CascadiaCode-NF-Propo
+scoop install nerd-fonts/CascadiaCode-NF-Mono
+scoop install nerd-fonts/CascadiaMono-NF
+scoop install nerd-fonts/CascadiaMono-NF-Propo
+scoop install nerd-fonts/CascadiaMono-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"

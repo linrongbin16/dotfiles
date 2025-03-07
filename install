@@ -339,88 +339,60 @@ fi
 sudo npm install --silent -g neovim
 sudo npm install --silent -g trash-cli
 
-# patched font
-get_nerdfont_latest_release_tag() {
-  local org="$1"
-  local repo="$2"
-  local uri="https://github.com/$org/$repo/releases/latest"
-  curl -f -L $uri | grep "href=\"/$org/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
+# release tag
+github_latest_tag() {
+  local repo="$1"
+  local uri="https://github.com/$repo/releases/latest"
+  curl -f -L $uri | grep "href=\"/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
 }
 
-download_font_for_linux() {
-  mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-  local org=$1
-  local repo=$2
-  local font_file=$3
-  local font_version=$(get_nerdfont_latest_release_tag $org $repo)
-  local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
-  info "install $font_file($font_version) nerd fonts from github"
-  if [ -f $font_file ]; then
-    rm -rf $font_file
+install_font_from_github() {
+  local repo=$1
+  local artifact=$2
+  local artifact_version=$(github_latest_tag "$repo")
+  local artifact_url="https://github.com/$repo/releases/download/$artifact_version/$artifact"
+  info "install $artifact($artifact_version) font from github"
+  if [ -f $artifact ]; then
+    rm -rf $artifact
   fi
-  curl -L $font_url -o $font_file
+  curl -L $artifact_url -o $artifact
   if [ $? -ne 0 ]; then
-    info "failed to download $font_file, skip..."
+    info "failed to download $artifact, skip..."
   else
-    unzip -o $font_file
-    info "install $font_file($font_version) nerd font from github - done"
+    unzip -o $artifact
+    rm $artifact
+    info "install $artifact($artifact_version) nerd font from github - done"
   fi
+}
+
+install_font_from_github_for_linux() {
+  mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+  install_font_from_github "$1" "$2"
   sudo fc-cache -f -v
 }
 
-depends_nerdfont_linux() {
-  download_font_for_linux "ryanoasis" "nerd-fonts" "$1"
-}
-
-depends_monaco_nerdfont_linux() {
-  download_font_for_linux "thep0y" "monaco-nerd-font" "MonacoNerdFont.zip"
-  download_font_for_linux "thep0y" "monaco-nerd-font" "MonacoNerdFontMono.zip"
-}
-
-download_font_for_macos() {
+install_font_from_github_for_macos() {
   cd ~/Library/Fonts
-  local org=$1
-  local repo=$2
-  local font_file=$3
-  local font_version=$(get_nerdfont_latest_release_tag $org $repo)
-  local font_url="https://github.com/$org/$repo/releases/download/$font_version/$font_file"
-  info "install $font_file($font_version) nerd fonts from github"
-  if [ -f $font_file ]; then
-    rm -rf $font_file
-  fi
-  curl -L $font_url -o $font_file
-  if [ $? -ne 0 ]; then
-    info "failed to download $font_file, skip..."
-  else
-    unzip -o $font_file
-    rm $font_file
-    info "install $font_file($font_version) nerd font from github - done"
-  fi
-}
-
-depends_monaco_nerdfont_macos() {
-  download_font_for_macos "thep0y" "monaco-nerd-font" "MonacoNerdFont.zip"
-  download_font_for_macos "thep0y" "monaco-nerd-font" "MonacoNerdFontMono.zip"
-}
-
-depends_nerdfont_macos() {
-  local font_name=$1
-  info "install $font_name nerd fonts with brew"
-  brew install $font_name
+  install_font_from_github "$1" "$2"
 }
 
 if [ "$OS" = "Darwin" ]; then
-  depends_monaco_nerdfont_macos
-  depends_nerdfont_macos "font-hack-nerd-font"
-  depends_nerdfont_macos "font-d2coding-nerd-font"
-  depends_nerdfont_macos "font-code-new-roman-nerd-font"
-  depends_nerdfont_macos "font-sauce-code-pro-nerd-font"
+  install_font_from_github_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
+  install_font_from_github_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
+  brew install "font-hack-nerd-font"
+  brew install "font-d2coding-nerd-font"
+  brew install "font-sauce-code-pro-nerd-font"
+  brew install "font-recursive-mono-nerd-font"
+  brew install "font-caskaydia-mono-nerd-font"
 else
-  depends_monaco_nerdfont_linux
-  depends_nerdfont_linux "Hack.zip"
-  depends_nerdfont_linux "D2Coding.zip"
-  depends_nerdfont_linux "CodeNewRoman.zip"
-  depends_nerdfont_linux "SourceCodePro.zip"
+  install_font_from_github_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
+  install_font_from_github_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
+  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "Hack.zip"
+  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "D2Coding.zip"
+  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "SourceCodePro.zip"
+  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "Recursive.zip"
+  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaCode.zip"
+  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaMono.zip"
 fi
 
 # mise
