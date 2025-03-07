@@ -427,12 +427,6 @@ fi
 curl https://mise.run | sh
 echo 'eval "$(~/.local/bin/mise activate zsh)"' >>~/.zshrc
 
-# ghostty config
-if [ ! -f ~/.config/ghostty/config ]; then
-  mkdir -p $HOME/.config/ghostty
-  cp $HOME/.dotfiles/ghostty $HOME/.config/ghostty/config
-fi
-
 # kitty config
 if [ ! -f ~/.config/kitty/kitty.conf ]; then
   mkdir -p $HOME/.config/kitty
