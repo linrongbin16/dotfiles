@@ -7,3 +7,10 @@ normal = { family = "Monaco Nerd Font Mono", style = "Regular" }
 bold = { family = "Monaco Nerd Font Mono", style = "Bold" }
 bold_italic = { family = "Monaco Nerd Font Mono", style = "Bold Italic" }
 italic = { family = "Monaco Nerd Font Mono", style = "Italic" }
+
+[mouse]
+hide_when_typing = true
+bindings = []
+
+[keyboard]
+bindings = []
