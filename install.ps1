@@ -100,6 +100,14 @@ Install -command "cargo install eza" -target "eza"
 Install -command "cargo install git-delta" -target "delta"
 Install -command "cargo install --locked zoxide" -target "zoxide"
 
+# alacritty
+$AlacrittyConfig = "$env:APPDATA\\alacritty\\alacritty.toml"
+if (!(Test-Path -Path $AlacrittyConfig))
+{
+  Copy-Item "$env:USERPROFILE\.dotfiles\alacritty.toml" -Destination $AlacrittyConfig
+}
+
+# $PROFILE
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
 {

@@ -405,6 +405,12 @@ if [ ! -f ~/.config/kitty/kitty.conf ]; then
   cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
 fi
 
+# alacritty
+if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
+  mkdir -p $HOME/.config/alacritty
+  cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
+fi
+
 # zsh plugins
 if [ ! -d "$HOME/.zsh" ]; then
   mkdir -p "$HOME/.zsh"
