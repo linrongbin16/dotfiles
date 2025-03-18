@@ -99,6 +99,7 @@ Install -command "cargo install --locked bat" -target "bat"
 Install -command "cargo install eza" -target "eza"
 Install -command "cargo install git-delta" -target "delta"
 Install -command "cargo install --locked zoxide" -target "zoxide"
+Install -command "cargo install bob-nvim" -target "bob"
 
 # alacritty
 $AlacrittyConfig = "$env:APPDATA\\alacritty\\alacritty.toml"

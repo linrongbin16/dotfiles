@@ -26,6 +26,7 @@ export GOROOT="$HOME/.go" # where go is installed
 export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOROOT/bin"
 export PATH="$PATH:$GOPATH/bin"
+export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 
 # zoxide
 eval "$(zoxide init zsh)"
