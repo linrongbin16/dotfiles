@@ -123,6 +123,9 @@ apt_depends() {
 
   install "install_nvim_for_apt" "nvim"
   install "sudo apt-get install -q -y zsh" "zsh"
+  install "sudo apt-get install pipx" "pipx"
+  pipx ensurepath
+  sudo pipx ensurepath --global
 }
 
 # apt }
@@ -162,6 +165,9 @@ pacman_depends() {
 
   install "yes | sudo pacman -S neovim" "nvim"
   install "yes | sudo pacman -S zsh" "zsh"
+  install "yes | sudo pacman -S python-pipx" "pipx"
+  pipx ensurepath
+  sudo pipx ensurepath --global
 }
 
 # pacman }
@@ -218,6 +224,9 @@ dnf_depends() {
 
   install "sudo dnf install -y neovim" "nvim"
   install "sudo dnf install -y zsh" "zsh"
+  install "sudo dnf install -y pipx" "pipx"
+  pipx ensurepath
+  sudo pipx ensurepath --global
 }
 
 # dnf }
@@ -253,6 +262,9 @@ brew_depends() {
 
   install "brew install neovim" "nvim"
   install "brew install zsh" "zsh"
+  install "brew install pipx" "pipx"
+  pipx ensurepath
+  sudo pipx ensurepath --global
 }
 
 # brew }
@@ -328,12 +340,10 @@ if [[ $python_has_pep668 -eq 1 ]]; then
   python3 -m pip install click --user --break-system-packages
   python3 -m pip install tinydb --user --break-system-packages
   python3 -m pip install pynvim --user --break-system-packages
-  python3 -m pip install pipx --user --break-system-packages
 else
   python3 -m pip install click --user
   python3 -m pip install tinydb --user
   python3 -m pip install pynvim --user
-  python3 -m pip install pipx --user
 fi
 
 # node.js

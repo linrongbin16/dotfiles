@@ -57,6 +57,7 @@ Install -command "scoop install neovim" -target "nvim"
 Install -command "scoop install starship" -target "starship"
 Install -command "scoop install mise" -target "mise"
 Install -command "scoop install pipx" -target "pipx"
+pipx ensurepath
 
 # python3
 python3 -m pip install click --user
