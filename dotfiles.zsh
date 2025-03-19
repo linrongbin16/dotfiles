@@ -31,6 +31,9 @@ export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 # zoxide
 eval "$(zoxide init zsh)"
 
+# atuin
+eval "$(atuin init zsh)"
+
 # pure
 fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
