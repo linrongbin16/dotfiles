@@ -1,5 +1,27 @@
 #!/bin/zsh
 
+OS="$(uname -s)"
+case "$OS" in
+Linux)
+  IS_LINUX=1
+  ;;
+FreeBSD)
+  IS_FREEBSD=1
+  ;;
+NetBSD)
+  IS_NETBSD=1
+  ;;
+OpenBSD)
+  IS_OPENBSD=1
+  ;;
+Darwin)
+  IS_MAC=1
+  ;;
+*)
+  # Nothing
+  ;;
+esac
+
 # performance
 ulimit -n 200000
 ulimit -u 2048
@@ -20,12 +42,18 @@ alias gb="git branch"
 alias gm="git merge"
 alias gc="git commit"
 
-# path
+# dotfiles
 export PATH="$PATH:$HOME/.dotfiles/bin"
-export GOROOT="$HOME/.go" # where go is installed
+
+# golang
+if [ "$IS_MAC" != "1" ]; then
+  export GOROOT="$HOME/.go" # where go is installed
+  export PATH="$PATH:$GOROOT/bin"
+fi
 export GOPATH="$HOME/go"  # user workspace
-export PATH="$PATH:$GOROOT/bin"
 export PATH="$PATH:$GOPATH/bin"
+
+# neovim
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 
 # zoxide
