@@ -57,7 +57,7 @@ export PATH="$PATH:$GOPATH/bin"
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 
 # zoxide
-eval "$(zoxide init zsh)"
+eval "$(zoxide init --cmd cd zsh)"
 
 # atuin
 eval "$(atuin init zsh)"
