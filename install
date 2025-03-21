@@ -82,13 +82,6 @@ install_moar_for_apt() {
   go install github.com/walles/moar@latest
 }
 
-install_fzf_for_apt() {
-  git clone --depth=1 https://github.com/junegunn/fzf
-  bash ./fzf/install --bin
-  sudo mv ./fzf/bin/fzf /usr/local/bin/fzf
-  rm -rf ./fzf
-}
-
 apt_depends() {
   info "install dependencies with apt"
   sudo apt-get -q -y update
@@ -106,7 +99,7 @@ apt_depends() {
   install "sudo apt-get install -q -y wget" "wget"
   install "install_lazygit_for_apt" "lazygit"
   install "install_moar_for_apt" "moar"
-  install "install_fzf_for_apt" "fzf"
+  install "sudo apt-get install -q -y fzf" "fzf"
 
   install "sudo apt-get install -q -y gzip" "gzip"
   install "sudo apt-get install -q -y p7zip" "7z"
