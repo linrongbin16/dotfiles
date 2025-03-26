@@ -409,28 +409,28 @@ curl https://mise.run | sh
 echo 'eval "$(~/.local/bin/mise activate zsh)"' >>~/.zshrc
 
 # kitty config
+mkdir -p $HOME/.config/kitty
 if [ ! -f ~/.config/kitty/kitty.conf ]; then
-  mkdir -p $HOME/.config/kitty
   cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
 fi
 
 # alacritty
+mkdir -p $HOME/.config/alacritty
 if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
-  mkdir -p $HOME/.config/alacritty
   cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
 fi
+if [ -d "$HOME/.config/alacritty/themes" ]; then
+  rm -rf "$HOME/.config/alacritty/themes"
+fi
+git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 
 # zsh plugins
-if [ ! -d "$HOME/.zsh" ]; then
-  mkdir -p "$HOME/.zsh"
-fi
-
+mkdir -p "$HOME/.zsh"
 # pure prompt theme
 if [ -d "$HOME/.zsh/pure" ]; then
   rm -rf "$HOME/.zsh/pure"
 fi
 git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
-
 # fzf-tab
 if [ -d "$HOME/.zsh/fzf-tab" ]; then
   rm -rf "$HOME/.zsh/fzf-tab"

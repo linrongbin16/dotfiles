@@ -1,3 +1,6 @@
+[general]
+import = ["themes/themes/sonokai.toml"]
+
 [window]
 startup_mode = "Maximized"
 
@@ -15,4 +18,9 @@ italic = { family = "Monaco Nerd Font Mono", style = "Italic" }
 bindings = []
 
 [keyboard]
-bindings = []
+bindings = [
+  { key = "N", mods = "Control", mode = "Search", action = "SearchFocusNext" },
+  { key = "P", mods = "Control", mode = "Search", action = "SearchFocusPrevious" },
+  { key = "ArrowDown", mode = "Search", action = "SearchFocusNext" },
+  { key = "ArrowUp", mode = "Search", action = "SearchFocusPrevious" },
+]

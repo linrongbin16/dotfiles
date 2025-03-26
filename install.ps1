@@ -103,11 +103,22 @@ Install -command "cargo install --locked zoxide" -target "zoxide"
 Install -command "cargo install bob-nvim" -target "bob"
 
 # alacritty
+$AlacrittyFolder = "$env:APPDATA\\alacritty"
+if (!(Test-Path -Path $AlacrittyFolder))
+{
+  New-Item -ItemType Directory $AlacrittyFolder
+}
 $AlacrittyConfig = "$env:APPDATA\\alacritty\\alacritty.toml"
 if (!(Test-Path -Path $AlacrittyConfig))
 {
   Copy-Item "$env:USERPROFILE\.dotfiles\alacritty.toml" -Destination $AlacrittyConfig
 }
+$AlacrittyThemesFolder = "$env:APPDATA\\alacritty\\themes"
+if (Test-Path -Path $AlacrittyThemesFolder)
+{
+  Remove-Item $AlacrittyThemesFolder -Recurse
+}
+git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
 
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
