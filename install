@@ -325,7 +325,6 @@ install "cargo install eza" "eza"
 install "cargo install git-delta" "delta"
 install "cargo install --locked zoxide" "zoxide"
 install "cargo install bob-nvim" "bob"
-install "cargo install atuin" "atuin"
 
 # python3
 
@@ -403,6 +402,9 @@ else
   install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaCode.zip"
   install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaMono.zip"
 fi
+
+# atuin
+curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
 # mise
 curl https://mise.run | sh
