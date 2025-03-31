@@ -408,7 +408,6 @@ curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
 # mise
 curl https://mise.run | sh
-echo 'eval "$(~/.local/bin/mise activate zsh)"' >>~/.zshrc
 
 # kitty config
 mkdir -p $HOME/.config/kitty

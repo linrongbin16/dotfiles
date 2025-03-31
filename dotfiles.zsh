@@ -62,6 +62,9 @@ eval "$(zoxide init --cmd cd zsh)"
 # atuin
 eval "$(atuin init zsh)"
 
+# mise
+eval "$(~/.local/bin/mise activate zsh)"
+
 # pure
 fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
