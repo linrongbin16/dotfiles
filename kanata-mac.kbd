@@ -4,28 +4,52 @@
 
 (defcfg
   process-unmapped-keys yes
+  concurrent-tap-hold yes
+)
+
+(defchordsv2
+  (s d)   S-[               50  all-released ()
+  (x c)   [                 50  all-released ()
+  (d f)   S-,               50  all-released ()
+  (c v)   S-9               50  all-released ()
+  (k l)   S-]               50  all-released ()
+  (f g)   S--               50  all-released ()
+  (v b)   -                 50  all-released ()
+  (, .)   ]                 50  all-released ()
+  (j k)   S-.               50  all-released ()
+  (m ,)   S-0               50  all-released ()
+  (h j)   S-=               50  all-released ()
+  (n m)   =                 50  all-released ()
 )
 
 (defalias l1 (layer-switch base))
 (defalias l2 (layer-switch num))
 (defalias l3 (layer-switch sym))
+(defalias l4 (layer-switch nav))
 
 (defsrc
   esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
-  grv  @l1  @l2  @l3  4    5    6    7    8    9    0    -    =    bspc
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
   tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
   lctl a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
-            lmet           spc                 rmet bspc
+       lalt lmet           spc                 rmet ralt
 )
 
 ;; base-layer
 (deflayermap (base)
-  spc  (tap-hold 200 200 spc (layer-while-held num))
+  1 @l1
+  2 @l2
+  3 @l3
+  4 @l4
 )
 
 ;; num-layer
 (deflayermap (num)
+  1 @l1
+  2 @l2
+  3 @l3
+  4 @l4
   a 1
   s 2
   d 3
@@ -40,14 +64,32 @@
 
 ;; sym-layer
 (deflayermap (sym)
-  a !
-  s @
-  d #
-  f $
-  g %
-  h ^
-  j &
-  k *
-  l (
-  ; )
+  1 @l1
+  2 @l2
+  3 @l3
+  4 @l4
+  a S-1
+  s S-2
+  d S-3
+  f S-4
+  g S-5
+  h S-6
+  j S-7
+  k S-8
+  l S-9
+  ; S-0
+)
+
+;; nav-layer
+(deflayermap (nav)
+  1 @l1
+  2 @l2
+  3 @l3
+  4 @l4
+  w up
+  s down
+  a left
+  d right
+  q home
+  e end
 )
