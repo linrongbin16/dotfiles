@@ -1,3 +1,5 @@
+;; Press Left-Control + Space + Esc to quit
+
 (defcfg
   process-unmapped-keys yes
   concurrent-tap-hold yes

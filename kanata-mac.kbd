@@ -1,95 +1,53 @@
-;; Basic home row mods example using QWERTY
-;; For a more complex but perhaps usable configuration,
-;; see home-row-mod-advanced.kbd
+;; Press Left-Control + Space + Esc to quit
 
 (defcfg
   process-unmapped-keys yes
   concurrent-tap-hold yes
 )
 
-(defchordsv2
-  (s d)   S-[               50  all-released ()
-  (x c)   [                 50  all-released ()
-  (d f)   S-,               50  all-released ()
-  (c v)   S-9               50  all-released ()
-  (k l)   S-]               50  all-released ()
-  (f g)   S--               50  all-released ()
-  (v b)   -                 50  all-released ()
-  (, .)   ]                 50  all-released ()
-  (j k)   S-.               50  all-released ()
-  (m ,)   S-0               50  all-released ()
-  (h j)   S-=               50  all-released ()
-  (n m)   =                 50  all-released ()
-)
-
-(defalias l1 (layer-switch base))
-(defalias l2 (layer-switch num))
-(defalias l3 (layer-switch sym))
-(defalias l4 (layer-switch nav))
-
 (defsrc
-  esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
-  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-  lctl a    s    d    f    g    h    j    k    l    ;    '    ret
-  lsft z    x    c    v    b    n    m    ,    .    /    rsft
-       lalt lmet           spc                 rmet ralt
+  s   d   f   j   k   l
 )
 
-;; base-layer
-(deflayermap (base)
-  1 @l1
-  2 @l2
-  3 @l3
-  4 @l4
+(defvar
+  tap-time 180
+  hold-time 180
+
+  left-hand-keys (
+    q w e r t
+    a s d f g
+    z x c v b
+  )
+  right-hand-keys (
+    y u i o p
+    h j k l ;
+    n m , . /
+  )
 )
 
-;; num-layer
-(deflayermap (num)
-  1 @l1
-  2 @l2
-  3 @l3
-  4 @l4
-  a 1
-  s 2
-  d 3
-  f 4
-  g 5
-  h 6
-  j 7
-  k 8
-  l 9
-  ; 0
+(deflayer base
+  @s  @d  @f  @j  @k  @l
 )
 
-;; sym-layer
-(deflayermap (sym)
-  1 @l1
-  2 @l2
-  3 @l3
-  4 @l4
-  a S-1
-  s S-2
-  d S-3
-  f S-4
-  g S-5
-  h S-6
-  j S-7
-  k S-8
-  l S-9
-  ; S-0
+(deflayer nomods
+  s   d   f   j   k   l
 )
 
-;; nav-layer
-(deflayermap (nav)
-  1 @l1
-  2 @l2
-  3 @l3
-  4 @l4
-  w up
-  s down
-  a left
-  d right
-  q home
-  e end
+(deffakekeys
+  to-base (layer-switch base)
+)
+
+(defalias
+  tap (multi
+    (layer-switch nomods)
+    (on-idle-fakekey to-base tap 20)
+  )
+
+  s (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lmet $left-hand-keys)
+  d (tap-hold-release-keys $tap-time $hold-time (multi d @tap) lctl $left-hand-keys)
+  f (tap-hold-release-keys $tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
+
+  j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
+  k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
+  l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) rmet $right-hand-keys)
 )
