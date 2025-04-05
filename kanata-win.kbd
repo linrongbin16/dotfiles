@@ -29,18 +29,6 @@
   )
 )
 
-(deflayer base
-  @s  @d  @f  @j  @k  @l
-)
-
-(deflayer nomods
-  s   d   f   j   k   l
-)
-
-(deffakekeys
-  to-base (layer-switch base)
-)
-
 (defalias
   tap (multi
     (layer-switch nomods)
@@ -54,4 +42,25 @@
   j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
   k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
   l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
+)
+
+(deffakekeys
+  to-base (layer-switch base)
+)
+
+(deflayer base
+  _    @qwr @dvk lrld _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _              _              _    _    _
+)
+
+(deflayer nomods
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    s    d    f    _    _    j    k    l    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _              _              _    _    _
+
 )
