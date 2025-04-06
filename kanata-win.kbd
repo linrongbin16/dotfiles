@@ -6,6 +6,7 @@
 )
 
 (defsrc
+  esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
   grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
   tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
   caps a    s    d    f    g    h    j    k    l    ;    '    ret
@@ -42,6 +43,11 @@
   j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
   k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
   l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
+
+  lbase (layer-switch base)
+  lnum (layer-switch num)
+  lsym (layer-switch sym)
+  lfun (layer-switch fun)
 )
 
 (deffakekeys
@@ -49,7 +55,8 @@
 )
 
 (deflayer base
-  _    @qwr @dvk lrld _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
@@ -57,6 +64,7 @@
 )
 
 (deflayer nomods
+  _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    s    d    f    _    _    j    k    l    _    _    _
@@ -65,26 +73,29 @@
 )
 
 (deflayer num
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    s    d    f    _    _    j    k    l    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
+  grv  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    1    2    3    4    5    6    7    8    9    0    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _              _              _    _    _
 )
 
 (deflayer sym
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    s    d    f    _    _    j    k    l    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
+ S-grv _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    !    @    #    $    %    ^    &    *    (    )    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _              _              _    _    _
 )
 
 (deflayer fun
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    s    d    f    _    _    j    k    l    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _
+  _    f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  _    _
+  _    _    _    _    _    f11  f12   _    _    _    _    _
   _    _    _              _              _    _    _
 )
 
