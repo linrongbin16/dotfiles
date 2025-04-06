@@ -44,10 +44,12 @@
   k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
   l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
 
-  lbase (layer-switch base)
-  lnum (layer-switch num)
-  lsym (layer-switch sym)
-  lfun (layer-switch fun)
+  to1 (layer-switch base)
+  to2 (layer-switch num)
+  to3 (layer-switch sym)
+  to4 (layer-switch fun)
+  mo2 (layer-while-held num)
+  mo3 (layer-while-held sym)
 )
 
 (deffakekeys
@@ -56,25 +58,25 @@
 
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
+  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   esc  _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _              _              _    _    _
+  _    _    @mo2           _              @mo3 _    _
 )
 
 (deflayer nomods
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   esc  _    s    d    f    _    _    j    k    l    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _              _              _    _    _
+  _    _    @mo2           _              @mo3 _    _
 )
 
 (deflayer num
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
+  _    @to1 @to2 @to3 @to4 _  _    _    _    _    _    _    _    _
   grv  _    _    _    _    _    _    _    _    _    _    _    _    _
   esc  1    2    3    4    5    6    7    8    9    0    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
@@ -83,7 +85,7 @@
 
 (deflayer sym
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
+  _    @to1 @to2 @to3 @to4 _  _    _    _    _    _    _    _    _
  S-grv _    _    _    _    _    _    _    _    _    _    _    _    _
   esc  !    @    #    $    %    ^    &    *    (    )    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
@@ -92,7 +94,7 @@
 
 (deflayer fun
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _ @lbase @lnum @lsym @lfun _  _    _    _    _    _    _    _    _
+  _    @to1 @to2 @to3 @to4 _  _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  _    _
   _    _    _    _    _    f11  f12   _    _    _    _    _
