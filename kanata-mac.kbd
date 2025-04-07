@@ -36,13 +36,13 @@
     (on-idle-fakekey to-base tap 20)
   )
 
-  s (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lalt $left-hand-keys)
+  s (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lmet $left-hand-keys)
   d (tap-hold-release-keys $tap-time $hold-time (multi d @tap) lctl $left-hand-keys)
   f (tap-hold-release-keys $tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
 
   j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
   k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
-  l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
+  l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) rmet $right-hand-keys)
 
   to1 (layer-switch base)
   to2 (layer-switch num)
