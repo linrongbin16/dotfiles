@@ -56,6 +56,21 @@
   to-base (layer-switch base)
 )
 
+(defchordsv2
+  (s d) S-[ 42 all-released ()
+  (x c) [   42 all-released ()
+  (d f) S-, 42 all-released ()
+  (c v) S-9 42 all-released ()
+  (f g) S-- 42 all-released ()
+  (v b) -   42 all-released ()
+  (k l) S-] 42 all-released ()
+  (, .) ]   42 all-released ()
+  (j k) S-. 42 all-released ()
+  (m ,) S-0 42 all-released ()
+  (h j) S-= 42 all-released ()
+  (n m) =   42 all-released ()
+)
+
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
