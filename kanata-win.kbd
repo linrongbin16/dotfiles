@@ -73,9 +73,9 @@
 
 (deflayer nav
   _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    up   _    _    _    _    _    _    _    _    _    _    _
-  _  left  down right _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _  left  down right _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    esc            _              ret  bspc _
 )
