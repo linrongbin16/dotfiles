@@ -46,7 +46,7 @@
 
   mo2 (layer-while-held nav)
 
-  tm2 (tap-hold-release-keys $tap-time $hold-time ret $mo2 $left-hand-keys)
+  tm2 (tap-hold-release-keys $tap-time $hold-time ret @mo2 $left-hand-keys)
 )
 
 (deffakekeys
@@ -59,7 +59,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              @tm2 bksp _
+  _    _    esc            _              @tm2 bspc _
 )
 
 (deflayer nomods
@@ -68,7 +68,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    s    d    f    _    _    j    k    l    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              @tm2 bksp _
+  _    _    esc            _              @tm2 bspc _
 )
 
 (deflayer nav
@@ -77,6 +77,6 @@
   _  left  down right _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              ret  bksp _
+  _    _    esc            _              ret  bspc _
 )
 
