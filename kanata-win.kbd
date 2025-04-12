@@ -19,11 +19,13 @@
   hold-time 180
 
   left-hand-keys (
+    grv 1 2 3 4 5
     q w e r t
     a s d f g
     z x c v b
   )
   right-hand-keys (
+    6 7 8 9 0 - =
     y u i o p
     h j k l ;
     n m , . /
@@ -31,22 +33,21 @@
 )
 
 (defalias
-  tap (multi
-    (layer-switch nomods)
-    (on-idle-fakekey to-base tap 20)
-  )
+  s (tap-hold-release-keys $tap-time $hold-time s lalt $left-hand-keys)
+  d (tap-hold-release-keys $tap-time $hold-time d lctl $left-hand-keys)
+  f (tap-hold-release-keys $tap-time $hold-time f lsft $left-hand-keys)
 
-  s (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lalt $left-hand-keys)
-  d (tap-hold-release-keys $tap-time $hold-time (multi d @tap) lctl $left-hand-keys)
-  f (tap-hold-release-keys $tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
+  j (tap-hold-release-keys $tap-time $hold-time j rsft $right-hand-keys)
+  k (tap-hold-release-keys $tap-time $hold-time k rctl $right-hand-keys)
+  l (tap-hold-release-keys $tap-time $hold-time l ralt $right-hand-keys)
 
-  j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
-  k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
-  l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
+  lsym (layer-while-held lsym)
+  rsym (layer-while-held rsym)
+  nav (layer-while-held nav)
 
-  mo2 (layer-while-held nav)
-
-  tm2 (tap-hold-release-keys $tap-time $hold-time ret @mo2 $left-hand-keys)
+  ret (tap-hold-release-keys $tap-time $hold-time ret @lsym $left-hand-keys)
+  esc (tap-hold-release-keys $tap-time $hold-time esc @rsym $left-hand-keys)
+  bspc (tap-hold-release-keys $tap-time $hold-time bspc @nav $left-hand-keys)
 )
 
 (deffakekeys
@@ -59,22 +60,31 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              @tm2 bspc _
+  _    _    @esc           _              @ret bspc _
 )
 
-(deflayer nomods
+(deflayer lsym
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    S-[  S-,  S--  _    _    _    _    _    _    _    _    _
+  _    _    [    S-9  -    _    _    _    _    _    _    _    _
+  _    _    _    '    S-'  _    _    _    _    _    _    _
+  _    _    esc            _              ret  bspc _
+)
+
+(deflayer rsym
+  _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    s    d    f    _    _    j    k    l    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              @tm2 bspc _
+  _    _    _    _    _    _    _    S-=   S-. S-]  _    _    _    _
+  _    _    _    _    _    _    _    =    S-0  ]    _    _    _
+  _    _    _    _    _    _    _    S-\  \    _    _    _
+  _    _    esc            _              ret  bspc _
 )
 
 (deflayer nav
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    up   _    _    _    _    _    _    _    _    _    _
+  _    _   home  up  end   _    _    _    _    _    _    _    _    _
   _    _  left  down right _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
   _    _    esc            _              ret  bspc _
