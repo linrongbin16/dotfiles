@@ -19,11 +19,13 @@
   hold-time 180
 
   left-hand-keys (
+    grv 1 2 3 4 5
     q w e r t
     a s d f g
     z x c v b
   )
   right-hand-keys (
+    6 7 8 9 0 - =
     y u i o p
     h j k l ;
     n m , . /
@@ -31,89 +33,60 @@
 )
 
 (defalias
-  tap (multi
-    (layer-switch nomods)
-    (on-idle-fakekey to-base tap 20)
-  )
+  s (tap-hold-release-keys $tap-time $hold-time s lmet $left-hand-keys)
+  d (tap-hold-release-keys $tap-time $hold-time d lctl $left-hand-keys)
+  f (tap-hold-release-keys $tap-time $hold-time f lsft $left-hand-keys)
 
-  s (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lmet $left-hand-keys)
-  d (tap-hold-release-keys $tap-time $hold-time (multi d @tap) lctl $left-hand-keys)
-  f (tap-hold-release-keys $tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
+  j (tap-hold-release-keys $tap-time $hold-time j rsft $right-hand-keys)
+  k (tap-hold-release-keys $tap-time $hold-time k rctl $right-hand-keys)
+  l (tap-hold-release-keys $tap-time $hold-time l rmet $right-hand-keys)
 
-  j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
-  k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rctl $right-hand-keys)
-  l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) rmet $right-hand-keys)
+  lsym (layer-while-held lsym)
+  rsym (layer-while-held rsym)
+  nav (layer-while-held nav)
 
-  to1 (layer-switch base)
-  to2 (layer-switch num)
-  to3 (layer-switch sym)
-  to4 (layer-switch fun)
-  mo2 (layer-while-held num)
-  mo3 (layer-while-held sym)
+  ret (tap-hold-release-keys $tap-time $hold-time ret @lsym $left-hand-keys)
+  esc (tap-hold-release-keys $tap-time $hold-time esc @rsym $left-hand-keys)
+  bspc (tap-hold-release-keys $tap-time $hold-time bspc @nav $left-hand-keys)
 )
 
 (deffakekeys
   to-base (layer-switch base)
 )
 
-(defchordsv2
-  (s d) S-[ 42 all-released ()
-  (x c) [   42 all-released ()
-  (d f) S-, 42 all-released ()
-  (c v) S-9 42 all-released ()
-  (f g) S-- 42 all-released ()
-  (v b) -   42 all-released ()
-  (k l) S-] 42 all-released ()
-  (, .) ]   42 all-released ()
-  (j k) S-. 42 all-released ()
-  (m ,) S-0 42 all-released ()
-  (h j) S-= 42 all-released ()
-  (n m) =   42 all-released ()
-)
-
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  esc  _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    @mo2           _              @mo3 \    _
+  _    _    @esc           _             @ret @bspc _
 )
 
-(deflayer nomods
+(deflayer lsym
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  esc  _    s    d    f    _    _    j    k    l    _    _    _
+  _    _    S-[  S-,  S--  _    _    _    _    _    _    _    _    _
+  _    _    [    S-9  -    _    _    _    _    _    _    _    _
+  _    _    _    '    S-'  _    _    _    _    _    _    _
+  _    _    esc            _              ret  bspc _
+)
+
+(deflayer rsym
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    S-=   S-. S-]  _    _    _    _
+  _    _    _    _    _    _    _    =    S-0  ]    _    _    _
+  _    _    _    _    _    _    S-\  \    _    _    _    _
+  _    _    esc            _              ret  bspc _
+)
+
+(deflayer nav
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _   home  up  end   _    _    _    _    _    _    _    _    _
+  _    _  left  down right _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    @mo2           _              @mo3 \    _
+  _    _    esc            _              ret  bspc _
 )
-
-(deflayer num
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
-  grv  _    up   _    _    _    _    _    _    _    _    _    _    _
-  esc  1    2    3    4    5    6    7    8    9    0    _    _
-  _   left down right _    _    _    _    _    _    _    _
-  _    _    _              _              _    _    _
-)
-
-(deflayer sym
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
- S-grv _    up   _    _    _    _    _    _    _    _    _    _    _
-  esc  S-1  S-2  S-3  S-4  S-5  S-6  S-7  S-8  S-9  S-0  _    _
-  _   left down right _    _    _    _    _    _    _    _
-  _    _    _              _              _    _    _
-)
-
-(deflayer fun
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    @to1 @to2 @to3 @to4 _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  _    _
-  _    _    _    _    _    f11  f12  _    _    _    _    _
-  _    _    _              _              _    _    _
-)
-
 
