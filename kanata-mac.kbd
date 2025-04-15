@@ -58,7 +58,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    @esc           _             @ret  \    _
+  _    '    @esc           _             @ret  \    _
 )
 
 (deflayer sym
@@ -67,7 +67,7 @@
   _    _    S-[  S-]  _    _    _    _    _    _    _    _    _    _
   _    _    [    ]    S--  S-=  _    _    _    _    _    _    _
   _    _    S-9  S-0  -    =    _    _    _    _    _    _
-  _    _    esc            _              ret  \    _
+  _    '    esc            _              ret  \    _
 )
 
 (deflayer nav
@@ -76,6 +76,6 @@
   _    _    _    _    _    _    _   home  end  _    _    _    _    _
   _    _    _    _    _    _   left down  up right  _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              ret  \    _
+  _    '    esc            _              ret  \    _
 )
 
