@@ -41,13 +41,11 @@
   k (tap-hold-release-keys $tap-time $hold-time k rctl $right-hand-keys)
   l (tap-hold-release-keys $tap-time $hold-time l rmet $right-hand-keys)
 
-  lsym (layer-while-held lsym)
-  rsym (layer-while-held rsym)
+  sym (layer-while-held sym)
   nav (layer-while-held nav)
 
-  ret (tap-hold-release-keys $tap-time $hold-time ret @lsym $left-hand-keys)
-  esc (tap-hold-release-keys $tap-time $hold-time esc @rsym $left-hand-keys)
-  bspc (tap-hold-release-keys $tap-time $hold-time bspc @nav $left-hand-keys)
+  ret (tap-hold-release-keys $tap-time $hold-time ret @sym $left-hand-keys)
+  esc (tap-hold-release-keys $tap-time $hold-time esc @nav $left-hand-keys)
 )
 
 (deffakekeys
@@ -60,33 +58,24 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    @esc           _             @ret @bspc _
+  _    _    @esc           _             @ret  \    _
 )
 
-(deflayer lsym
+(deflayer sym
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    S-[  S-,  S--  _    _    _    _    _    _    _    _    _
-  _    _    [    S-9  -    _    _    _    _    _    _    _    _
-  _    _    _    '    S-'  _    _    _    _    _    _    _
-  _    _    esc            _              ret  bspc _
-)
-
-(deflayer rsym
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    S-=   S-. S-]  _    _    _    _
-  _    _    _    _    _    _    _    =    S-0  ]    _    _    _
-  _    _    _    _    _    _    S-\  \    _    _    _    _
-  _    _    esc            _              ret  bspc _
+  _    _    S-[  S-]  _    _    _    _    _    _    _    _    _    _
+  _    _    [    ]    S--  S-=  _    _    _    _    _    _    _
+  _    _    S-9  S-0  -    =    _    _    _    _    _    _
+  _    _    esc            _              ret  \    _
 )
 
 (deflayer nav
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _   home  up  end   _    _    _    _    _    _    _    _    _
-  _    _  left  down right _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _   home  end  _    _    _    _    _
+  _    _    _    _    _    _   left down  up right  _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              ret  bspc _
+  _    _    esc            _              ret  \    _
 )
 
