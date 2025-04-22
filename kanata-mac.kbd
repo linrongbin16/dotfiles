@@ -41,10 +41,11 @@
   k (tap-hold-release-keys $tap-time $hold-time k rctl $right-hand-keys)
   l (tap-hold-release-keys $tap-time $hold-time l rmet $right-hand-keys)
 
-  sym (layer-while-held sym)
+  lsym (layer-while-held lsym)
+  rsym (layer-while-held rsym)
   nav (layer-while-held nav)
 
-  ret (tap-hold-release-keys $tap-time $hold-time ret @sym $left-hand-keys)
+  ret (tap-hold-release-keys $tap-time $hold-time ret @lsym $left-hand-keys)
   esc (tap-hold-release-keys $tap-time $hold-time esc @nav $left-hand-keys)
 )
 
@@ -58,24 +59,15 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    '    @esc           _             @ret  \    _
-)
-
-(deflayer sym
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    S-[  S-]  _    _    _    _    _    _    _    _    _    _
-  _    _    [    ]    S--  S-=  _    _    _    _    _    _    _
-  _    _    S-9  S-0  -    =    _    _    _    _    _    _
-  _    '    esc            _              ret  \    _
+  _    _    @esc           _              ret  _    _
 )
 
 (deflayer nav
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _   home  end  _    _    _    _    _
-  _    _    _    _    _    _   left down  up right  _    _    _
+  _    _    _    _    _    _    _   home end   _    _    _    _    _
+  _    _    _    _    _    _   left down  up  right _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    '    esc            _              ret  \    _
+  _    _    esc            _              ret  _    _
 )
 
