@@ -41,11 +41,8 @@
   k (tap-hold-release-keys $tap-time $hold-time k rctl $right-hand-keys)
   l (tap-hold-release-keys $tap-time $hold-time l rmet $right-hand-keys)
 
-  lsym (layer-while-held lsym)
-  rsym (layer-while-held rsym)
   nav (layer-while-held nav)
 
-  ret (tap-hold-release-keys $tap-time $hold-time ret @lsym $left-hand-keys)
   esc (tap-hold-release-keys $tap-time $hold-time esc @nav $left-hand-keys)
 )
 
