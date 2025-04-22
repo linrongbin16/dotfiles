@@ -42,29 +42,23 @@
   l (tap-hold-release-keys $tap-time $hold-time l rmet $right-hand-keys)
 
   nav (layer-while-held nav)
-
-  esc (tap-hold-release-keys $tap-time $hold-time esc @nav $left-hand-keys)
-)
-
-(deffakekeys
-  to-base (layer-switch base)
 )
 
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
+  esc  _    @s   @d   @f   _    _    @j   @k   @l   _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    @esc           _              \    _    _
+  _    _    @nav           _              \    _    _
 )
 
 (deflayer nav
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _   home end   _    _    _    _    _
-  _    _    _    _    _    _   left down  up  right _    _    _
+  esc  _    _    _    _    _   left down  up  right _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    esc            _              \    _    _
+  _    _    _              _              \    _    _
 )
 
