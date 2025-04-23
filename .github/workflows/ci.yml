@@ -1,21 +1,20 @@
-name: CI
+name: Nightly Installer
+permissions:
+  contents: write
 on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
 concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: false
 jobs:
   ubuntu_installer:
     name: Ubuntu Installer
     runs-on: ubuntu-latest
     steps:
       - uses: Swatinem/rust-cache@v2
-      - uses: mozilla-actions/sccache-action@v0.0.7
+      - uses: mozilla-actions/sccache-action@v0.0.9
       - name: Get branch
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
@@ -26,6 +25,11 @@ jobs:
           RUSTC_WRAPPER: "sccache"
         run: |
           set -x
+          sudo apt-get install -q -y fd-find
+          sudo apt-get install -q -y ripgrep
+          sudo apt-get install -q -y batcat
+          sudo apt-get install -q -y eza
+          sudo apt-get install -q -y zoxide
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
           sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install --github-actions"
@@ -38,7 +42,7 @@ jobs:
           xcode-version: latest-stable
       - uses: Homebrew/actions/setup-homebrew@master
       - uses: Swatinem/rust-cache@v2
-      - uses: mozilla-actions/sccache-action@v0.0.7
+      - uses: mozilla-actions/sccache-action@v0.0.9
       - name: Get branch
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
@@ -50,6 +54,12 @@ jobs:
           set -x
           echo '${{ steps.extract_branch.outputs.branch }}'
           echo ${{ steps.extract_branch.outputs.branch }}
+          brew install fd
+          brew install ripgrep
+          brew install bat
+          brew install git-delta
+          brew install eza
+          brew install zoxide
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && bash -euxo pipefail ./install --github-actions
   windows_installer:
     name: Windows Installer
@@ -57,7 +67,7 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: Swatinem/rust-cache@v2
-      - uses: mozilla-actions/sccache-action@v0.0.7
+      - uses: mozilla-actions/sccache-action@v0.0.9
       - uses: MinoruSekine/setup-scoop@v4.0.1
         with:
           buckets: extras
@@ -75,4 +85,10 @@ jobs:
         run: |
           echo '${{ steps.extract_branch.outputs.branch }}'
           echo ${{ steps.extract_branch.outputs.branch }}
+          scoop install fd
+          scoop install ripgrep
+          scoop install bat
+          scoop install delta
+          scoop install eza
+          scoop install zoxide
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles && cd $env:USERPROFILE\.dotfiles && pwsh .\install.ps1
