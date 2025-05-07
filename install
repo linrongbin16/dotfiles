@@ -78,10 +78,6 @@ install_lazygit_for_apt() {
   go install github.com/jesseduffield/lazygit@latest
 }
 
-install_moar_for_apt() {
-  go install github.com/walles/moar@latest
-}
-
 install_fzf_for_apt() {
   go install github.com/junegunn/fzf@latest
 }
@@ -102,7 +98,6 @@ apt_depends() {
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
   install "install_lazygit_for_apt" "lazygit"
-  install "install_moar_for_apt" "moar"
   install "install_fzf_for_apt" "fzf"
 
   install "sudo apt-get install -q -y gzip" "gzip"
@@ -145,7 +140,6 @@ pacman_depends() {
   install "yes | sudo pacman -S curl" "curl"
   install "yes | sudo pacman -S wget" "wget"
   install "yes | sudo pacman -S lazygit" "lazygit"
-  install "yes | sudo pacman -S moar" "moar"
   install "yes | sudo pacman -S fzf" "fzf"
 
   install "yes | sudo pacman -S unzip" "unzip"
@@ -185,10 +179,6 @@ install_lazygit_for_dnf() {
   sudo dnf install -y lazygit
 }
 
-install_moar_for_dnf() {
-  install_moar_for_apt
-}
-
 dnf_depends() {
   info "install dependencies with dnf"
   sudo dnf check-update
@@ -205,7 +195,6 @@ dnf_depends() {
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
   install "install_lazygit_for_dnf" "lazygit"
-  install "install_moar_for_dnf" "moar"
   install "sudo dnf install -y fzf" "fzf"
 
   install "sudo dnf install -y gzip" "gzip"
@@ -247,7 +236,6 @@ brew_depends() {
   install "brew install curl" "curl"
   install "brew install wget" "wget"
   install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-  install "brew install moar" "moar"
   install "brew install fzf" "fzf"
 
   install "brew install gzip" "gzip"
