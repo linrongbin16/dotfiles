@@ -375,20 +375,20 @@ install_font_from_github_for_macos() {
 if [ "$OS" = "Darwin" ]; then
   install_font_from_github_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
   install_font_from_github_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
-  brew install "font-hack-nerd-font"
-  brew install "font-d2coding-nerd-font"
-  brew install "font-sauce-code-pro-nerd-font"
-  brew install "font-recursive-mono-nerd-font"
-  brew install "font-caskaydia-mono-nerd-font"
+  # brew install "font-hack-nerd-font"
+  # brew install "font-d2coding-nerd-font"
+  # brew install "font-sauce-code-pro-nerd-font"
+  # brew install "font-recursive-mono-nerd-font"
+  # brew install "font-caskaydia-mono-nerd-font"
 else
   install_font_from_github_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
   install_font_from_github_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
-  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "Hack.zip"
-  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "D2Coding.zip"
-  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "SourceCodePro.zip"
-  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "Recursive.zip"
-  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaCode.zip"
-  install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaMono.zip"
+  # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "Hack.zip"
+  # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "D2Coding.zip"
+  # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "SourceCodePro.zip"
+  # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "Recursive.zip"
+  # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaCode.zip"
+  # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaMono.zip"
 fi
 
 # atuin
