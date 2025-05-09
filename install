@@ -391,6 +391,35 @@ else
   # install_font_from_github_for_linux "ryanoasis/nerd-fonts" "CascadiaMono.zip"
 fi
 
+# fzf-tab
+install_fzf_tab_for_zsh() {
+  if [ -d "$HOME/.zsh/fzf-tab" ]; then
+    rm -rf "$HOME/.zsh/fzf-tab"
+  fi
+  git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$HOME/.zsh/fzf-tab"
+}
+
+# pure prompt
+install_pure_for_zsh() {
+  mkdir -p "$HOME/.zsh"
+  if [ -d "$HOME/.zsh/pure" ]; then
+    rm -rf "$HOME/.zsh/pure"
+  fi
+  git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
+}
+
+# spaceship prompt
+install_spaceship_for_zsh() {
+  mkdir -p "$HOME/.zsh"
+  if [ -d "$HOME/.zsh/spaceship" ]; then
+    rm -rf "$HOME/.zsh/spaceship"
+  fi
+  git clone --depth=1 https://github.com/spaceship-prompt/spaceship-prompt.git "$HOME/.zsh/spaceship"
+}
+
+install_fzf_tab_for_zsh
+install_spaceship_for_zsh
+
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
@@ -412,19 +441,6 @@ if [ -d "$HOME/.config/alacritty/themes" ]; then
   rm -rf "$HOME/.config/alacritty/themes"
 fi
 git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
-
-# zsh plugins
-mkdir -p "$HOME/.zsh"
-# pure prompt theme
-if [ -d "$HOME/.zsh/pure" ]; then
-  rm -rf "$HOME/.zsh/pure"
-fi
-git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
-# fzf-tab
-if [ -d "$HOME/.zsh/fzf-tab" ]; then
-  rm -rf "$HOME/.zsh/fzf-tab"
-fi
-git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$HOME/.zsh/fzf-tab"
 
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc

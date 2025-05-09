@@ -66,15 +66,8 @@ fi
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
 
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  # pure
-  fpath+=($HOME/.zsh/pure)
-  autoload -U promptinit; promptinit
-  zstyle :prompt:pure:prompt:success color green
-  zstyle :prompt:pure:git:stash show yes
-  prompt pure
-
-  # fzf-tab
+# fzf-tab
+init_fzf_tab() {
   autoload -U compinit; compinit
   source $HOME/.zsh/fzf-tab/fzf-tab.plugin.zsh
   # disable sort when completing `git checkout`
@@ -88,4 +81,25 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   zstyle ':fzf-tab:complete:z:*' fzf-preview 'eza -1 --color=always $realpath'
   # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
   zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
+}
+
+# pure
+init_pure_prompt() {
+  fpath+=($HOME/.zsh/pure)
+  autoload -U promptinit; promptinit
+  zstyle :prompt:pure:prompt:success color green
+  zstyle :prompt:pure:git:stash show yes
+  prompt pure
+}
+
+# spaceship
+init_spaceship_prompt() {
+  source "$HOME/.zsh/spaceship/spaceship.zsh"
+}
+
+init_spaceship_prompt
+
+if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  init_fzf_tab
+  init_spaceship_prompt
 fi
