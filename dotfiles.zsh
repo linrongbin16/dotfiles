@@ -97,8 +97,6 @@ init_spaceship_prompt() {
   source "$HOME/.zsh/spaceship/spaceship.zsh"
 }
 
-init_spaceship_prompt
-
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   init_fzf_tab
   init_spaceship_prompt
