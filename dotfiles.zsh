@@ -29,8 +29,6 @@ ulimit -u 2048
 # ls
 alias l="eza -lh"
 alias ll="eza -alh"
-alias rm=rmz
-alias cp=cpz
 
 # lazygit
 alias lg="lazygit"
