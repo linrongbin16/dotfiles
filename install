@@ -418,7 +418,7 @@ install_spaceship_for_zsh() {
 }
 
 install_fzf_tab_for_zsh
-install_spaceship_for_zsh
+install_pure_for_zsh
 
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh

@@ -99,5 +99,5 @@ init_spaceship_prompt() {
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   init_fzf_tab
-  init_spaceship_prompt
+  init_pure_prompt
 fi
