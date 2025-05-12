@@ -100,6 +100,8 @@ Install -command "cargo install eza" -target "eza"
 Install -command "cargo install git-delta" -target "delta"
 Install -command "cargo install --locked zoxide" -target "zoxide"
 Install -command "cargo install bob-nvim" -target "bob"
+Install -command "cargo install cpz" -target "cpz"
+Install -command "cargo install rmz" -target "rmz"
 
 # alacritty
 $AlacrittyFolder = "$env:APPDATA\\alacritty"
