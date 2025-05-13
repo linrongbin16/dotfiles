@@ -246,6 +246,7 @@ brew_depends() {
   install "brew install wget" "wget"
   install "brew install jesseduffield/lazygit/lazygit" "lazygit"
   install "brew install fzf" "fzf"
+  install "brew install moar" "moar"
 
   install "brew install gzip" "gzip"
   install "brew install p7zip" "7z"
