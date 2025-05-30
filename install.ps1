@@ -101,18 +101,6 @@ Install -command "cargo install git-delta" -target "delta"
 Install -command "cargo install --locked zoxide" -target "zoxide"
 Install -command "cargo install bob-nvim" -target "bob"
 
-# alacritty
-$AlacrittyFolder = "$env:APPDATA\\alacritty"
-if (!(Test-Path -Path $AlacrittyFolder))
-{
-  New-Item -ItemType Directory $AlacrittyFolder
-}
-$AlacrittyConfig = "$env:APPDATA\\alacritty\\alacritty.toml"
-if (!(Test-Path -Path $AlacrittyConfig))
-{
-  Copy-Item "$env:USERPROFILE\.dotfiles\alacritty.toml" -Destination $AlacrittyConfig
-}
-
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
