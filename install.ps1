@@ -112,12 +112,6 @@ if (!(Test-Path -Path $AlacrittyConfig))
 {
   Copy-Item "$env:USERPROFILE\.dotfiles\alacritty.toml" -Destination $AlacrittyConfig
 }
-$AlacrittyThemesFolder = "$env:APPDATA\\alacritty\\themes"
-if (Test-Path -Path $AlacrittyThemesFolder)
-{
-  Remove-Item $AlacrittyThemesFolder -Recurse
-}
-git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
 
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
