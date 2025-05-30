@@ -68,7 +68,7 @@ npm install --silent -g neovim
 npm install --silent -g trash-cli
 
 # nerd fonts
-scoop bucket add nerd-fonts
+# scoop bucket add nerd-fonts
 # scoop install nerd-fonts/Hack-NF
 # scoop install nerd-fonts/Hack-NF-Mono
 # scoop install nerd-fonts/D2Coding-NF
