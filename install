@@ -237,6 +237,7 @@ brew_depends() {
   install "brew install pkg-config" "pkg-config"
   install "brew install cmake" "cmake"
   install "brew install go" "go"
+  brew install openssl openssh
 
   install "brew install git" "git"
   install "brew install curl" "curl"
