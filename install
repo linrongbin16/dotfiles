@@ -343,23 +343,23 @@ install_font_from_github() {
   fi
 }
 
-install_font_from_github_for_linux() {
+install_font_for_linux() {
   mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
   install_font_from_github "$1" "$2"
   sudo fc-cache -f -v
 }
 
-install_font_from_github_for_macos() {
+install_font_for_macos() {
   cd ~/Library/Fonts
   install_font_from_github "$1" "$2"
 }
 
 if [ "$OS" = "Darwin" ]; then
-  install_font_from_github_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
-  install_font_from_github_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
+  install_font_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
+  install_font_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
 else
-  install_font_from_github_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
-  install_font_from_github_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
+  install_font_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
+  install_font_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
 fi
 
 # fzf-tab
