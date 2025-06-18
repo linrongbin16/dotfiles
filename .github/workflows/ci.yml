@@ -44,9 +44,13 @@ jobs:
           export PATH=$PATH:~/.local/bin
           ln -s $(which fdfind) ~/.local/bin/fd
           ln -s $(which batcat) ~/.local/bin/bat
+          fd --version
+          bat --version
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
-          sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install --github-actions"
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
+          cd ~/.dotfiles
+          sudo bash -euxo pipefail ./install
   macos_installer:
     name: MacOS Installer
     runs-on: macos-latest
@@ -75,7 +79,9 @@ jobs:
           brew install eza
           brew install zoxide
           brew install neovim
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && bash -euxo pipefail ./install --github-actions
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
+          cd ~/.dotfiles
+          bash -euxo pipefail ./install
   windows_installer:
     name: Windows Installer
     runs-on: windows-latest
@@ -107,4 +113,6 @@ jobs:
           scoop install eza
           scoop install zoxide
           scoop install neovim
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles && cd $env:USERPROFILE\.dotfiles && pwsh .\install.ps1
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles
+          cd $env:USERPROFILE\.dotfiles
+          pwsh .\install.ps1

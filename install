@@ -4,17 +4,6 @@
 
 OS="$(uname -s)"
 
-GITHUB_ACTIONS=0
-
-for i in "$@"; do
-  case $i in
-  --github-actions)
-    GITHUB_ACTIONS=1
-    ;;
-  *) ;;
-  esac
-done
-
 # utils {
 
 info() {
