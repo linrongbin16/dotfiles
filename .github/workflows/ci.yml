@@ -42,14 +42,14 @@ jobs:
           sudo snap install nvim --classic
           mkdir -p ~/.local/bin
           export PATH=$PATH:~/.local/bin
-          ln -s $(which fdfind) ~/.local/bin/fd
-          ln -s $(which batcat) ~/.local/bin/bat
+          sudo ln -s $(which fdfind) /usr/local/bin/fd
+          sudo ln -s $(which batcat) /usr/local/bin/bat
           fd --version
           bat --version
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
-          cd ~/.dotfiles
+          sudo git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
+          sudo cd ~/.dotfiles
           sudo bash -euxo pipefail ./install
   macos_installer:
     name: MacOS Installer
