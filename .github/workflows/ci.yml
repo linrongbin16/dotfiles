@@ -74,6 +74,7 @@ jobs:
           brew install git-delta
           brew install eza
           brew install zoxide
+          brew install neovim
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && bash -euxo pipefail ./install --github-actions
   windows_installer:
     name: Windows Installer
@@ -105,4 +106,5 @@ jobs:
           scoop install delta
           scoop install eza
           scoop install zoxide
+          scoop install neovim
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles && cd $env:USERPROFILE\.dotfiles && pwsh .\install.ps1
