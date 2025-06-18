@@ -363,7 +363,7 @@ else
 fi
 
 # fzf-tab
-install_fzf_tab_for_zsh() {
+zsh_install_fzf_tab() {
   if [ -d "$HOME/.zsh/fzf-tab" ]; then
     rm -rf "$HOME/.zsh/fzf-tab"
   fi
@@ -371,7 +371,7 @@ install_fzf_tab_for_zsh() {
 }
 
 # pure prompt
-install_pure_for_zsh() {
+zsh_install_pure_prompt() {
   mkdir -p "$HOME/.zsh"
   if [ -d "$HOME/.zsh/pure" ]; then
     rm -rf "$HOME/.zsh/pure"
@@ -379,8 +379,8 @@ install_pure_for_zsh() {
   git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 }
 
-install_fzf_tab_for_zsh
-install_pure_for_zsh
+zsh_install_fzf_tab
+zsh_install_pure_prompt
 
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
