@@ -342,15 +342,6 @@ install_pure_for_zsh() {
   git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 }
 
-# spaceship prompt
-install_spaceship_for_zsh() {
-  mkdir -p "$HOME/.zsh"
-  if [ -d "$HOME/.zsh/spaceship" ]; then
-    rm -rf "$HOME/.zsh/spaceship"
-  fi
-  git clone --depth=1 https://github.com/spaceship-prompt/spaceship-prompt.git "$HOME/.zsh/spaceship"
-}
-
 install_fzf_tab_for_zsh
 install_pure_for_zsh
 

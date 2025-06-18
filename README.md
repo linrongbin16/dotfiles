@@ -36,6 +36,8 @@ Install with MSVC components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
+#### Install [Git](https://git-scm.com/downloads/win) (for all users)
+
 #### Install [7-Zip](https://www.7-zip.org/) (for all users)
 
 #### Install [Python 3.x](https://www.python.org/downloads/) (only for current user)
