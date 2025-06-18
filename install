@@ -45,15 +45,15 @@ install() {
 
 # apt {
 
-install_nvim_for_apt() {
-  sudo snap install nvim --classic
+install_nvim() {
+  bob use stable
 }
 
 install_nodejs_for_apt() {
   # see: https://github.com/nodesource/distributions
   info "install nodejs-lts from NodeSource"
   sudo apt-get install -y curl
-  curl -fsSL https://deb.nodesource.com/setup_22.x -o nodesource_setup.sh
+  curl -fsSL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
   sudo -E bash nodesource_setup.sh
   sudo apt-get -qq update
   sudo apt-get -qq -y install nodejs
@@ -74,12 +74,25 @@ install_golang_for_apt() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_lazygit_for_apt() {
-  go install github.com/jesseduffield/lazygit@latest
+_install_lazygit_impl() {
+  local LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+  tar xf lazygit.tar.gz lazygit
+  sudo install lazygit -D -t /usr/local/bin/
 }
 
-install_fzf_for_apt() {
-  go install github.com/junegunn/fzf@latest
+install_lazygit() {
+  install "_install_lazygit_impl" "lazygit"
+}
+
+_install_fzf_impl() {
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  ~/.fzf/install --bin
+  export PATH=$PATH:~/.fzf/bin
+}
+
+install_fzf() {
+  install "_install_fzf_impl" "fzf"
 }
 
 install_moar_for_apt() {
@@ -101,8 +114,6 @@ apt_depends() {
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
-  install "install_lazygit_for_apt" "lazygit"
-  install "install_fzf_for_apt" "fzf"
   install "install_moar_for_apt" "moar"
 
   install "sudo apt-get install -q -y gzip" "gzip"
@@ -118,11 +129,12 @@ apt_depends() {
   install "install_nodejs_for_apt" "node"
   install "install_nodejs_for_apt" "npm"
 
-  install "install_nvim_for_apt" "nvim"
-  install "sudo apt-get install -q -y zsh" "zsh"
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
   sudo pipx ensurepath --global
+
+  install "sudo apt-get install -q -y zsh" "zsh"
+  sudo chsh -s $(which zsh) $USER
 }
 
 # apt }
