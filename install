@@ -98,6 +98,7 @@ apt_depends() {
   install "sudo apt-get install -q -y pkg-config" "pkg-config"
   install "sudo apt-get install -q -y cmake" "cmake"
   install "install_golang" "go"
+  sudo apt-get install -q -y libssl-dev openssh-client openssh-server
 
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
