@@ -33,6 +33,9 @@ alias ll="eza -alh"
 # lazygit
 alias lg="lazygit"
 
+# fzf
+export PATH=$PATH:~/.fzf/bin
+
 # git
 alias gs="git status"
 alias gp="git pull"

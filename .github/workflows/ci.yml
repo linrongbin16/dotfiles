@@ -1,13 +1,22 @@
-name: Nightly Installer
+name: CI
 permissions:
   contents: write
 on:
-  schedule:
-    - cron: "0 0 1 * *"
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
   workflow_dispatch:
 concurrency:
-  group: ${{ github.ref }}-${{ github.workflow }}
-  cancel-in-progress: false
+  group: ${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+  CARGO_NET_RETRY: 3
+  CARGO_TERM_COLOR: always
 jobs:
   ubuntu_installer:
     name: Ubuntu Installer
@@ -30,9 +39,14 @@ jobs:
           sudo apt-get install -q -y bat
           sudo apt-get install -q -y eza
           sudo apt-get install -q -y zoxide
+          sudo snap install nvim --classic
+          sudo ln -s $(which fdfind) /usr/local/bin/fd
+          sudo ln -s $(which batcat) /usr/local/bin/bat
+          fd --version
+          bat --version
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
-          sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install --github-actions"
+          sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install"
   macos_installer:
     name: MacOS Installer
     runs-on: macos-latest
@@ -60,7 +74,10 @@ jobs:
           brew install git-delta
           brew install eza
           brew install zoxide
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && bash -euxo pipefail ./install --github-actions
+          brew install neovim
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
+          cd ~/.dotfiles
+          bash -euxo pipefail ./install
   windows_installer:
     name: Windows Installer
     runs-on: windows-latest
@@ -91,4 +108,7 @@ jobs:
           scoop install delta
           scoop install eza
           scoop install zoxide
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles && cd $env:USERPROFILE\.dotfiles && pwsh .\install.ps1
+          scoop install neovim
+          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles
+          cd $env:USERPROFILE\.dotfiles
+          pwsh .\install.ps1

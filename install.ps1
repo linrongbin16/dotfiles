@@ -52,38 +52,13 @@ Install -command "scoop install gzip" -target "gzip"
 Install -command "scoop install unzip" -target "unzip"
 
 Install -command "scoop install vim" -target "vim"
-Install -command "scoop install neovim" -target "nvim"
 Install -command "scoop install starship" -target "starship"
 Install -command "scoop install mise" -target "mise"
 Install -command "scoop install pipx" -target "pipx"
 pipx ensurepath
 
-# python3
-python3 -m pip install click --user
-python3 -m pip install tinydb --user
-python3 -m pip install pynvim --user
-
 # node.js
-npm install --silent -g neovim
 npm install --silent -g trash-cli
-
-# nerd fonts
-# scoop bucket add nerd-fonts
-# scoop install nerd-fonts/Hack-NF
-# scoop install nerd-fonts/Hack-NF-Mono
-# scoop install nerd-fonts/D2Coding-NF
-# scoop install nerd-fonts/D2Coding-NF-Mono
-# scoop install nerd-fonts/SourceCodePro-NF
-# scoop install nerd-fonts/SourceCodePro-NF-Mono
-# scoop install nerd-fonts/Recursive-NF
-# scoop install nerd-fonts/Recursive-NF-Propo
-# scoop install nerd-fonts/Recursive-NF-Mono
-# scoop install nerd-fonts/CascadiaCode-NF
-# scoop install nerd-fonts/CascadiaCode-NF-Propo
-# scoop install nerd-fonts/CascadiaCode-NF-Mono
-# scoop install nerd-fonts/CascadiaMono-NF
-# scoop install nerd-fonts/CascadiaMono-NF-Propo
-# scoop install nerd-fonts/CascadiaMono-NF-Mono
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
@@ -100,6 +75,8 @@ Install -command "cargo install eza" -target "eza"
 Install -command "cargo install git-delta" -target "delta"
 Install -command "cargo install --locked zoxide" -target "zoxide"
 Install -command "cargo install bob-nvim" -target "bob"
+Install -command "bob use stable" -target "nvim"
+$env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
