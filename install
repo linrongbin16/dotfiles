@@ -214,10 +214,12 @@ dnf_depends() {
   install "sudo dnf install -y nodejs npm" "node"
 
   install "sudo dnf install -y neovim" "nvim"
-  install "sudo dnf install -y zsh" "zsh"
   install "sudo dnf install -y pipx" "pipx"
   pipx ensurepath
   sudo pipx ensurepath --global
+
+  install "sudo dnf install -y zsh" "zsh"
+  sudo chsh -s $(which zsh) $USER
 }
 
 # dnf }
@@ -252,10 +254,12 @@ brew_depends() {
   install "brew install node" "node"
 
   install "brew install neovim" "nvim"
-  install "brew install zsh" "zsh"
   install "brew install pipx" "pipx"
   pipx ensurepath
   sudo pipx ensurepath --global
+
+  install "brew install zsh" "zsh"
+  sudo chsh -s $(which zsh) $USER
 }
 
 # brew }
