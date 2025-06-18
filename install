@@ -81,14 +81,10 @@ install_lazygit_for_apt() {
   sudo install lazygit -D -t /usr/local/bin/
 }
 
-_install_fzf_impl() {
+install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
   export PATH=$PATH:~/.fzf/bin
-}
-
-install_fzf() {
-  install "_install_fzf_impl" "fzf"
 }
 
 install_moar() {
@@ -111,6 +107,7 @@ apt_depends() {
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
   install "install_lazygit_for_apt" "lazygit"
+  install "install_fzf" "fzf"
   install "install_moar" "moar"
 
   install "sudo apt-get install -q -y gzip" "gzip"
@@ -202,6 +199,7 @@ dnf_depends() {
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
   install "install_lazygit_for_dnf" "lazygit"
+  install "install_fzf" "fzf"
   install "install_moar" "moar"
 
   install "sudo dnf install -y gzip" "gzip"
