@@ -1,6 +1,6 @@
 # path
-$env:PATH="$env:PATH;$env:USERPROFILE\go\bin"
-$env:PATH="$env:PATH;$env:USERPROFILE\.go\bin"
+$env:PATH += ";$env:USERPROFILE\go\bin"
+$env:PATH += ";$env:USERPROFILE\.go\bin"
 
 # lazygit
 Set-Alias -name lg -value lazygit
