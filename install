@@ -34,7 +34,7 @@ install() {
 
 # apt {
 
-install_nodejs_for_apt() {
+_apt_install_nodejs() {
   # https://github.com/nodesource/distributions
   info "install nodejs-lts from github NodeSource"
   sudo apt-get install -y curl
@@ -44,13 +44,13 @@ install_nodejs_for_apt() {
   sudo apt-get -qq -y install nodejs
 }
 
-install_git_for_apt() {
+_apt_install_git() {
   sudo apt-add-repository ppa:git-core/ppa
   sudo apt-get -q -q -y update
   install "sudo apt-get install -q -y git" "git"
 }
 
-install_golang() {
+_install_golang() {
   git clone --depth=1 https://github.com/kerolloz/go-installer
   export GOROOT="$HOME/.go" # where go is installed
   export GOPATH="$HOME/go"  # user workspace
@@ -59,20 +59,20 @@ install_golang() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_lazygit_for_apt() {
+_apt_install_lazygit() {
   local LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
   curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
   tar xf lazygit.tar.gz lazygit
   sudo install lazygit -D -t /usr/local/bin/
 }
 
-install_fzf() {
+_install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
   export PATH=$PATH:~/.fzf/bin
 }
 
-install_moar() {
+_install_moar() {
   go install github.com/walles/moar@latest
 }
 
@@ -86,15 +86,15 @@ apt_depends() {
   install "sudo apt-get install -q -y automake" "automake"
   install "sudo apt-get install -q -y pkg-config" "pkg-config"
   install "sudo apt-get install -q -y cmake" "cmake"
-  install "install_golang" "go"
+  install "_install_golang" "go"
   sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
 
-  install "install_git_for_apt" "git"
+  install "_apt_install_git" "git"
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
-  install "install_lazygit_for_apt" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
+  install "_apt_install_lazygit" "lazygit"
+  install "_install_fzf" "fzf"
+  install "_install_moar" "moar"
 
   install "sudo apt-get install -q -y gzip" "gzip"
   install "sudo apt-get install -q -y p7zip" "7z"
@@ -106,8 +106,8 @@ apt_depends() {
   install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
   install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
 
-  install "install_nodejs_for_apt" "node"
-  install "install_nodejs_for_apt" "npm"
+  install "_apt_install_nodejs" "node"
+  install "_apt_install_nodejs" "npm"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
@@ -165,7 +165,7 @@ pacman_depends() {
 
 # dnf {
 
-install_lazygit_for_dnf() {
+_dnf_install_lazygit() {
   sudo dnf copr enable atim/lazygit -y
   sudo dnf install -y lazygit
 }
@@ -180,15 +180,15 @@ dnf_depends() {
   install "sudo dnf install -y automake" "automake"
   install "sudo dnf install -y pkg-config" "pkg-config"
   install "sudo dnf install -y cmake" "cmake"
-  install "install_golang" "go"
+  install "_install_golang" "go"
   sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
 
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
-  install "install_lazygit_for_dnf" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
+  install "_dnf_install_lazygit" "lazygit"
+  install "_install_fzf" "fzf"
+  install "_install_moar" "moar"
 
   install "sudo dnf install -y gzip" "gzip"
   install "sudo dnf install -y p7zip" "7z"
@@ -318,16 +318,16 @@ sudo npm install --silent -g trash-cli
 
 # nerd fonts
 # release tag
-last_github_tag() {
+_last_github_tag() {
   local repo="$1"
   local uri="https://github.com/$repo/releases/latest"
   curl -f -L $uri | grep "href=\"/$repo/releases/tag" | grep -Eo 'href="/[a-zA-Z0-9#~.*,/!?=+&_%:-]*"' | head -n 1 | cut -d '"' -f2 | cut -d "/" -f6
 }
 
-install_font_from_github() {
+_install_font() {
   local repo=$1
   local artifact=$2
-  local artifact_version=$(last_github_tag "$repo")
+  local artifact_version=$(_last_github_tag "$repo")
   local artifact_url="https://github.com/$repo/releases/download/$artifact_version/$artifact"
   info "install $artifact($artifact_version) font from github"
   if [ -f $artifact ]; then
@@ -343,23 +343,23 @@ install_font_from_github() {
   fi
 }
 
-install_font_for_linux() {
+linux_install_font() {
   mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
-  install_font_from_github "$1" "$2"
+  _install_font "$1" "$2"
   sudo fc-cache -f -v
 }
 
-install_font_for_macos() {
+macos_install_font() {
   cd ~/Library/Fonts
-  install_font_from_github "$1" "$2"
+  _install_font "$1" "$2"
 }
 
 if [ "$OS" = "Darwin" ]; then
-  install_font_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
-  install_font_for_macos "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
+  macos_install_font "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
+  macos_install_font "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
 else
-  install_font_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
-  install_font_for_linux "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
+  linux_install_font "thep0y/monaco-nerd-font" "MonacoNerdFont.zip"
+  linux_install_font "thep0y/monaco-nerd-font" "MonacoNerdFontMono.zip"
 fi
 
 # fzf-tab
