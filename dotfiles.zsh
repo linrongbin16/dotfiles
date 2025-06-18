@@ -34,7 +34,9 @@ alias ll="eza -alh"
 alias lg="lazygit"
 
 # fzf
-export PATH=$PATH:~/.fzf/bin
+if [ -d ~/.fzf/bin ]; then
+  export PATH=$PATH:~/.fzf/bin
+fi
 
 # git
 alias gs="git status"
