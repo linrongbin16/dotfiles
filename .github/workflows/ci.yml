@@ -39,6 +39,10 @@ jobs:
           sudo apt-get install -q -y bat
           sudo apt-get install -q -y eza
           sudo apt-get install -q -y zoxide
+          mkdir -p ~/.local/bin
+          export PATH=$PATH:~/.local/bin
+          ln -s $(which fdfind) ~/.local/bin/fd
+          ln -s $(which batcat) ~/.local/bin/bat
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
           sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install --github-actions"
