@@ -212,7 +212,6 @@ dnf_depends() {
 
   install "sudo dnf install -y nodejs npm" "node"
 
-  install "sudo dnf install -y neovim" "nvim"
   install "sudo dnf install -y pipx" "pipx"
   pipx ensurepath
   sudo pipx ensurepath --global
@@ -253,7 +252,6 @@ brew_depends() {
   install "brew install python3" "python3"
   install "brew install node" "node"
 
-  install "brew install neovim" "nvim"
   install "brew install pipx" "pipx"
   pipx ensurepath
   sudo pipx ensurepath --global

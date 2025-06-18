@@ -39,6 +39,7 @@ jobs:
           sudo apt-get install -q -y bat
           sudo apt-get install -q -y eza
           sudo apt-get install -q -y zoxide
+          sudo snap install nvim --classic
           mkdir -p ~/.local/bin
           export PATH=$PATH:~/.local/bin
           ln -s $(which fdfind) ~/.local/bin/fd
