@@ -45,10 +45,6 @@ install() {
 
 # apt {
 
-install_nvim() {
-  bob use stable
-}
-
 install_nodejs_for_apt() {
   # https://github.com/nodesource/distributions
   info "install nodejs-lts from github NodeSource"
@@ -323,6 +319,8 @@ install "cargo install eza" "eza"
 install "cargo install git-delta" "delta"
 install "cargo install --locked zoxide" "zoxide"
 install "cargo install bob-nvim" "bob"
+export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+install "bob use stable" "nvim"
 
 # python3
 
