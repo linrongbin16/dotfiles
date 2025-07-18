@@ -316,14 +316,6 @@ install "bob use stable" "nvim"
 # node.js
 sudo npm install --silent -g trash-cli
 
-# fzf-tab
-install_fzf_tab_for_zsh() {
-  if [ -d "$HOME/.zsh/fzf-tab" ]; then
-    rm -rf "$HOME/.zsh/fzf-tab"
-  fi
-  git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$HOME/.zsh/fzf-tab"
-}
-
 # pure prompt
 install_pure_for_zsh() {
   mkdir -p "$HOME/.zsh"

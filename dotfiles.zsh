@@ -69,23 +69,6 @@ fi
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
 
-# fzf-tab
-init_fzf_tab() {
-  autoload -U compinit; compinit
-  source $HOME/.zsh/fzf-tab/fzf-tab.plugin.zsh
-  # disable sort when completing `git checkout`
-  zstyle ':completion:*:git-checkout:*' sort false
-  # set list-colors to enable filename colorizing
-  zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-  # force zsh not to show completion menu, which allows fzf-tab to capture the unambiguous prefix
-  zstyle ':completion:*' menu no
-  # preview directory's content with eza when completing cd/z
-  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-  zstyle ':fzf-tab:complete:z:*' fzf-preview 'eza -1 --color=always $realpath'
-  # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS by default
-  zstyle ':fzf-tab:*' fzf-flags --color=fg:1,fg+:2 --bind=tab:accept
-}
-
 # pure
 init_pure_prompt() {
   fpath+=($HOME/.zsh/pure)
@@ -95,12 +78,6 @@ init_pure_prompt() {
   prompt pure
 }
 
-# spaceship
-init_spaceship_prompt() {
-  source "$HOME/.zsh/spaceship/spaceship.zsh"
-}
-
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  init_fzf_tab
   init_pure_prompt
 fi
