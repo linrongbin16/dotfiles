@@ -67,13 +67,14 @@ git config --global pull.rebase false
 git config --global init.defaultBranch main
 
 # rust/cargo
+Install -command "scoop install rustup" -target "rustc"
 Install -command "scoop install rustup" -target "cargo"
-Install -command "cargo install fd-find" -target "fd"
-Install -command "cargo install ripgrep" -target "rg"
-Install -command "cargo install --locked bat" -target "bat"
-Install -command "cargo install eza" -target "eza"
-Install -command "cargo install git-delta" -target "delta"
-Install -command "cargo install --locked zoxide" -target "zoxide"
+Install -command "scoop install fd" -target "fd"
+Install -command "scoop install ripgrep" -target "rg"
+Install -command "scoop install bat" -target "bat"
+Install -command "scoop install eza" -target "eza"
+Install -command "scoop install delta" -target "delta"
+Install -command "scoop install zoxide" -target "zoxide"
 Install -command "cargo install bob-nvim" -target "bob"
 Install -command "bob use stable" -target "nvim"
 $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"

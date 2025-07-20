@@ -303,13 +303,14 @@ install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 if [ -f $HOME/.cargo/env ]; then
   . "$HOME/.cargo/env"
 fi
-install "cargo install fd-find" "fd"
-install "cargo install ripgrep" "rg"
-install "cargo install --locked bat" "bat"
-install "cargo install eza" "eza"
-install "cargo install git-delta" "delta"
-install "cargo install --locked zoxide" "zoxide"
-install "cargo install bob-nvim" "bob"
+install "curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash" "cargo-binstall"
+install "cargo binstall -y --force fd-find" "fd"
+install "cargo binstall -y --force ripgrep" "rg"
+install "cargo binstall -y --force bat" "bat"
+install "cargo binstall -y --force eza" "eza"
+install "cargo binstall -y --force git-delta" "delta"
+install "cargo binstall -y --force zoxide" "zoxide"
+install "cargo binstall -y --force bob-nvim" "bob"
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 install "bob use stable" "nvim"
 
