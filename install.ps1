@@ -75,9 +75,9 @@ Install -command "scoop install bat" -target "bat"
 Install -command "scoop install eza" -target "eza"
 Install -command "scoop install delta" -target "delta"
 Install -command "scoop install zoxide" -target "zoxide"
-Install -command "cargo install bob-nvim" -target "bob"
-Install -command "bob use stable" -target "nvim"
-$env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+# Install -command "cargo install bob-nvim" -target "bob"
+# Install -command "bob use stable" -target "nvim"
+# $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
