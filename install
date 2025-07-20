@@ -326,7 +326,6 @@ install_pure_for_zsh() {
   git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 }
 
-install_fzf_tab_for_zsh
 install_pure_for_zsh
 
 # atuin
