@@ -310,9 +310,9 @@ install "cargo binstall -y --force bat" "bat"
 install "cargo binstall -y --force eza" "eza"
 install "cargo binstall -y --force git-delta" "delta"
 install "cargo binstall -y --force zoxide" "zoxide"
-# install "cargo install bob-nvim" "bob"
-# export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-# install "bob use stable" "nvim"
+install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+install "bob use stable" "nvim"
 
 # node.js
 sudo npm install --silent -g trash-cli
