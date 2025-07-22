@@ -70,6 +70,7 @@ jobs:
           brew install eza
           brew install git-delta
           brew install zoxide
+          brew install bob
           echo '${{ steps.extract_branch.outputs.branch }}'
           echo ${{ steps.extract_branch.outputs.branch }}
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
