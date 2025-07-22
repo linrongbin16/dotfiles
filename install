@@ -59,7 +59,7 @@ install_golang() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_lazygit_for_apt() {
+install_lazygit() {
   go install github.com/jesseduffield/lazygit@latest
 }
 
@@ -89,7 +89,7 @@ apt_depends() {
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
-  install "install_lazygit_for_apt" "lazygit"
+  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
 
@@ -162,11 +162,6 @@ pacman_depends() {
 
 # dnf {
 
-install_lazygit_for_dnf() {
-  sudo dnf copr enable atim/lazygit -y
-  sudo dnf install -y lazygit
-}
-
 dnf_depends() {
   info "install dependencies with dnf"
   sudo dnf check-update
@@ -183,7 +178,7 @@ dnf_depends() {
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
-  install "install_lazygit_for_dnf" "lazygit"
+  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
 
