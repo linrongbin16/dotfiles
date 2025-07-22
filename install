@@ -59,11 +59,8 @@ install_golang() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_lazygit_for_apt() {
-  local LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-  tar xf lazygit.tar.gz lazygit
-  sudo install lazygit -D -t /usr/local/bin/
+install_lazygit() {
+  go install github.com/jesseduffield/lazygit@latest
 }
 
 install_fzf() {
@@ -92,7 +89,7 @@ apt_depends() {
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
-  install "install_lazygit_for_apt" "lazygit"
+  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
 
@@ -165,11 +162,6 @@ pacman_depends() {
 
 # dnf {
 
-install_lazygit_for_dnf() {
-  sudo dnf copr enable atim/lazygit -y
-  sudo dnf install -y lazygit
-}
-
 dnf_depends() {
   info "install dependencies with dnf"
   sudo dnf check-update
@@ -186,7 +178,7 @@ dnf_depends() {
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
-  install "install_lazygit_for_dnf" "lazygit"
+  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
 
@@ -303,13 +295,12 @@ install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 if [ -f $HOME/.cargo/env ]; then
   . "$HOME/.cargo/env"
 fi
-install "curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash" "cargo-binstall"
-install "cargo binstall -y --force fd-find" "fd"
-install "cargo binstall -y --force ripgrep" "rg"
-install "cargo binstall -y --force bat" "bat"
-install "cargo binstall -y --force eza" "eza"
-install "cargo binstall -y --force git-delta" "delta"
-install "cargo binstall -y --force zoxide" "zoxide"
+install "cargo install fd-find" "fd"
+install "cargo install ripgrep" "rg"
+install "cargo install --locked bat" "bat"
+install "cargo install eza" "eza"
+install "cargo install git-delta" "delta"
+install "cargo install --locked zoxide" "zoxide"
 install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 install "bob use stable" "nvim"
