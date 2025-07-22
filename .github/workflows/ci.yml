@@ -34,6 +34,7 @@ jobs:
           RUSTC_WRAPPER: "sccache"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
           sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install"
