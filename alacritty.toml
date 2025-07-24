@@ -10,16 +10,50 @@ history = 100000
 [font]
 size = 12.0
 
-normal = { family = "Monaco Nerd Font Mono", style = "Regular" }
+# normal = { family = "Monaco Nerd Font Mono", style = "Regular" }
 # bold = { family = "Monaco Nerd Font Mono", style = "Bold" }
 # bold_italic = { family = "Monaco Nerd Font Mono", style = "Bold Italic" }
 # italic = { family = "Monaco Nerd Font Mono", style = "Italic" }
+
+normal = { family = "MonoLisa Nerd Font", style = "Regular" }
+bold = { family = "MonoLisa Nerd Font", style = "Bold" }
+bold_italic = { family = "MonoLisa Nerd Font", style = "Bold Italic" }
+italic = { family = "MonoLisa Nerd Font", style = "Italic" }
 
 [mouse]
 bindings = []
 
 [keyboard]
+
+# Mac
 bindings = [
+  { key = "N", mods = "Control", mode = "Search", action = "SearchFocusNext" },
+  { key = "P", mods = "Control", mode = "Search", action = "SearchFocusPrevious" },
+  { key = "ArrowDown", mode = "Search", action = "SearchFocusNext" },
+  { key = "ArrowUp", mode = "Search", action = "SearchFocusPrevious" },
+]
+
+# Windows
+bindings = [
+  { key = "K", mods = "Control", mode = "~Vi|~Search", action = "ClearHistory" },
+  { key = "V", mods = "Shift|Control", mode = "~Vi", action = "Paste" },
+  { key = "V", mods = "Shift|Control", mode = "Vi|Search", action = "Paste" },
+  { key = "C", mods = "Shift|Control", action = "Copy" },
+  { key = "W", mods = "Shift|Control", action = "CreateNewWindow" },
+  { key = "T", mods = "Shift|Control", action = "CreateNewTab" },
+  { key = "F", mods = "Shift|Control", mode = "~Search", action = "SearchForward" },
+  { key = "B", mods = "Shift|Control", mode = "~Search", action = "SearchBackward" },
+  { key = "Tab", mods = "Control", action = "SelectNextTab" },
+  { key = "Tab", mods = "Shift|Control", action = "SelectPreviousTab" },
+  { key = "1", mods = "Control", action = "SelectTab1" },
+  { key = "2", mods = "Control", action = "SelectTab2" },
+  { key = "3", mods = "Control", action = "SelectTab3" },
+  { key = "4", mods = "Control", action = "SelectTab4" },
+  { key = "5", mods = "Control", action = "SelectTab5" },
+  { key = "6", mods = "Control", action = "SelectTab6" },
+  { key = "7", mods = "Control", action = "SelectTab7" },
+  { key = "8", mods = "Control", action = "SelectTab8" },
+  { key = "9", mods = "Control", action = "SelectLastTab" },
   { key = "N", mods = "Control", mode = "Search", action = "SearchFocusNext" },
   { key = "P", mods = "Control", mode = "Search", action = "SearchFocusPrevious" },
   { key = "ArrowDown", mode = "Search", action = "SearchFocusNext" },
