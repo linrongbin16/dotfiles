@@ -334,12 +334,6 @@ curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 # mise
 curl https://mise.run | sh
 
-# # kitty config
-# mkdir -p $HOME/.config/kitty
-# if [ ! -f ~/.config/kitty/kitty.conf ]; then
-#   cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
-# fi
-
 # alacritty
 mkdir -p $HOME/.config/alacritty
 if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
