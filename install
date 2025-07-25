@@ -85,6 +85,7 @@ apt_depends() {
   install "sudo apt-get install -q -y cmake" "cmake"
   install "install_golang" "go"
   sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
+  sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
 
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
@@ -130,6 +131,7 @@ pacman_depends() {
   install "yes | sudo pacman -S cmake" "cmake"
   install "yes | sudo pacman -S go" "go"
   yes | sudo pacman -S libssl openssl openssh
+  yes | sudo pacman -S cmake freetype2 fontconfig pkg-config make libxcb libxkbcommon python
 
   install "yes | sudo pacman -S git" "git"
   install "yes | sudo pacman -S curl" "curl"
