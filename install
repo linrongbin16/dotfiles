@@ -176,6 +176,7 @@ dnf_depends() {
   install "sudo dnf install -y cmake" "cmake"
   install "install_golang" "go"
   sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
+  sudo dnf install -y cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++
 
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
