@@ -79,6 +79,21 @@ Install -command "cargo install --git https://github.com/MordechaiHadad/bob --lo
 Install -command "bob use stable" -target "nvim"
 $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
+# alacritty
+$AlacrittyFolder = "$env:APPDATA\alacritty"
+if (!(Test-Path -Path $AlacrittyFolder))
+{
+  New-Item -ItemType Directory $AlacrittyFolder
+}
+$AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
+Copy-Item ".\alacritty.toml" -Destination $AlacrittyConfig
+$AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
+if (Test-Path -Path $AlacrittyThemesFolder)
+{
+  Remove-Item -Path $AlacrittyThemesFolder -Recurse
+}
+git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
+
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
