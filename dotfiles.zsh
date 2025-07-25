@@ -80,7 +80,8 @@ init_pure_prompt() {
 
 # agkozak
 init_agkozak_prompt() {
-  AGKOZAK_PROMPT_DIRTRIM=5
+  AGKOZAK_PROMPT_DIRTRIM=0
+  AGKOZAK_LEFT_PROMPT_ONLY=1
   source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 }
 
