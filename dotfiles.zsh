@@ -69,23 +69,13 @@ fi
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
 
-# pure
-init_pure_prompt() {
-  fpath+=($HOME/.zsh/pure)
-  autoload -U promptinit; promptinit
-  zstyle :prompt:pure:prompt:success color green
-  zstyle :prompt:pure:git:stash show yes
-  prompt pure
-}
-
-# agkozak
-init_agkozak_prompt() {
+# agkozak prompt
+init_prompt() {
   AGKOZAK_PROMPT_DIRTRIM=0
   AGKOZAK_LEFT_PROMPT_ONLY=1
   source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 }
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  # init_pure_prompt
-  init_agkozak_prompt
+  init_prompt
 fi

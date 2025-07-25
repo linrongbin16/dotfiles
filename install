@@ -308,17 +308,8 @@ install "bob use stable" "nvim"
 # node.js
 sudo npm install --silent -g trash-cli
 
-# pure prompt
-install_pure_for_zsh() {
-  mkdir -p "$HOME/.zsh"
-  if [ -d "$HOME/.zsh/pure" ]; then
-    rm -rf "$HOME/.zsh/pure"
-  fi
-  git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
-}
-
 # agkozak prompt
-install_agkozak_for_zsh() {
+install_prompt() {
   mkdir -p "$HOME/.zsh"
   if [ -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
     rm -rf "$HOME/.zsh/agkozak-zsh-prompt"
@@ -326,7 +317,7 @@ install_agkozak_for_zsh() {
   git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
 }
 
-install_agkozak_for_zsh
+install_prompt
 
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
