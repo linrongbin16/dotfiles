@@ -85,8 +85,8 @@ if (!(Test-Path -Path $AlacrittyFolder))
 {
   New-Item -ItemType Directory $AlacrittyFolder
 }
-$AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
-Copy-Item ".\alacritty.toml" -Destination $AlacrittyConfig
+$AlacrittyConfig = "$env:APPDATA\alacritty\alacritty_win.toml"
+Copy-Item ".\alacritty_win.toml" -Destination $AlacrittyConfig
 $AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
 if (Test-Path -Path $AlacrittyThemesFolder)
 {
