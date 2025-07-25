@@ -1,6 +1,9 @@
 #!/bin/zsh
 
 OS="$(uname -s)"
+
+IS_LINUX=0
+IS_MAC=0
 case "$OS" in
 Linux)
   IS_LINUX=1
