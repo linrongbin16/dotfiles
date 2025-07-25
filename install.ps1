@@ -103,3 +103,4 @@ if (!(Test-Path -Path $ProfileFolder))
 Write-Output '' >>$PROFILE
 Write-Output '# dotfiles' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
+Write-Output '[dotfiles] Done'

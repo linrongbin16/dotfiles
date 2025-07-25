@@ -376,3 +376,4 @@ git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacr
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+echo '[dotfiles] Done'
