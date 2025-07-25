@@ -78,6 +78,12 @@ init_pure_prompt() {
   prompt pure
 }
 
+# jj
+init_jj_prompt() {
+  source ~/.zsh/zsh-jj/zsh-jj.plugin.zsh
+}
+
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  init_pure_prompt
+  # init_pure_prompt
+  init_jj_prompt
 fi

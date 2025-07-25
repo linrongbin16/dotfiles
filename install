@@ -317,7 +317,16 @@ install_pure_for_zsh() {
   git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 }
 
-install_pure_for_zsh
+# jj prompt
+install_jj_for_zsh() {
+  mkdir -p "$HOME/.zsh"
+  if [ -d "$HOME/.zsh/zsh-jj" ]; then
+    rm -rf "$HOME/.zsh/zsh-jj"
+  fi
+  git clone --depth=1 https://github.com/rkh/zsh-jj "$HOME/.zsh/zsh-jj"
+}
+
+install_jj_for_zsh
 
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
@@ -325,11 +334,11 @@ curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 # mise
 curl https://mise.run | sh
 
-# kitty config
-mkdir -p $HOME/.config/kitty
-if [ ! -f ~/.config/kitty/kitty.conf ]; then
-  cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
-fi
+# # kitty config
+# mkdir -p $HOME/.config/kitty
+# if [ ! -f ~/.config/kitty/kitty.conf ]; then
+#   cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
+# fi
 
 # alacritty
 mkdir -p $HOME/.config/alacritty
