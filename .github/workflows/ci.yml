@@ -34,13 +34,14 @@ jobs:
           RUSTC_WRAPPER: "sccache"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-          cargo binstall -y --force fd-find
-          cargo binstall -y --force ripgrep
-          cargo binstall -y --force bat
-          cargo binstall -y --force eza
-          cargo binstall -y --force git-delta
-          cargo binstall -y --force zoxide
+          sudo apt-get install -q -y fd-find
+          sudo apt-get install -q -y ripgrep
+          sudo apt-get install -q -y bat
+          sudo apt-get install -q -y eza
+          sudo apt-get install -q -y zoxide
+          sudo snap install nvim --classic
+          sudo ln -s $(which fdfind) /usr/local/bin/fd
+          sudo ln -s $(which batcat) /usr/local/bin/bat
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
           sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install"
