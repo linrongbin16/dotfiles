@@ -78,12 +78,12 @@ init_pure_prompt() {
   prompt pure
 }
 
-# jj
-init_jj_prompt() {
-  source ~/.zsh/zsh-jj/zsh-jj.plugin.zsh
+# agkozak
+init_agkozak_prompt() {
+  source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 }
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   # init_pure_prompt
-  init_jj_prompt
+  init_agkozak_prompt
 fi

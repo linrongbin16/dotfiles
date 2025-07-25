@@ -317,16 +317,16 @@ install_pure_for_zsh() {
   git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 }
 
-# jj prompt
-install_jj_for_zsh() {
+# agkozak prompt
+install_agkozak_for_zsh() {
   mkdir -p "$HOME/.zsh"
-  if [ -d "$HOME/.zsh/zsh-jj" ]; then
-    rm -rf "$HOME/.zsh/zsh-jj"
+  if [ -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
+    rm -rf "$HOME/.zsh/agkozak-zsh-prompt"
   fi
-  git clone --depth=1 https://github.com/rkh/zsh-jj "$HOME/.zsh/zsh-jj"
+  git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
 }
 
-install_jj_for_zsh
+install_agkozak_for_zsh
 
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
