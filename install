@@ -328,6 +328,7 @@ install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bo
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 install "bob use stable" "nvim"
 
+# alacritty
 if [ "$IS_MAC" != "1" ]; then
   git clone --depth=1 --branch=v0.15.1 https://github.com/alacritty/alacritty.git ~/.alacritty
   cd ~/.alacritty
@@ -340,6 +341,7 @@ if [ "$IS_MAC" != "1" ]; then
 else
   install "brew install alacritty" "alacritty"
 fi
+alacritty --version
 
 # node.js
 sudo npm install --silent -g trash-cli
