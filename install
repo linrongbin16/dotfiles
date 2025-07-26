@@ -85,6 +85,7 @@ apt_depends() {
   install "sudo apt-get install -q -y cmake" "cmake"
   install "install_golang" "go"
   sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
+  sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
 
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
@@ -130,6 +131,7 @@ pacman_depends() {
   install "yes | sudo pacman -S cmake" "cmake"
   install "yes | sudo pacman -S go" "go"
   yes | sudo pacman -S libssl openssl openssh
+  yes | sudo pacman -S cmake freetype2 fontconfig pkg-config make libxcb libxkbcommon python
 
   install "yes | sudo pacman -S git" "git"
   install "yes | sudo pacman -S curl" "curl"
@@ -174,6 +176,7 @@ dnf_depends() {
   install "sudo dnf install -y cmake" "cmake"
   install "install_golang" "go"
   sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
+  sudo dnf install -y cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++
 
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
@@ -229,6 +232,7 @@ brew_depends() {
   install "brew install gzip" "gzip"
   install "brew install p7zip" "7z"
   install "brew install unzip" "unzip"
+  install "brew install alacritty" "alacritty"
 
   install "brew install python3" "python3"
   install "brew install node" "node"
@@ -308,28 +312,22 @@ install "bob use stable" "nvim"
 # node.js
 sudo npm install --silent -g trash-cli
 
-# pure prompt
-install_pure_for_zsh() {
+# agkozak prompt
+install_prompt() {
   mkdir -p "$HOME/.zsh"
-  if [ -d "$HOME/.zsh/pure" ]; then
-    rm -rf "$HOME/.zsh/pure"
+  if [ -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
+    rm -rf "$HOME/.zsh/agkozak-zsh-prompt"
   fi
-  git clone --depth=1 https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
+  git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
 }
 
-install_pure_for_zsh
+install_prompt
 
 # atuin
 curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
 
 # mise
 curl https://mise.run | sh
-
-# kitty config
-mkdir -p $HOME/.config/kitty
-if [ ! -f ~/.config/kitty/kitty.conf ]; then
-  cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
-fi
 
 # alacritty
 mkdir -p $HOME/.config/alacritty
@@ -344,3 +342,4 @@ git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacr
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+echo '[dotfiles] Done'

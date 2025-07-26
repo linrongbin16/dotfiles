@@ -51,7 +51,7 @@ Install -command "scoop install 7zip" -target "7z"
 Install -command "scoop install gzip" -target "gzip"
 Install -command "scoop install unzip" -target "unzip"
 
-Install -command "scoop install vim" -target "vim"
+Install -command "scoop install extras/alacritty" -target "vim"
 Install -command "scoop install starship" -target "starship"
 Install -command "scoop install mise" -target "mise"
 Install -command "scoop install pipx" -target "pipx"
@@ -79,6 +79,21 @@ Install -command "cargo install --git https://github.com/MordechaiHadad/bob --lo
 Install -command "bob use stable" -target "nvim"
 $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
+# alacritty
+$AlacrittyFolder = "$env:APPDATA\alacritty"
+if (!(Test-Path -Path $AlacrittyFolder))
+{
+  New-Item -ItemType Directory $AlacrittyFolder
+}
+$AlacrittyConfig = "$env:APPDATA\alacritty\alacritty_win.toml"
+Copy-Item ".\alacritty_win.toml" -Destination $AlacrittyConfig
+$AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
+if (Test-Path -Path $AlacrittyThemesFolder)
+{
+  Remove-Item -Path $AlacrittyThemesFolder -Recurse
+}
+git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
+
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE
 if (!(Test-Path -Path $ProfileFolder))
@@ -88,3 +103,4 @@ if (!(Test-Path -Path $ProfileFolder))
 Write-Output '' >>$PROFILE
 Write-Output '# dotfiles' >>$PROFILE
 Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
+Write-Output '[dotfiles] Done'

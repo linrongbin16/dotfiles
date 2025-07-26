@@ -1,6 +1,9 @@
 #!/bin/zsh
 
 OS="$(uname -s)"
+
+IS_LINUX=0
+IS_MAC=0
 case "$OS" in
 Linux)
   IS_LINUX=1
@@ -69,15 +72,14 @@ fi
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
 
-# pure
-init_pure_prompt() {
-  fpath+=($HOME/.zsh/pure)
-  autoload -U promptinit; promptinit
-  zstyle :prompt:pure:prompt:success color green
-  zstyle :prompt:pure:git:stash show yes
-  prompt pure
+# agkozak prompt
+init_prompt() {
+  AGKOZAK_PROMPT_DIRTRIM=0
+  AGKOZAK_LEFT_PROMPT_ONLY=1
+  AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
+  source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 }
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  init_pure_prompt
+  init_prompt
 fi
