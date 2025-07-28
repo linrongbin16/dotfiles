@@ -76,8 +76,8 @@ eval "$(~/.local/bin/mise activate zsh)"
 init_prompt() {
   AGKOZAK_PROMPT_DIRTRIM=0
   AGKOZAK_LEFT_PROMPT_ONLY=1
-  AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
-  AGKOZAK_PROMPT_CHAR=( ❯ %# : )
+  # AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
+  AGKOZAK_PROMPT_CHAR=( '%F{magenta}❯%f' %# : )
   source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 }
 
