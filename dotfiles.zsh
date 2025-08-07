@@ -50,11 +50,23 @@ alias gc="git commit"
 
 # golang
 if [ "$IS_MAC" != "1" ]; then
-  export GOROOT="$HOME/.go" # where go is installed
-  export PATH="$PATH:$GOROOT/bin"
+  if [ -d "$HOME/.go/bin" ]; then
+    export GOROOT="$HOME/.go" # where go is installed
+    export PATH="$PATH:$GOROOT/bin"
+  fi
 fi
 export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOPATH/bin"
+
+# deno/bun
+if [ "$IS_MAC" != "1" ]; then
+  if [ -d "$HOME/.deno/bin" ]; then
+    export PATH="$PATH:$HOME/.deno/bin"
+  fi
+  if [ -d "$HOME/.bun/bin" ]; then
+    export PATH="$PATH:$HOME/.bun/bin"
+  fi
+fi
 
 # neovim
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
