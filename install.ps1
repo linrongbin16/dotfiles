@@ -54,6 +54,8 @@ Install -command "scoop install unzip" -target "unzip"
 Install -command "scoop install extras/alacritty" -target "vim"
 Install -command "scoop install starship" -target "starship"
 Install -command "scoop install mise" -target "mise"
+Install -command "scoop install deno" -target "deno"
+Install -command "scoop install bun" -target "bun"
 Install -command "scoop install pipx" -target "pipx"
 pipx ensurepath
 
