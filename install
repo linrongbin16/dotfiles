@@ -378,10 +378,9 @@ install_rust_deps
 # agkozak prompt
 install_prompt() {
   mkdir -p "$HOME/.zsh"
-  if [ -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
-    rm -rf "$HOME/.zsh/agkozak-zsh-prompt"
+  if [ ! -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
+    git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
   fi
-  git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
 }
 
 install_prompt
@@ -397,10 +396,9 @@ mkdir -p $HOME/.config/alacritty
 if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
   cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
 fi
-if [ -d "$HOME/.config/alacritty/themes" ]; then
-  rm -rf "$HOME/.config/alacritty/themes"
+if [ ! -d "$HOME/.config/alacritty/themes" ]; then
+  git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 fi
-git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
