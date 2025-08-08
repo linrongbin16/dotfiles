@@ -376,9 +376,6 @@ install_rust_deps() {
 
 install_rust_deps
 
-# node.js
-sudo npm install --silent -g trash-cli
-
 # agkozak prompt
 install_prompt() {
   mkdir -p "$HOME/.zsh"
