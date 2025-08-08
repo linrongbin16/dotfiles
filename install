@@ -345,7 +345,6 @@ install_go_deps() {
   install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
-  install "install_gtrash" "gtrash"
 }
 
 install_go_deps
