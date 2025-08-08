@@ -85,13 +85,6 @@ install_golang() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_lazygit() {
-  local LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-  tar xf lazygit.tar.gz lazygit
-  sudo install lazygit -D -t /usr/local/bin/
-}
-
 install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
@@ -148,6 +141,7 @@ apt_depends() {
   install "install_bun" "bun"
 
   install "sudo apt-get install -q -y golang-go golang-src" "go"
+  install "sudo apt-get install -q -y lazygit" "lazygit"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
@@ -191,6 +185,7 @@ pacman_depends() {
   install "yes | sudo pacman -S nodejs npm" "node"
 
   install "yes | sudo pacman -S go" "go"
+  install "yes | sudo pacman -S lazygit" "lazygit"
 
   install "yes | sudo pacman -S python-pipx" "pipx"
   pipx ensurepath
@@ -203,6 +198,11 @@ pacman_depends() {
 # pacman }
 
 # dnf {
+
+dnf_install_lazygit() {
+  sudo dnf copr enable dejan/lazygit
+  sudo dnf install -y lazygit
+}
 
 dnf_depends() {
   info "install dependencies with dnf"
@@ -234,6 +234,7 @@ dnf_depends() {
   install "sudo dnf install -y nodejs npm" "node"
 
   install "sudo dnf install -y go" "go"
+  install "dnf_install_lazygit" "lazygit"
 
   install "sudo dnf install -y pipx" "pipx"
   pipx ensurepath
@@ -346,7 +347,6 @@ install_bun_deno_deps
 
 # golang
 install_go_deps() {
-  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
   install "install_gtrash" "gtrash"
