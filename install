@@ -332,26 +332,52 @@ git config --global user.name "linrongbin16"
 git config --global pull.rebase false
 git config --global init.defaultBranch main
 
+# bun/deno
+install_bun_deno_deps() {
+  install "install_deno" "deno"
+  install "install_bun" "bun"
+}
+
+install_bun_deno_deps
+
+# golang
+install_go_deps() {
+  install "install_lazygit" "lazygit"
+  install "install_fzf" "fzf"
+  install "install_moar" "moar"
+  install "install_gtrash" "gtrash"
+}
+
+install_go_deps
+
 # rust
-install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
-install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
-if [ -f $HOME/.cargo/env ]; then
-  . "$HOME/.cargo/env"
-fi
-install "cargo install fd-find" "fd"
-install "cargo install ripgrep" "rg"
-install "cargo install --locked bat" "bat"
-install "cargo install eza" "eza"
-install "cargo install git-delta" "delta"
-install "cargo install --locked zoxide" "zoxide"
-install "cargo install --locked rmz" "rmz"
-install "cargo install --locked cpz" "cpz"
-install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-install "bob use stable" "nvim"
+install_rust_deps() {
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
+  if [ -f $HOME/.cargo/env ]; then
+    . "$HOME/.cargo/env"
+  fi
+  install "cargo install fd-find" "fd"
+  install "cargo install ripgrep" "rg"
+  install "cargo install --locked bat" "bat"
+  install "cargo install eza" "eza"
+  install "cargo install git-delta" "delta"
+  install "cargo install --locked zoxide" "zoxide"
+  install "cargo install --locked rmz" "rmz"
+  install "cargo install --locked cpz" "cpz"
+  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+  install "bob use stable" "nvim"
+}
+
+install_rust_deps
 
 # node.js
-sudo npm install --silent -g trash-cli
+install_npm_deps() {
+  sudo npm install --silent -g trash-cli
+}
+
+install_npm_deps
 
 # agkozak prompt
 install_prompt() {

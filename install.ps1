@@ -39,13 +39,10 @@ Install -command "scoop install llvm" -target "clang"
 Install -command "scoop install llvm" -target "clang++"
 Install -command "scoop install make" -target "make"
 Install -command "scoop install cmake" -target "cmake"
-Install -command "scoop install go" -target "go"
 
 Install -command "scoop install git" -target "git"
 Install -command "scoop install curl" -target "curl"
 Install -command "scoop install wget" -target "wget"
-Install -command "scoop install extras/lazygit" -target "lazygit"
-Install -command "scoop install main/fzf" -target "fzf"
 
 Install -command "scoop install 7zip" -target "7z"
 Install -command "scoop install gzip" -target "gzip"
@@ -54,8 +51,14 @@ Install -command "scoop install unzip" -target "unzip"
 Install -command "scoop install extras/alacritty" -target "vim"
 Install -command "scoop install starship" -target "starship"
 Install -command "scoop install mise" -target "mise"
+
 Install -command "scoop install deno" -target "deno"
 Install -command "scoop install bun" -target "bun"
+
+Install -command "scoop install go" -target "go"
+Install -command "scoop install extras/lazygit" -target "lazygit"
+Install -command "scoop install main/fzf" -target "fzf"
+
 Install -command "scoop install pipx" -target "pipx"
 pipx ensurepath
 
