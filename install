@@ -147,7 +147,7 @@ apt_depends() {
   install "install_deno" "deno"
   install "install_bun" "bun"
 
-  install "sudo apt-get install -q -y golang" "go"
+  install "sudo apt-get install -q -y golang-go golang-src" "go"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
@@ -374,8 +374,6 @@ install_rust_deps() {
 }
 
 install_rust_deps
-
-install_npm_deps
 
 # agkozak prompt
 install_prompt() {
