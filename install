@@ -360,7 +360,6 @@ install_rust_deps() {
   install "cargo install ripgrep" "rg"
   install "cargo install --locked bat" "bat"
   install "cargo install eza" "eza"
-  install "cargo install git-delta" "delta"
   install "cargo install --locked zoxide" "zoxide"
   install "cargo install --locked rmz" "rmz"
   install "cargo install --locked cpz" "cpz"
