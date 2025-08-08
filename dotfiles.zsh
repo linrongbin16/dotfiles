@@ -4,6 +4,9 @@ OS="$(uname -s)"
 
 IS_LINUX=0
 IS_MAC=0
+IS_FREEBSD=0
+IS_NETBSD=0
+IS_OPENBSD=0
 case "$OS" in
 Linux)
   IS_LINUX=1
