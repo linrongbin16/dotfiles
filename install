@@ -205,6 +205,7 @@ dnf_depends() {
   install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
+  install "install_gtrash" "gtrash"
 
   install "sudo dnf install -y gzip" "gzip"
   install "sudo dnf install -y p7zip" "7z"
@@ -252,6 +253,7 @@ brew_depends() {
   install "brew install jesseduffield/lazygit/lazygit" "lazygit"
   install "brew install fzf" "fzf"
   install "brew install moar" "moar"
+  install "brew install umlx5h/tap/gtrash" "gtrash"
 
   install "brew install gzip" "gzip"
   install "brew install p7zip" "7z"
