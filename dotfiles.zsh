@@ -53,7 +53,7 @@ alias gc="git commit"
 
 # golang
 if [ "$IS_MAC" != "1" ]; then
-  if [ -d "$HOME/.go/bin" ]; then
+  if [ -d "$HOME/.go" ]; then
     export GOROOT="$HOME/.go" # where go is installed
     export PATH="$PATH:$GOROOT/bin"
   fi
