@@ -223,8 +223,6 @@ dnf_depends() {
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
 
-  install "install_golang" "go"
-
   install "sudo dnf install -y gzip" "gzip"
   install "sudo dnf install -y p7zip" "7z"
   install "sudo dnf install -y unzip" "unzip"
@@ -237,6 +235,8 @@ dnf_depends() {
   install "sudo dnf install -y nodejs npm" "node"
   install "install_deno" "deno"
   install "install_bun" "bun"
+
+  install "sudo dnf install -y go" "go"
 
   install "sudo dnf install -y pipx" "pipx"
   pipx ensurepath
@@ -267,12 +267,6 @@ brew_depends() {
   install "brew install curl" "curl"
   install "brew install wget" "wget"
 
-  install "brew install go" "go"
-  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-  install "brew install fzf" "fzf"
-  install "brew install moar" "moar"
-  install "brew install umlx5h/tap/gtrash" "gtrash"
-
   install "brew install gzip" "gzip"
   install "brew install p7zip" "7z"
   install "brew install unzip" "unzip"
@@ -282,6 +276,12 @@ brew_depends() {
   install "brew install node" "node"
   install "brew install deno" "deno"
   install "brew install oven-sh/bun/bun" "bun"
+
+  install "brew install go" "go"
+  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
+  install "brew install fzf" "fzf"
+  install "brew install moar" "moar"
+  install "brew install umlx5h/tap/gtrash" "gtrash"
 
   install "brew install pipx" "pipx"
   pipx ensurepath
