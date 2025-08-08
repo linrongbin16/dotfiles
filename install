@@ -111,6 +111,10 @@ install_moar() {
   go install github.com/walles/moar@latest
 }
 
+install_gtrash() {
+  go install github.com/umlx5h/gtrash@latest
+}
+
 apt_depends() {
   info "install dependencies with apt"
   sudo apt-get -q -y update
@@ -345,6 +349,7 @@ install_go_deps() {
   install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
+  install "install_gtrash" "gtrash"
 }
 
 install_go_deps
@@ -369,11 +374,6 @@ install_rust_deps() {
 }
 
 install_rust_deps
-
-# node.js
-install_npm_deps() {
-  sudo npm install --silent -g trash-cli
-}
 
 install_npm_deps
 
