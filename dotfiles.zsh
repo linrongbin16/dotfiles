@@ -71,6 +71,13 @@ if [ "$IS_MAC" != "1" ]; then
   fi
 fi
 
+# trash
+if [ "$IS_MAC" != "1" ]; then
+  if [ -x "/opt/homebrew/opt/trash/bin/trash" ]; then
+    export PATH="/opt/homebrew/opt/trash/bin:$PATH"
+  fi
+fi
+
 # neovim
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 
