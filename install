@@ -362,6 +362,9 @@ install "cargo install --locked zoxide" "zoxide"
 install "cargo install --locked rmz" "rmz"
 install "cargo install --locked cpz" "cpz"
 install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+if [ "$IS_MAC" != "1" ]; then
+  install "cargo install trashy" "trashy"
+fi
 export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 install "bob use stable" "nvim"
 
