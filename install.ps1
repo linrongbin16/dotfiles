@@ -39,13 +39,10 @@ Install -command "scoop install llvm" -target "clang"
 Install -command "scoop install llvm" -target "clang++"
 Install -command "scoop install make" -target "make"
 Install -command "scoop install cmake" -target "cmake"
-Install -command "scoop install go" -target "go"
 
 Install -command "scoop install git" -target "git"
 Install -command "scoop install curl" -target "curl"
 Install -command "scoop install wget" -target "wget"
-Install -command "scoop install extras/lazygit" -target "lazygit"
-Install -command "scoop install main/fzf" -target "fzf"
 
 Install -command "scoop install 7zip" -target "7z"
 Install -command "scoop install gzip" -target "gzip"
@@ -54,8 +51,14 @@ Install -command "scoop install unzip" -target "unzip"
 Install -command "scoop install extras/alacritty" -target "vim"
 Install -command "scoop install starship" -target "starship"
 Install -command "scoop install mise" -target "mise"
+
 Install -command "scoop install deno" -target "deno"
 Install -command "scoop install bun" -target "bun"
+
+Install -command "scoop install go" -target "go"
+Install -command "scoop install extras/lazygit" -target "lazygit"
+Install -command "scoop install main/fzf" -target "fzf"
+
 Install -command "scoop install pipx" -target "pipx"
 pipx ensurepath
 
@@ -75,8 +78,6 @@ Install -command "scoop install fd" -target "fd"
 Install -command "scoop install ripgrep" -target "rg"
 Install -command "scoop install bat" -target "bat"
 Install -command "scoop install eza" -target "eza"
-Install -command "scoop install delta" -target "delta"
-Install -command "scoop install zoxide" -target "zoxide"
 Install -command "cargo install --locked rmz" -target "rmz"
 Install -command "cargo install --locked cpz" -target "cpz"
 Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
@@ -92,11 +93,10 @@ if (!(Test-Path -Path $AlacrittyFolder))
 $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty_win.toml"
 Copy-Item ".\alacritty_win.toml" -Destination $AlacrittyConfig
 $AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
-if (Test-Path -Path $AlacrittyThemesFolder)
+if (!(Test-Path -Path $AlacrittyThemesFolder))
 {
-  Remove-Item -Path $AlacrittyThemesFolder -Recurse
+  git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
 }
-git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
 
 # $PROFILE
 $ProfileFolder = Split-Path $PROFILE

@@ -4,6 +4,32 @@
 
 OS="$(uname -s)"
 
+IS_LINUX=0
+IS_MAC=0
+IS_FREEBSD=0
+IS_NETBSD=0
+IS_OPENBSD=0
+case "$OS" in
+Linux)
+  IS_LINUX=1
+  ;;
+FreeBSD)
+  IS_FREEBSD=1
+  ;;
+NetBSD)
+  IS_NETBSD=1
+  ;;
+OpenBSD)
+  IS_OPENBSD=1
+  ;;
+Darwin)
+  IS_MAC=1
+  ;;
+*)
+  # Nothing
+  ;;
+esac
+
 # utils {
 
 info() {
@@ -59,14 +85,11 @@ install_golang() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_lazygit() {
-  go install github.com/jesseduffield/lazygit@latest
-}
-
 install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
-  export PATH=$PATH:~/.fzf/bin
+  sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf
+  fzf --version
 }
 
 install_deno() {
@@ -81,6 +104,17 @@ install_moar() {
   go install github.com/walles/moar@latest
 }
 
+install_gtrash() {
+  go install github.com/umlx5h/gtrash@latest
+}
+
+apt_install_lazygit() {
+  LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+  tar xf lazygit.tar.gz lazygit
+  sudo install lazygit -D -t /usr/local/bin/
+}
+
 apt_depends() {
   info "install dependencies with apt"
   sudo apt-get -q -y update
@@ -91,16 +125,12 @@ apt_depends() {
   install "sudo apt-get install -q -y automake" "automake"
   install "sudo apt-get install -q -y pkg-config" "pkg-config"
   install "sudo apt-get install -q -y cmake" "cmake"
-  install "install_golang" "go"
   sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
   sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
 
   install "install_git_for_apt" "git"
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
-  install "install_lazygit" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
 
   install "sudo apt-get install -q -y gzip" "gzip"
   install "sudo apt-get install -q -y p7zip" "7z"
@@ -116,6 +146,9 @@ apt_depends() {
   install "install_nodejs_for_apt" "npm"
   install "install_deno" "deno"
   install "install_bun" "bun"
+
+  install "sudo apt-get install -q -y golang-go golang-src" "go"
+  install "apt_install_lazygit" "lazygit"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
@@ -139,16 +172,12 @@ pacman_depends() {
   install "yes | sudo pacman -S automake" "automake"
   install "yes | sudo pacman -S pkg-config" "pkg-config"
   install "yes | sudo pacman -S cmake" "cmake"
-  install "yes | sudo pacman -S go" "go"
   yes | sudo pacman -S libssl openssl openssh
   yes | sudo pacman -S cmake freetype2 fontconfig pkg-config make libxcb libxkbcommon python
 
   install "yes | sudo pacman -S git" "git"
   install "yes | sudo pacman -S curl" "curl"
   install "yes | sudo pacman -S wget" "wget"
-  install "yes | sudo pacman -S lazygit" "lazygit"
-  install "yes | sudo pacman -S fzf" "fzf"
-  install "yes | sudo pacman -S moar" "moar"
 
   install "yes | sudo pacman -S unzip" "unzip"
   install "yes | sudo pacman -S gzip" "gzip"
@@ -161,8 +190,9 @@ pacman_depends() {
   install "yes | sudo pacman -S python python-pip" "python3"
 
   install "yes | sudo pacman -S nodejs npm" "node"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
+
+  install "yes | sudo pacman -S go" "go"
+  install "yes | sudo pacman -S lazygit" "lazygit"
 
   install "yes | sudo pacman -S python-pipx" "pipx"
   pipx ensurepath
@@ -175,6 +205,11 @@ pacman_depends() {
 # pacman }
 
 # dnf {
+
+dnf_install_lazygit() {
+  sudo dnf copr enable dejan/lazygit
+  sudo dnf install -y lazygit
+}
 
 dnf_depends() {
   info "install dependencies with dnf"
@@ -193,9 +228,6 @@ dnf_depends() {
   install "sudo dnf install -y git" "git"
   install "sudo dnf install -y curl" "curl"
   install "sudo dnf install -y wget" "wget"
-  install "install_lazygit" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
 
   install "sudo dnf install -y gzip" "gzip"
   install "sudo dnf install -y p7zip" "7z"
@@ -207,8 +239,9 @@ dnf_depends() {
   install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 
   install "sudo dnf install -y nodejs npm" "node"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
+
+  install "sudo dnf install -y go" "go"
+  install "dnf_install_lazygit" "lazygit"
 
   install "sudo dnf install -y pipx" "pipx"
   pipx ensurepath
@@ -233,15 +266,11 @@ brew_depends() {
   install "brew install automake" "automake"
   install "brew install pkg-config" "pkg-config"
   install "brew install cmake" "cmake"
-  install "brew install go" "go"
   brew install openssl openssh
 
   install "brew install git" "git"
   install "brew install curl" "curl"
   install "brew install wget" "wget"
-  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-  install "brew install fzf" "fzf"
-  install "brew install moar" "moar"
 
   install "brew install gzip" "gzip"
   install "brew install p7zip" "7z"
@@ -252,6 +281,12 @@ brew_depends() {
   install "brew install node" "node"
   install "brew install deno" "deno"
   install "brew install oven-sh/bun/bun" "bun"
+
+  install "brew install go" "go"
+  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
+  install "brew install fzf" "fzf"
+  install "brew install moar" "moar"
+  install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 
   install "brew install pipx" "pipx"
   pipx ensurepath
@@ -309,34 +344,50 @@ git config --global user.name "linrongbin16"
 git config --global pull.rebase false
 git config --global init.defaultBranch main
 
-# rust
-install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
-install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
-if [ -f $HOME/.cargo/env ]; then
-  . "$HOME/.cargo/env"
-fi
-install "cargo install fd-find" "fd"
-install "cargo install ripgrep" "rg"
-install "cargo install --locked bat" "bat"
-install "cargo install eza" "eza"
-install "cargo install git-delta" "delta"
-install "cargo install --locked zoxide" "zoxide"
-install "cargo install --locked rmz" "rmz"
-install "cargo install --locked cpz" "cpz"
-install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-install "bob use stable" "nvim"
+# bun/deno
+install_bun_deno_deps() {
+  install "install_deno" "deno"
+  install "install_bun" "bun"
+}
 
-# node.js
-sudo npm install --silent -g trash-cli
+install_bun_deno_deps
+
+# golang
+install_go_deps() {
+  install "install_fzf" "fzf"
+  install "install_moar" "moar"
+  install "install_gtrash" "gtrash"
+}
+
+install_go_deps
+
+# rust
+install_rust_deps() {
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
+  if [ -f $HOME/.cargo/env ]; then
+    . "$HOME/.cargo/env"
+  fi
+  install "cargo install fd-find" "fd"
+  install "cargo install ripgrep" "rg"
+  install "cargo install --locked bat" "bat"
+  install "cargo install eza" "eza"
+  install "cargo install --locked zoxide" "zoxide"
+  install "cargo install --locked rmz" "rmz"
+  install "cargo install --locked cpz" "cpz"
+  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+  install "bob use stable" "nvim"
+}
+
+install_rust_deps
 
 # agkozak prompt
 install_prompt() {
   mkdir -p "$HOME/.zsh"
-  if [ -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
-    rm -rf "$HOME/.zsh/agkozak-zsh-prompt"
+  if [ ! -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
+    git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
   fi
-  git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
 }
 
 install_prompt
@@ -352,10 +403,9 @@ mkdir -p $HOME/.config/alacritty
 if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
   cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
 fi
-if [ -d "$HOME/.config/alacritty/themes" ]; then
-  rm -rf "$HOME/.config/alacritty/themes"
+if [ ! -d "$HOME/.config/alacritty/themes" ]; then
+  git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 fi
-git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
 
 echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
