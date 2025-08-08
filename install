@@ -86,13 +86,17 @@ install_golang() {
 }
 
 install_lazygit() {
-  go install github.com/jesseduffield/lazygit@latest
+  local LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+  tar xf lazygit.tar.gz lazygit
+  sudo install lazygit -D -t /usr/local/bin/
 }
 
 install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
-  export PATH=$PATH:~/.fzf/bin
+  sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf
+  fzf --version
 }
 
 install_deno() {
@@ -128,12 +132,6 @@ apt_depends() {
   install "sudo apt-get install -q -y curl" "curl"
   install "sudo apt-get install -q -y wget" "wget"
 
-  install "install_golang" "go"
-  install "install_lazygit" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
-  install "install_gtrash" "gtrash"
-
   install "sudo apt-get install -q -y gzip" "gzip"
   install "sudo apt-get install -q -y p7zip" "7z"
   install "sudo apt-get install -q -y unzip" "unzip"
@@ -148,6 +146,8 @@ apt_depends() {
   install "install_nodejs_for_apt" "npm"
   install "install_deno" "deno"
   install "install_bun" "bun"
+
+  install "sudo apt-get install -q -y golang" "go"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
@@ -178,12 +178,6 @@ pacman_depends() {
   install "yes | sudo pacman -S curl" "curl"
   install "yes | sudo pacman -S wget" "wget"
 
-  install "install_golang" "go"
-  install "install_lazygit" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
-  install "install_gtrash" "gtrash"
-
   install "yes | sudo pacman -S unzip" "unzip"
   install "yes | sudo pacman -S gzip" "gzip"
   install "yes | sudo pacman -S p7zip" "7z"
@@ -197,6 +191,8 @@ pacman_depends() {
   install "yes | sudo pacman -S nodejs npm" "node"
   install "install_deno" "deno"
   install "install_bun" "bun"
+
+  install "yes | sudo pacman -S go" "go"
 
   install "yes | sudo pacman -S python-pipx" "pipx"
   pipx ensurepath
@@ -228,10 +224,6 @@ dnf_depends() {
   install "sudo dnf install -y wget" "wget"
 
   install "install_golang" "go"
-  install "install_lazygit" "lazygit"
-  install "install_fzf" "fzf"
-  install "install_moar" "moar"
-  install "install_gtrash" "gtrash"
 
   install "sudo dnf install -y gzip" "gzip"
   install "sudo dnf install -y p7zip" "7z"
@@ -347,26 +339,40 @@ git config --global user.name "linrongbin16"
 git config --global pull.rebase false
 git config --global init.defaultBranch main
 
+# golang
+install_go_deps() {
+  install "install_lazygit" "lazygit"
+  install "install_fzf" "fzf"
+  install "install_moar" "moar"
+  install "install_gtrash" "gtrash"
+}
+
+install_go_deps
+
 # rust
-install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
-install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
-if [ -f $HOME/.cargo/env ]; then
-  . "$HOME/.cargo/env"
-fi
-install "cargo install fd-find" "fd"
-install "cargo install ripgrep" "rg"
-install "cargo install --locked bat" "bat"
-install "cargo install eza" "eza"
-install "cargo install git-delta" "delta"
-install "cargo install --locked zoxide" "zoxide"
-install "cargo install --locked rmz" "rmz"
-install "cargo install --locked cpz" "cpz"
-install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-if [ "$IS_MAC" != "1" ]; then
-  install "cargo install trashy" "trashy"
-fi
-export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-install "bob use stable" "nvim"
+install_rust_deps() {
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
+  if [ -f $HOME/.cargo/env ]; then
+    . "$HOME/.cargo/env"
+  fi
+  install "cargo install fd-find" "fd"
+  install "cargo install ripgrep" "rg"
+  install "cargo install --locked bat" "bat"
+  install "cargo install eza" "eza"
+  install "cargo install git-delta" "delta"
+  install "cargo install --locked zoxide" "zoxide"
+  install "cargo install --locked rmz" "rmz"
+  install "cargo install --locked cpz" "cpz"
+  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+  if [ "$IS_MAC" != "1" ]; then
+    install "cargo install trashy" "trashy"
+  fi
+  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+  install "bob use stable" "nvim"
+}
+
+install_rust_deps
 
 # node.js
 sudo npm install --silent -g trash-cli
