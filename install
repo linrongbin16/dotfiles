@@ -144,8 +144,6 @@ apt_depends() {
 
   install "install_nodejs_for_apt" "node"
   install "install_nodejs_for_apt" "npm"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
 
   install "sudo apt-get install -q -y golang" "go"
 
@@ -189,8 +187,6 @@ pacman_depends() {
   install "yes | sudo pacman -S python python-pip" "python3"
 
   install "yes | sudo pacman -S nodejs npm" "node"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
 
   install "yes | sudo pacman -S go" "go"
 
@@ -233,8 +229,6 @@ dnf_depends() {
   install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 
   install "sudo dnf install -y nodejs npm" "node"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
 
   install "sudo dnf install -y go" "go"
 
@@ -338,6 +332,14 @@ git config --global user.email "linrongbin16@outlook.com"
 git config --global user.name "linrongbin16"
 git config --global pull.rebase false
 git config --global init.defaultBranch main
+
+# bun/deno
+install_bun_deno_deps() {
+  install "install_deno" "deno"
+  install "install_bun" "bun"
+}
+
+install_bun_deno_deps
 
 # golang
 install_go_deps() {
