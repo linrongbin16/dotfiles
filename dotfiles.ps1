@@ -1,6 +1,11 @@
-# path
-$env:PATH += ";$env:USERPROFILE\go\bin"
-$env:PATH += ";$env:USERPROFILE\.go\bin"
+# go
+$env:GOROOT="$env:USERPROFILE\.go"
+$env:GOPATH="$env:USERPROFILE\go"
+$env:PATH += ";$env:GOROOT\bin"
+$env:PATH += ";$env:GOPATH\bin"
+
+# neovim
+$env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
 # lazygit
 Set-Alias -name lg -value lazygit
