@@ -30,6 +30,8 @@ Darwin)
   ;;
 esac
 
+export DOTFILES_HOME="$HOME/.dotfiles"
+
 # utils {
 
 info() {

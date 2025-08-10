@@ -2,54 +2,23 @@
 
 # set -x
 
+. "$DOTFILES_HOME/inst/util.sh"
+
 IS_LINUX=1
 
 install_nodejs() {
   # https://github.com/nodesource/distributions
-  info "install nodejs-lts from github NodeSource"
   sudo apt-get install -y curl
   curl -fsSL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
   sudo -E bash nodesource_setup.sh
-  sudo apt-get -qq update
-  sudo apt-get -qq -y install nodejs
+  sudo apt-get -q update
+  sudo apt-get -q -y install nodejs
 }
 
 install_git() {
   sudo apt-add-repository ppa:git-core/ppa
   sudo apt-get -q -q -y update
-  install "sudo apt-get install -q -y git" "git"
-}
-
-install_golang() {
-  git clone --depth=1 https://github.com/kerolloz/go-installer
-  export GOROOT="$HOME/.go" # where go is installed
-  export GOPATH="$HOME/go"  # user workspace
-  bash ./go-installer/go.sh
-  export PATH="$PATH:$GOROOT/bin"
-  export PATH="$PATH:$GOPATH/bin"
-}
-
-install_fzf() {
-  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-  ~/.fzf/install --bin
-  sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf
-  fzf --version
-}
-
-install_deno() {
-  curl -fsSL https://deno.land/install.sh | sh -s -- -y
-}
-
-install_bun() {
-  curl -fsSL https://bun.com/install | bash
-}
-
-install_moar() {
-  go install github.com/walles/moar@latest
-}
-
-install_gtrash() {
-  go install github.com/umlx5h/gtrash@latest
+  sudo apt-get install -q -y git
 }
 
 apt_install_lazygit() {
