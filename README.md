@@ -93,10 +93,13 @@ After this step, **git.exe** and builtin shell commands(such as **echo.exe**, **
 
 </details>
 
-#### Install [Node.js](https://nodejs.org/) (only for current user)
+#### Install [Node.js](https://nodejs.org/)
+
+> [!WARNING]
+> Note: Install node only for current user (i.e. in user's home directory) to avoid permission issues when installing npm packages in the future.
 
 <details>
-<summary>Click here to see how to install node only for current user.</summary>
+<summary>Click here to see how to install node for current user.</summary>
 
 - In "Destination Folder", choose the install directory in you user directory (for example `C:\Users\linrongbin\opt\nodejs\`).
 
