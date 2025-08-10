@@ -27,7 +27,7 @@ install() {
   fi
 }
 
-install_go_for_linux() {
+install_go() {
   git clone --depth=1 https://github.com/kerolloz/go-installer
   export GOROOT="$HOME/.go" # where go is installed
   export GOPATH="$HOME/go"  # user workspace
@@ -36,7 +36,7 @@ install_go_for_linux() {
   export PATH="$PATH:$GOPATH/bin"
 }
 
-install_fzf_for_linux() {
+install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
   sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf

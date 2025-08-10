@@ -21,7 +21,7 @@ install_git() {
   sudo apt-get install -q -y git
 }
 
-apt_install_lazygit() {
+install_lazygit() {
   LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
   curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
   tar xf lazygit.tar.gz lazygit
@@ -60,8 +60,8 @@ apt_depends() {
   install "install_deno" "deno"
   install "install_bun" "bun"
 
-  install "sudo apt-get install -q -y golang-go golang-src" "go"
-  install "apt_install_lazygit" "lazygit"
+  install "install_go" "go"
+  install "install_lazygit" "lazygit"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
