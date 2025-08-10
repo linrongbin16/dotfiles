@@ -34,7 +34,6 @@ install "install_golang" "go"
 
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
-sudo pipx ensurepath --global
 
 install "sudo dnf install -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER

@@ -51,7 +51,6 @@ install "install_go" "go"
 
 install "sudo apt-get install pipx" "pipx"
 pipx ensurepath
-sudo pipx ensurepath --global
 
 install "sudo apt-get install -q -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER
