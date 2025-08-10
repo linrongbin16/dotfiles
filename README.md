@@ -29,17 +29,17 @@ Please see: [active developer mode](https://learn.microsoft.com/en-us/windows/ap
 
 #### Install [Visual Studio](https://www.visualstudio.com/)
 
-Install with MSVC components:
+Install with below components:
 
 - .NET Desktop Development
 - Desktop development with C++
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install [Git for Windows](https://git-scm.com/download/win) (for all users)
+#### Install [Git for Windows](https://git-scm.com/download/win)
 
 <details>
-<summary>Click here to see how to install git with windows console enabled.</summary>
+<summary>Click here to see how to install git with builtin shell commands for windows console.</summary>
 
 Install git with the below 3 options:
 
@@ -55,16 +55,19 @@ Install git with the below 3 options:
 
   <img width="70%" alt="image" src="https://github.com/linrongbin16/fzfx.nvim/assets/6496887/f9174330-ca58-4117-a58d-9e84826c13d1" />
 
-After this step, **git.exe** and builtin linux commands(such as **echo.exe**, **ls.exe**, **curl.exe**) will be available in `%PATH%`.
+After this step, **git.exe** and builtin shell commands(such as **echo.exe**, **ls.exe**, **curl.exe**) will be available in `%PATH%`.
 
 </details>
 
-#### Install [7-Zip](https://www.7-zip.org/) (for all users)
+#### Install [7-Zip](https://www.7-zip.org/)
 
-#### Install [Python 3.x](https://www.python.org/downloads/) (only for current user)
+#### Install [Python 3.x](https://www.python.org/downloads/)
+
+> [!WARNING]
+> Note: Install python only for current user (i.e. in user's home directory) to avoid permission issues when installing pip packages in the future.
 
 <details>
-<summary>Click here to see how to install python3 only for current user.</summary>
+<summary>Click here to see how to install python3 for current user.</summary>
 
 - Select "Customize Installation", unselect "Use admin privileges when installing py.exe".
 
@@ -90,10 +93,13 @@ After this step, **git.exe** and builtin linux commands(such as **echo.exe**, **
 
 </details>
 
-#### Install [Node.js](https://nodejs.org/) (only for current user)
+#### Install [Node.js](https://nodejs.org/)
+
+> [!WARNING]
+> Note: Install node only for current user (i.e. in user's home directory) to avoid permission issues when installing npm packages in the future.
 
 <details>
-<summary>Click here to see how to install node only for current user.</summary>
+<summary>Click here to see how to install node for current user.</summary>
 
 - In "Destination Folder", choose the install directory in you user directory (for example `C:\Users\linrongbin\opt\nodejs\`).
 

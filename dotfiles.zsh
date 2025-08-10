@@ -1,33 +1,5 @@
 #!/bin/zsh
 
-OS="$(uname -s)"
-
-IS_LINUX=0
-IS_MAC=0
-IS_FREEBSD=0
-IS_NETBSD=0
-IS_OPENBSD=0
-case "$OS" in
-Linux)
-  IS_LINUX=1
-  ;;
-FreeBSD)
-  IS_FREEBSD=1
-  ;;
-NetBSD)
-  IS_NETBSD=1
-  ;;
-OpenBSD)
-  IS_OPENBSD=1
-  ;;
-Darwin)
-  IS_MAC=1
-  ;;
-*)
-  # Nothing
-  ;;
-esac
-
 # performance
 ulimit -n 200000
 ulimit -u 2048
@@ -51,24 +23,20 @@ alias gb="git branch"
 alias gm="git merge"
 alias gc="git commit"
 
-# golang
-if [ "$IS_MAC" != "1" ]; then
-  if [ -d "$HOME/.go" ]; then
-    export GOROOT="$HOME/.go" # where go is installed
-    export PATH="$PATH:$GOROOT/bin"
-  fi
+# go
+if [ -x "$HOME/.go/bin/go" ]; then
+  export GOROOT="$HOME/.go" # where go is installed
+  export PATH="$PATH:$GOROOT/bin"
 fi
 export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOPATH/bin"
 
 # deno/bun
-if [ "$IS_MAC" != "1" ]; then
-  if [ -d "$HOME/.deno/bin" ]; then
-    export PATH="$PATH:$HOME/.deno/bin"
-  fi
-  if [ -d "$HOME/.bun/bin" ]; then
-    export PATH="$PATH:$HOME/.bun/bin"
-  fi
+if [ -x "$HOME/.deno/bin/deno" ]; then
+  export PATH="$PATH:$HOME/.deno/bin"
+fi
+if [ -d "$HOME/.bun/bin/bun" ]; then
+  export PATH="$PATH:$HOME/.bun/bin"
 fi
 
 # neovim
@@ -87,15 +55,11 @@ fi
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
 
-# agkozak prompt
-init_prompt() {
+if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  # agkozak prompt
   AGKOZAK_PROMPT_DIRTRIM=0
   AGKOZAK_LEFT_PROMPT_ONLY=1
   # AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
   AGKOZAK_PROMPT_CHAR=( '%F{magenta}❯%f' %# : )
   source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
-}
-
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  init_prompt
 fi

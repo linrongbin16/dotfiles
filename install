@@ -2,367 +2,54 @@
 
 # set -x
 
-OS="$(uname -s)"
-
-IS_LINUX=0
-IS_MAC=0
-IS_FREEBSD=0
-IS_NETBSD=0
-IS_OPENBSD=0
-case "$OS" in
-Linux)
-  IS_LINUX=1
-  ;;
-FreeBSD)
-  IS_FREEBSD=1
-  ;;
-NetBSD)
-  IS_NETBSD=1
-  ;;
-OpenBSD)
-  IS_OPENBSD=1
-  ;;
-Darwin)
-  IS_MAC=1
-  ;;
-*)
-  # Nothing
-  ;;
-esac
-
-# utils {
-
-info() {
-  local content="$*"
-  printf "[dotfiles] - %s\n" "$content"
-}
-
-skip_info() {
-  local old="$IFS"
-  IFS='/'
-  local target="'$*'"
-  info "$target already exist, skip..."
-  IFS=$old
-}
-
-install() {
-  local command="$1"
-  local target="$2"
-  if ! type "$target" >/dev/null 2>&1; then
-    info "install '$target' with: '$command'"
-    eval "$command"
-  else
-    skip_info $target
-  fi
-}
-
-# utils }
-
-# apt {
-
-install_nodejs_for_apt() {
-  # https://github.com/nodesource/distributions
-  info "install nodejs-lts from github NodeSource"
-  sudo apt-get install -y curl
-  curl -fsSL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
-  sudo -E bash nodesource_setup.sh
-  sudo apt-get -qq update
-  sudo apt-get -qq -y install nodejs
-}
-
-install_git_for_apt() {
-  sudo apt-add-repository ppa:git-core/ppa
-  sudo apt-get -q -q -y update
-  install "sudo apt-get install -q -y git" "git"
-}
-
-install_golang() {
-  git clone --depth=1 https://github.com/kerolloz/go-installer
-  export GOROOT="$HOME/.go" # where go is installed
-  export GOPATH="$HOME/go"  # user workspace
-  bash ./go-installer/go.sh
-  export PATH="$PATH:$GOROOT/bin"
-  export PATH="$PATH:$GOPATH/bin"
-}
-
-install_fzf() {
-  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-  ~/.fzf/install --bin
-  sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf
-  fzf --version
-}
-
-install_deno() {
-  curl -fsSL https://deno.land/install.sh | sh -s -- -y
-}
-
-install_bun() {
-  curl -fsSL https://bun.com/install | bash
-}
-
-install_moar() {
-  go install github.com/walles/moar@latest
-}
-
-install_gtrash() {
-  go install github.com/umlx5h/gtrash@latest
-}
-
-apt_install_lazygit() {
-  LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-  tar xf lazygit.tar.gz lazygit
-  sudo install lazygit -D -t /usr/local/bin/
-}
-
-apt_depends() {
-  info "install dependencies with apt"
-  sudo apt-get -q -y update
-
-  install "sudo apt-get install -q -y build-essential" "gcc"
-  install "sudo apt-get install -q -y build-essential" "make"
-  install "sudo apt-get install -q -y autoconf" "autoconf"
-  install "sudo apt-get install -q -y automake" "automake"
-  install "sudo apt-get install -q -y pkg-config" "pkg-config"
-  install "sudo apt-get install -q -y cmake" "cmake"
-  sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
-  sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
-
-  install "install_git_for_apt" "git"
-  install "sudo apt-get install -q -y curl" "curl"
-  install "sudo apt-get install -q -y wget" "wget"
-
-  install "sudo apt-get install -q -y gzip" "gzip"
-  install "sudo apt-get install -q -y p7zip" "7z"
-  install "sudo apt-get install -q -y unzip" "unzip"
-
-  install "sudo apt-get install -q -y xsel" "xsel"
-  install "sudo apt-get install -q -y xclip" "xclip"
-
-  install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
-  install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
-
-  install "install_nodejs_for_apt" "node"
-  install "install_nodejs_for_apt" "npm"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
-
-  install "sudo apt-get install -q -y golang-go golang-src" "go"
-  install "apt_install_lazygit" "lazygit"
-
-  install "sudo apt-get install pipx" "pipx"
-  pipx ensurepath
-  sudo pipx ensurepath --global
-
-  install "sudo apt-get install -q -y zsh" "zsh"
-  sudo chsh -s $(which zsh) $USER
-}
-
-# apt }
-
-# pacman {
-
-pacman_depends() {
-  info "install dependencies with pacman"
-  sudo pacman -Syy
-
-  install "yes | sudo pacman -S base-devel" "gcc"
-  install "yes | sudo pacman -S base-devel" "make"
-  install "yes | sudo pacman -S autoconf" "autoconf"
-  install "yes | sudo pacman -S automake" "automake"
-  install "yes | sudo pacman -S pkg-config" "pkg-config"
-  install "yes | sudo pacman -S cmake" "cmake"
-  yes | sudo pacman -S libssl openssl openssh
-  yes | sudo pacman -S cmake freetype2 fontconfig pkg-config make libxcb libxkbcommon python
-
-  install "yes | sudo pacman -S git" "git"
-  install "yes | sudo pacman -S curl" "curl"
-  install "yes | sudo pacman -S wget" "wget"
-
-  install "yes | sudo pacman -S unzip" "unzip"
-  install "yes | sudo pacman -S gzip" "gzip"
-  install "yes | sudo pacman -S p7zip" "7z"
-  install "yes | sudo pacman -S atool" "atool"
-
-  install "yes | sudo pacman -S xsel" "xsel"
-  install "yes | sudo pacman -S xclip" "xclip"
-
-  install "yes | sudo pacman -S python python-pip" "python3"
-
-  install "yes | sudo pacman -S nodejs npm" "node"
-
-  install "yes | sudo pacman -S go" "go"
-  install "yes | sudo pacman -S lazygit" "lazygit"
-
-  install "yes | sudo pacman -S python-pipx" "pipx"
-  pipx ensurepath
-  sudo pipx ensurepath --global
-
-  install "yes | sudo pacman -S zsh" "zsh"
-  sudo chsh -s $(which zsh) $USER
-}
-
-# pacman }
-
-# dnf {
-
-dnf_install_lazygit() {
-  sudo dnf copr enable dejan/lazygit
-  sudo dnf install -y lazygit
-}
-
-dnf_depends() {
-  info "install dependencies with dnf"
-  sudo dnf check-update
-
-  install "sudo dnf group install -y \"Development Tools\"" "gcc"
-  install "sudo dnf group install -y \"Development Tools\"" "make"
-  install "sudo dnf install -y autoconf" "autoconf"
-  install "sudo dnf install -y automake" "automake"
-  install "sudo dnf install -y pkg-config" "pkg-config"
-  install "sudo dnf install -y cmake" "cmake"
-  install "install_golang" "go"
-  sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
-  sudo dnf install -y cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++
-
-  install "sudo dnf install -y git" "git"
-  install "sudo dnf install -y curl" "curl"
-  install "sudo dnf install -y wget" "wget"
-
-  install "sudo dnf install -y gzip" "gzip"
-  install "sudo dnf install -y p7zip" "7z"
-  install "sudo dnf install -y unzip" "unzip"
-
-  install "sudo dnf install -y xsel" "xsel"
-  install "sudo dnf install -y xclip" "xclip"
-
-  install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
-
-  install "sudo dnf install -y nodejs npm" "node"
-
-  install "sudo dnf install -y go" "go"
-  install "dnf_install_lazygit" "lazygit"
-
-  install "sudo dnf install -y pipx" "pipx"
-  pipx ensurepath
-  sudo pipx ensurepath --global
-
-  install "sudo dnf install -y zsh" "zsh"
-  sudo chsh -s $(which zsh) $USER
-}
-
-# dnf }
-
-# brew {
-
-brew_depends() {
-  info "install dependencies with brew"
-
-  install "xcode-select --install" "clang"
-  install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
-  brew update
-
-  install "brew install autoconf" "autoconf"
-  install "brew install automake" "automake"
-  install "brew install pkg-config" "pkg-config"
-  install "brew install cmake" "cmake"
-  brew install openssl openssh
-
-  install "brew install git" "git"
-  install "brew install curl" "curl"
-  install "brew install wget" "wget"
-
-  install "brew install gzip" "gzip"
-  install "brew install p7zip" "7z"
-  install "brew install unzip" "unzip"
-  install "brew install alacritty" "alacritty"
-
-  install "brew install python3" "python3"
-  install "brew install node" "node"
-  install "brew install deno" "deno"
-  install "brew install oven-sh/bun/bun" "bun"
-
-  install "brew install go" "go"
-  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-  install "brew install fzf" "fzf"
-  install "brew install moar" "moar"
-  install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
-
-  install "brew install pipx" "pipx"
-  pipx ensurepath
-  sudo pipx ensurepath --global
-
-  install "brew install zsh" "zsh"
-  sudo chsh -s $(which zsh) $USER
-}
-
-# brew }
-
-# install dependencies
-
-case "$OS" in
-Linux)
-  if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
-    pacman_depends
-  elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
-    dnf_depends
-  elif [ -f "/etc/gentoo-release" ]; then
-    # emerge
-    info "gentoo is not supported, exit..."
+export DOTFILES_HOME="$HOME/.dotfiles"
+
+. "$DOTFILES_HOME/inst/util.sh"
+
+core_deps() {
+  OS="$(uname -s)"
+
+  case "$OS" in
+  Linux)
+    if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
+      . "$DOTFILES_HOME/inst/pacman.sh"
+    elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
+      . "$DOTFILES_HOME/inst/dnf.sh"
+    else
+      . "$DOTFILES_HOME/inst/apt.sh"
+    fi
+    ;;
+  Darwin)
+    . "$DOTFILES_HOME/inst/brew.sh"
+    ;;
+  *)
+    info "$OS is not supported, exit..."
     exit 1
-  else
-    apt_depends
-  fi
-  ;;
-FreeBSD)
-  # pkg
-  info "FreeBSD is not supported, exit..."
-  exit 1
-  ;;
-NetBSD)
-  # pkgin
-  info "NetBSD is not supported, exit..."
-  exit 1
-  ;;
-OpenBSD)
-  # pkg_add
-  info "OpenBSD is not supported, exit..."
-  exit 1
-  ;;
-Darwin)
-  brew_depends
-  ;;
-*)
-  info "$OS is not supported, exit..."
-  exit 1
-  ;;
-esac
+    ;;
+  esac
+}
 
-# git config
-git config --global user.email "linrongbin16@outlook.com"
-git config --global user.name "linrongbin16"
-git config --global pull.rebase false
-git config --global init.defaultBranch main
+git_configs() {
+  git config --global user.email "linrongbin16@outlook.com"
+  git config --global user.name "linrongbin16"
+  git config --global pull.rebase false
+  git config --global init.defaultBranch main
+}
 
-# bun/deno
-install_bun_deno_deps() {
+js_deps() {
   install "install_deno" "deno"
   install "install_bun" "bun"
 }
 
-install_bun_deno_deps
-
-# golang
-install_go_deps() {
+go_deps() {
+  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
   install "install_gtrash" "gtrash"
 }
 
-install_go_deps
-
 # rust
-install_rust_deps() {
+rust_deps() {
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
   if [ -f $HOME/.cargo/env ]; then
@@ -375,39 +62,59 @@ install_rust_deps() {
   install "cargo install --locked zoxide" "zoxide"
   install "cargo install --locked rmz" "rmz"
   install "cargo install --locked cpz" "cpz"
+}
+
+neovim_deps() {
   install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
   install "bob use stable" "nvim"
 }
 
-install_rust_deps
-
-# agkozak prompt
-install_prompt() {
-  mkdir -p "$HOME/.zsh"
+prompt_deps() {
+  # agkozak-zsh-prompt
+  if [ ! -d "$HOME/.zsh" ]; then
+    mkdir -p "$HOME/.zsh"
+  fi
   if [ ! -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
     git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
   fi
+
+  # atuin
+  install "install_atuin" "atuin"
+
+  # mise
+  install "install_mise" "mise"
 }
 
-install_prompt
+alacritty_configs() {
+  if [ ! -d "$HOME/.config/alacritty" ]; then
+    mkdir -p $HOME/.config/alacritty
+  fi
+  if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
+    cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
+  fi
+  if [ ! -d "$HOME/.config/alacritty/themes" ]; then
+    git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
+  fi
+}
 
-# atuin
-curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+profile_configs() {
+  echo '' >>~/.zshrc
+  echo '# dotfiles ' >>~/.zshrc
+  echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+  echo '[dotfiles] Done'
+}
 
-# mise
-curl https://mise.run | sh
+main() {
+  core_deps
+  js_deps
+  go_deps
+  rust_deps
+  neovim_deps
+  prompt_deps
+  git_configs
+  alacritty_configs
+  profile_configs
+}
 
-# alacritty
-mkdir -p $HOME/.config/alacritty
-if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
-  cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
-fi
-if [ ! -d "$HOME/.config/alacritty/themes" ]; then
-  git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
-fi
-
-echo '' >>~/.zshrc
-echo '# dotfiles ' >>~/.zshrc
-echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
-echo '[dotfiles] Done'
+main

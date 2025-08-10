@@ -26,85 +26,140 @@ function Install([string]$command, [string]$target)
 
 # utils }
 
-Info "install dependencies for windows"
-
-# deps
-scoop bucket add extras
-scoop install mingw
-scoop install uutils-coreutils
-Install -command "scoop install which" -target "which"
-Install -command "scoop install gawk" -target "awk"
-Install -command "scoop install sed" -target "sed"
-Install -command "scoop install llvm" -target "clang"
-Install -command "scoop install llvm" -target "clang++"
-Install -command "scoop install make" -target "make"
-Install -command "scoop install cmake" -target "cmake"
-
-Install -command "scoop install git" -target "git"
-Install -command "scoop install curl" -target "curl"
-Install -command "scoop install wget" -target "wget"
-
-Install -command "scoop install 7zip" -target "7z"
-Install -command "scoop install gzip" -target "gzip"
-Install -command "scoop install unzip" -target "unzip"
-
-Install -command "scoop install extras/alacritty" -target "vim"
-Install -command "scoop install starship" -target "starship"
-Install -command "scoop install mise" -target "mise"
-
-Install -command "scoop install deno" -target "deno"
-Install -command "scoop install bun" -target "bun"
-
-Install -command "scoop install go" -target "go"
-Install -command "scoop install extras/lazygit" -target "lazygit"
-Install -command "scoop install main/fzf" -target "fzf"
-
-Install -command "scoop install pipx" -target "pipx"
-pipx ensurepath
-
-# node.js
-npm install --silent -g trash-cli
-
-# git config
-git config --global user.email "linrongbin16@outlook.com"
-git config --global user.name "linrongbin16"
-git config --global pull.rebase false
-git config --global init.defaultBranch main
-
-# rust/cargo
-Install -command "scoop install rustup" -target "rustc"
-Install -command "scoop install rustup" -target "cargo"
-Install -command "scoop install fd" -target "fd"
-Install -command "scoop install ripgrep" -target "rg"
-Install -command "scoop install bat" -target "bat"
-Install -command "scoop install eza" -target "eza"
-Install -command "cargo install --locked rmz" -target "rmz"
-Install -command "cargo install --locked cpz" -target "cpz"
-Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
-Install -command "bob use stable" -target "nvim"
-$env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
-
-# alacritty
-$AlacrittyFolder = "$env:APPDATA\alacritty"
-if (!(Test-Path -Path $AlacrittyFolder))
+function CoreDeps()
 {
-  New-Item -ItemType Directory $AlacrittyFolder
-}
-$AlacrittyConfig = "$env:APPDATA\alacritty\alacritty_win.toml"
-Copy-Item ".\alacritty_win.toml" -Destination $AlacrittyConfig
-$AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
-if (!(Test-Path -Path $AlacrittyThemesFolder))
-{
-  git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
+  Info "install core deps for windows"
+
+  # deps
+  scoop bucket add extras
+  scoop install mingw
+  scoop install uutils-coreutils
+  Install -command "scoop install which" -target "which"
+  Install -command "scoop install gawk" -target "awk"
+  Install -command "scoop install sed" -target "sed"
+  Install -command "scoop install llvm" -target "clang"
+  Install -command "scoop install llvm" -target "clang++"
+  Install -command "scoop install make" -target "make"
+  Install -command "scoop install cmake" -target "cmake"
+
+  Install -command "scoop install git" -target "git"
+  Install -command "scoop install curl" -target "curl"
+  Install -command "scoop install wget" -target "wget"
+
+  Install -command "scoop install 7zip" -target "7z"
+  Install -command "scoop install gzip" -target "gzip"
+  Install -command "scoop install unzip" -target "unzip"
+
+  Install -command "scoop install extras/alacritty" -target "alacritty"
+
+  Install -command "scoop install pipx" -target "pipx"
+  pipx ensurepath
 }
 
-# $PROFILE
-$ProfileFolder = Split-Path $PROFILE
-if (!(Test-Path -Path $ProfileFolder))
+
+function JsDeps()
 {
-  New-Item -ItemType Directory $ProfileFolder
+  Info "install javascript deps for windows"
+
+  Install -command "scoop install deno" -target "deno"
+  Install -command "scoop install bun" -target "bun"
+  npm install --silent -g trash-cli
 }
-Write-Output '' >>$PROFILE
-Write-Output '# dotfiles' >>$PROFILE
-Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
-Write-Output '[dotfiles] Done'
+
+function GitConfigs()
+{
+  Info "install git configs for windows"
+
+  git config --global user.email "linrongbin16@outlook.com"
+  git config --global user.name "linrongbin16"
+  git config --global pull.rebase false
+  git config --global init.defaultBranch main
+}
+
+function GoDeps() {
+  Info "install go deps for windows"
+
+  Install -command "scoop install go" -target "go"
+  Install -command "scoop install extras/lazygit" -target "lazygit"
+  Install -command "scoop install main/fzf" -target "fzf"
+}
+
+function RustDeps()
+{
+  Info "install rust deps for windows"
+
+  Install -command "scoop install rustup" -target "rustc"
+  Install -command "scoop install rustup" -target "cargo"
+  Install -command "scoop install fd" -target "fd"
+  Install -command "scoop install ripgrep" -target "rg"
+  Install -command "scoop install bat" -target "bat"
+  Install -command "scoop install eza" -target "eza"
+  Install -command "cargo install --locked rmz" -target "rmz"
+  Install -command "cargo install --locked cpz" -target "cpz"
+}
+
+function NeovimDeps()
+{
+  Info "install neovim deps for windows"
+
+  Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
+  Install -command "bob use stable" -target "nvim"
+  $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+}
+
+function PromptDeps() {
+  Install -command "scoop install starship" -target "starship"
+  Install -command "scoop install mise" -target "mise"
+}
+
+function AlacrittyConfigs()
+{
+  Info "install alacritty configs for windows"
+
+  # alacritty_win.toml
+  $AlacrittyFolder = "$env:APPDATA\alacritty"
+  if (!(Test-Path -Path $AlacrittyFolder))
+  {
+    New-Item -ItemType Directory $AlacrittyFolder
+  }
+  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty_win.toml"
+  Copy-Item ".\alacritty_win.toml" -Destination $AlacrittyConfig
+
+  # alacritty/themes
+  $AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
+  if (!(Test-Path -Path $AlacrittyThemesFolder))
+  {
+    git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
+  }
+}
+
+function ProfileConfigs()
+{
+  Info "install PROFILE configs for windows"
+
+  $ProfileFolder = Split-Path $PROFILE
+  if (!(Test-Path -Path $ProfileFolder))
+  {
+    New-Item -ItemType Directory $ProfileFolder
+  }
+
+  Write-Output '' >>$PROFILE
+  Write-Output '# dotfiles' >>$PROFILE
+  Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
+  Write-Output '[dotfiles] Done'
+}
+
+function Main()
+{
+  CoreDeps
+  JsDeps
+  GoDeps
+  RustDeps
+  NeovimDeps
+  PromptDeps
+  GitConfigs
+  AlacrittyConfigs
+  ProfileConfigs
+}
+
+Main
