@@ -1,33 +1,5 @@
 #!/bin/zsh
 
-OS="$(uname -s)"
-
-IS_LINUX=0
-IS_MAC=0
-IS_FREEBSD=0
-IS_NETBSD=0
-IS_OPENBSD=0
-case "$OS" in
-Linux)
-  IS_LINUX=1
-  ;;
-FreeBSD)
-  IS_FREEBSD=1
-  ;;
-NetBSD)
-  IS_NETBSD=1
-  ;;
-OpenBSD)
-  IS_OPENBSD=1
-  ;;
-Darwin)
-  IS_MAC=1
-  ;;
-*)
-  # Nothing
-  ;;
-esac
-
 # performance
 ulimit -n 200000
 ulimit -u 2048
