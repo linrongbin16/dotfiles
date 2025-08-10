@@ -69,7 +69,6 @@ jobs:
           brew install ripgrep
           brew install bat
           brew install eza
-          brew install git-delta
           brew install zoxide
           brew install bob
           echo '${{ steps.extract_branch.outputs.branch }}'
