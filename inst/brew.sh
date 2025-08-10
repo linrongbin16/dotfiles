@@ -2,44 +2,44 @@
 
 # set -x
 
-brew_deps() {
-  info "install deps with brew"
+. "$DOTFILES_HOME/inst/util.sh"
 
-  install "xcode-select --install" "clang"
-  install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
-  brew update
+info "install deps with brew"
 
-  install "brew install autoconf" "autoconf"
-  install "brew install automake" "automake"
-  install "brew install pkg-config" "pkg-config"
-  install "brew install cmake" "cmake"
-  brew install openssl openssh
+install "xcode-select --install" "clang"
+install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
+brew update
 
-  install "brew install git" "git"
-  install "brew install curl" "curl"
-  install "brew install wget" "wget"
+install "brew install autoconf" "autoconf"
+install "brew install automake" "automake"
+install "brew install pkg-config" "pkg-config"
+install "brew install cmake" "cmake"
+brew install openssl openssh
 
-  install "brew install gzip" "gzip"
-  install "brew install p7zip" "7z"
-  install "brew install unzip" "unzip"
-  install "brew install alacritty" "alacritty"
+install "brew install git" "git"
+install "brew install curl" "curl"
+install "brew install wget" "wget"
 
-  install "brew install python3" "python3"
+install "brew install gzip" "gzip"
+install "brew install p7zip" "7z"
+install "brew install unzip" "unzip"
+install "brew install alacritty" "alacritty"
 
-  install "brew install node" "node"
-  install "brew install deno" "deno"
-  install "brew install oven-sh/bun/bun" "bun"
+install "brew install python3" "python3"
 
-  install "brew install go" "go"
-  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-  install "brew install fzf" "fzf"
-  install "brew install moar" "moar"
-  install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
+install "brew install node" "node"
+install "brew install deno" "deno"
+install "brew install oven-sh/bun/bun" "bun"
 
-  install "brew install pipx" "pipx"
-  pipx ensurepath
-  sudo pipx ensurepath --global
+install "brew install go" "go"
+install "brew install jesseduffield/lazygit/lazygit" "lazygit"
+install "brew install fzf" "fzf"
+install "brew install moar" "moar"
+install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 
-  install "brew install zsh" "zsh"
-  sudo chsh -s $(which zsh) $USER
-}
+install "brew install pipx" "pipx"
+pipx ensurepath
+sudo pipx ensurepath --global
+
+install "brew install zsh" "zsh"
+sudo chsh -s $(which zsh) $USER

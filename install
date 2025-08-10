@@ -6,21 +6,9 @@ OS="$(uname -s)"
 
 IS_LINUX=0
 IS_MAC=0
-IS_FREEBSD=0
-IS_NETBSD=0
-IS_OPENBSD=0
 case "$OS" in
 Linux)
   IS_LINUX=1
-  ;;
-FreeBSD)
-  IS_FREEBSD=1
-  ;;
-NetBSD)
-  IS_NETBSD=1
-  ;;
-OpenBSD)
-  IS_OPENBSD=1
   ;;
 Darwin)
   IS_MAC=1
@@ -60,90 +48,26 @@ install() {
 
 # utils }
 
-# brew {
-
-brew_depends() {
-  info "install dependencies with brew"
-
-  install "xcode-select --install" "clang"
-  install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
-  brew update
-
-  install "brew install autoconf" "autoconf"
-  install "brew install automake" "automake"
-  install "brew install pkg-config" "pkg-config"
-  install "brew install cmake" "cmake"
-  brew install openssl openssh
-
-  install "brew install git" "git"
-  install "brew install curl" "curl"
-  install "brew install wget" "wget"
-
-  install "brew install gzip" "gzip"
-  install "brew install p7zip" "7z"
-  install "brew install unzip" "unzip"
-  install "brew install alacritty" "alacritty"
-
-  install "brew install python3" "python3"
-  install "brew install node" "node"
-  install "brew install deno" "deno"
-  install "brew install oven-sh/bun/bun" "bun"
-
-  install "brew install go" "go"
-  install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-  install "brew install fzf" "fzf"
-  install "brew install moar" "moar"
-  install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
-
-  install "brew install pipx" "pipx"
-  pipx ensurepath
-  sudo pipx ensurepath --global
-
-  install "brew install zsh" "zsh"
-  sudo chsh -s $(which zsh) $USER
-}
-
-# brew }
-
-# install dependencies
-
-case "$OS" in
-Linux)
-  if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
-    pacman_depends
-  elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
-    dnf_depends
-  elif [ -f "/etc/gentoo-release" ]; then
-    # emerge
-    info "gentoo is not supported, exit..."
+core_deps() {
+  case "$OS" in
+  Linux)
+    if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
+      . "$DOTFILES_HOME/inst/pacman.sh"
+    elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
+      . "$DOTFILES_HOME/inst/dnf.sh"
+    else
+      . "$DOTFILES_HOME/inst/apt.sh"
+    fi
+    ;;
+  Darwin)
+    . "$DOTFILES_HOME/inst/brew.sh"
+    ;;
+  *)
+    info "$OS is not supported, exit..."
     exit 1
-  else
-    apt_depends
-  fi
-  ;;
-FreeBSD)
-  # pkg
-  info "FreeBSD is not supported, exit..."
-  exit 1
-  ;;
-NetBSD)
-  # pkgin
-  info "NetBSD is not supported, exit..."
-  exit 1
-  ;;
-OpenBSD)
-  # pkg_add
-  info "OpenBSD is not supported, exit..."
-  exit 1
-  ;;
-Darwin)
-  brew_depends
-  ;;
-*)
-  info "$OS is not supported, exit..."
-  exit 1
-  ;;
-esac
+    ;;
+  esac
+}
 
 # git config
 git config --global user.email "linrongbin16@outlook.com"
