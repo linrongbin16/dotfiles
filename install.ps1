@@ -161,3 +161,5 @@ function Main()
   AlacrittyConfigs
   ProfileConfigs
 }
+
+Main
