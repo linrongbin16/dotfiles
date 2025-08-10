@@ -94,25 +94,30 @@ prompt_deps() {
   fi
 
   # atuin
-  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+  install "install_atuin" "atuin"
 
   # mise
-  curl https://mise.run | sh
+  install "install_mise" "mise"
 }
 
-# alacritty
-mkdir -p $HOME/.config/alacritty
-if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
-  cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
-fi
-if [ ! -d "$HOME/.config/alacritty/themes" ]; then
-  git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
-fi
+alacritty_configs() {
+  if [ ! -d "$HOME/.config/alacritty" ]; then
+    mkdir -p $HOME/.config/alacritty
+  fi
+  if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
+    cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
+  fi
+  if [ ! -d "$HOME/.config/alacritty/themes" ]; then
+    git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
+  fi
+}
 
-echo '' >>~/.zshrc
-echo '# dotfiles ' >>~/.zshrc
-echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
-echo '[dotfiles] Done'
+profile_configs() {
+  echo '' >>~/.zshrc
+  echo '# dotfiles ' >>~/.zshrc
+  echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+  echo '[dotfiles] Done'
+}
 
 core_deps
 js_deps
@@ -121,3 +126,5 @@ rust_deps
 neovim_deps
 prompt_deps
 git_configs
+alacritty_configs
+profile_configs

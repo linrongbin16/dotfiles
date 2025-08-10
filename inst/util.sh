@@ -62,3 +62,11 @@ install_deno() {
 install_bun() {
   curl -fsSL https://bun.com/install | bash
 }
+
+install_atuin() {
+  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+}
+
+install_mise() {
+  curl https://mise.run | sh
+}
