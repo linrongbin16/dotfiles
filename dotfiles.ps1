@@ -1,7 +1,5 @@
 # go
-$env:GOROOT="$env:USERPROFILE\.go"
 $env:GOPATH="$env:USERPROFILE\go"
-$env:PATH += ";$env:GOROOT\bin"
 $env:PATH += ";$env:GOPATH\bin"
 
 # neovim
