@@ -16,6 +16,6 @@ function MyLs2 { eza -lha $args }
 Set-Alias -name l -value MyLs1
 Set-Alias -name ll -value MyLs2
 
-# starship
+# prompt
 $env:STARSHIP_CONFIG = "$HOME\.dotfiles\starship.toml"
 Invoke-Expression (&starship init powershell)

@@ -51,12 +51,6 @@ function CoreDeps()
   Install -command "scoop install unzip" -target "unzip"
 
   Install -command "scoop install extras/alacritty" -target "alacritty"
-  Install -command "scoop install starship" -target "starship"
-  Install -command "scoop install mise" -target "mise"
-
-  Install -command "scoop install go" -target "go"
-  Install -command "scoop install extras/lazygit" -target "lazygit"
-  Install -command "scoop install main/fzf" -target "fzf"
 
   Install -command "scoop install pipx" -target "pipx"
   pipx ensurepath
@@ -82,6 +76,14 @@ function GitConfigs()
   git config --global init.defaultBranch main
 }
 
+function GoDeps() {
+  Info "install go deps for windows"
+
+  Install -command "scoop install go" -target "go"
+  Install -command "scoop install extras/lazygit" -target "lazygit"
+  Install -command "scoop install main/fzf" -target "fzf"
+}
+
 function RustDeps()
 {
   Info "install rust deps for windows"
@@ -103,6 +105,11 @@ function NeovimDeps()
   Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
   Install -command "bob use stable" -target "nvim"
   $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+}
+
+function PromptDeps() {
+  Install -command "scoop install starship" -target "starship"
+  Install -command "scoop install mise" -target "mise"
 }
 
 function AlacrittyConfigs()
@@ -146,8 +153,10 @@ function Main()
 {
   CoreDeps
   JsDeps
+  GoDeps
   RustDeps
   NeovimDeps
+  PromptDeps
   GitConfigs
   AlacrittyConfigs
   ProfileConfigs

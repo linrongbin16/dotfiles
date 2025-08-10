@@ -20,33 +20,7 @@ esac
 
 export DOTFILES_HOME="$HOME/.dotfiles"
 
-# utils {
-
-info() {
-  local content="$*"
-  printf "[dotfiles] - %s\n" "$content"
-}
-
-skip_info() {
-  local old="$IFS"
-  IFS='/'
-  local target="'$*'"
-  info "$target already exist, skip..."
-  IFS=$old
-}
-
-install() {
-  local command="$1"
-  local target="$2"
-  if ! type "$target" >/dev/null 2>&1; then
-    info "install '$target' with: '$command'"
-    eval "$command"
-  else
-    skip_info $target
-  fi
-}
-
-# utils }
+. "$DOTFILES_HOME/inst/util.sh"
 
 core_deps() {
   case "$OS" in
@@ -69,31 +43,27 @@ core_deps() {
   esac
 }
 
-# git config
-git config --global user.email "linrongbin16@outlook.com"
-git config --global user.name "linrongbin16"
-git config --global pull.rebase false
-git config --global init.defaultBranch main
+git_configs() {
+  git config --global user.email "linrongbin16@outlook.com"
+  git config --global user.name "linrongbin16"
+  git config --global pull.rebase false
+  git config --global init.defaultBranch main
+}
 
-# bun/deno
-install_bun_deno_deps() {
+js_deps() {
   install "install_deno" "deno"
   install "install_bun" "bun"
 }
 
-install_bun_deno_deps
-
-# golang
-install_go_deps() {
+go_deps() {
+  install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
   install "install_gtrash" "gtrash"
 }
 
-install_go_deps
-
 # rust
-install_rust_deps() {
+rust_deps() {
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
   if [ -f $HOME/.cargo/env ]; then
@@ -106,28 +76,29 @@ install_rust_deps() {
   install "cargo install --locked zoxide" "zoxide"
   install "cargo install --locked rmz" "rmz"
   install "cargo install --locked cpz" "cpz"
+}
+
+neovim_deps() {
   install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
   install "bob use stable" "nvim"
 }
 
-install_rust_deps
-
-# agkozak prompt
-install_prompt() {
-  mkdir -p "$HOME/.zsh"
+prompt_deps() {
+  # agkozak-zsh-prompt
+  if [ ! -d "$HOME/.zsh" ]; then
+    mkdir -p "$HOME/.zsh"
+  fi
   if [ ! -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
     git clone --depth=1 https://github.com/agkozak/agkozak-zsh-prompt "$HOME/.zsh/agkozak-zsh-prompt"
   fi
+
+  # atuin
+  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+
+  # mise
+  curl https://mise.run | sh
 }
-
-install_prompt
-
-# atuin
-curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
-
-# mise
-curl https://mise.run | sh
 
 # alacritty
 mkdir -p $HOME/.config/alacritty
@@ -142,3 +113,11 @@ echo '' >>~/.zshrc
 echo '# dotfiles ' >>~/.zshrc
 echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
 echo '[dotfiles] Done'
+
+core_deps
+js_deps
+go_deps
+rust_deps
+neovim_deps
+prompt_deps
+git_configs
