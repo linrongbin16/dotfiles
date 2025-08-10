@@ -2,8 +2,6 @@
 
 # set -x
 
-. "$DOTFILES_HOME/inst/util.sh"
-
 info "install deps with dnf"
 
 sudo dnf check-update

@@ -2,8 +2,6 @@
 
 # set -x
 
-. "$DOTFILES_HOME/inst/util.sh"
-
 install_nodejs() {
   # https://github.com/nodesource/distributions
   sudo apt-get install -y curl
