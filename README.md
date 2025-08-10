@@ -39,7 +39,7 @@ Install with below components:
 #### Install [Git for Windows](https://git-scm.com/download/win)
 
 <details>
-<summary>Click here to see how to install git with core utils for windows console.</summary>
+<summary>Click here to see how to install git with builtin shell commands for windows console.</summary>
 
 Install git with the below 3 options:
 
@@ -55,13 +55,16 @@ Install git with the below 3 options:
 
   <img width="70%" alt="image" src="https://github.com/linrongbin16/fzfx.nvim/assets/6496887/f9174330-ca58-4117-a58d-9e84826c13d1" />
 
-After this step, **git.exe** and builtin linux commands(such as **echo.exe**, **ls.exe**, **curl.exe**) will be available in `%PATH%`.
+After this step, **git.exe** and builtin shell commands(such as **echo.exe**, **ls.exe**, **curl.exe**) will be available in `%PATH%`.
 
 </details>
 
-#### Install [7-Zip](https://www.7-zip.org/) (for all users)
+#### Install [7-Zip](https://www.7-zip.org/)
 
-#### Install [Python 3.x](https://www.python.org/downloads/) (only for current user)
+#### Install [Python 3.x](https://www.python.org/downloads/)
+
+> [!WARNING]
+> Note: Install python only for current user (i.e. in user's home directory) to avoid permission issues when installing pip packages in the future.
 
 <details>
 <summary>Click here to see how to install python3 only for current user.</summary>
