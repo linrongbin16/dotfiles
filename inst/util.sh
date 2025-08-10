@@ -51,6 +51,10 @@ install_gtrash() {
   go install github.com/umlx5h/gtrash@latest
 }
 
+install_lazygit() {
+  go install github.com/jesseduffield/lazygit@latest
+}
+
 install_deno() {
   curl -fsSL https://deno.land/install.sh | sh -s -- -y
 }

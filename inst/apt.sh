@@ -21,15 +21,9 @@ install_git() {
   sudo apt-get install -q -y git
 }
 
-install_lazygit() {
-  LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-  tar xf lazygit.tar.gz lazygit
-  sudo install lazygit -D -t /usr/local/bin/
-}
+apt_deps() {
+  info "install deps with apt"
 
-apt_depends() {
-  info "install dependencies with apt"
   sudo apt-get -q -y update
 
   install "sudo apt-get install -q -y build-essential" "gcc"
@@ -57,11 +51,8 @@ apt_depends() {
 
   install "install_nodejs" "node"
   install "install_nodejs" "npm"
-  install "install_deno" "deno"
-  install "install_bun" "bun"
 
   install "install_go" "go"
-  install "install_lazygit" "lazygit"
 
   install "sudo apt-get install pipx" "pipx"
   pipx ensurepath
