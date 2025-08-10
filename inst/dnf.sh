@@ -14,7 +14,6 @@ install "sudo dnf install -y autoconf" "autoconf"
 install "sudo dnf install -y automake" "automake"
 install "sudo dnf install -y pkg-config" "pkg-config"
 install "sudo dnf install -y cmake" "cmake"
-install "install_golang" "go"
 sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
 sudo dnf install -y cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++
 
@@ -33,7 +32,7 @@ install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils"
 
 install "sudo dnf install -y nodejs npm" "node"
 
-install "sudo dnf install -y go" "go"
+install "install_golang" "go"
 
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
