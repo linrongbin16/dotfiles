@@ -67,7 +67,7 @@ After this step, **git.exe** and builtin shell commands(such as **echo.exe**, **
 > Note: Install python only for current user (i.e. in user's home directory) to avoid permission issues when installing pip packages in the future.
 
 <details>
-<summary>Click here to see how to install python3 only for current user.</summary>
+<summary>Click here to see how to install python3 for current user.</summary>
 
 - Select "Customize Installation", unselect "Use admin privileges when installing py.exe".
 
