@@ -29,17 +29,17 @@ Please see: [active developer mode](https://learn.microsoft.com/en-us/windows/ap
 
 #### Install [Visual Studio](https://www.visualstudio.com/)
 
-Install with MSVC components:
+Install with below components:
 
 - .NET Desktop Development
 - Desktop development with C++
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install [Git for Windows](https://git-scm.com/download/win) (for all users)
+#### Install [Git for Windows](https://git-scm.com/download/win)
 
 <details>
-<summary>Click here to see how to install git with windows console enabled.</summary>
+<summary>Click here to see how to install git with core utils for windows console.</summary>
 
 Install git with the below 3 options:
 
