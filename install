@@ -2,27 +2,13 @@
 
 # set -x
 
-OS="$(uname -s)"
-
-IS_LINUX=0
-IS_MAC=0
-case "$OS" in
-Linux)
-  IS_LINUX=1
-  ;;
-Darwin)
-  IS_MAC=1
-  ;;
-*)
-  # Nothing
-  ;;
-esac
-
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
 
 core_deps() {
+  OS="$(uname -s)"
+
   case "$OS" in
   Linux)
     if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
