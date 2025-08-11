@@ -102,11 +102,14 @@ profile_configs() {
   echo '' >>~/.zshrc
   echo '# dotfiles ' >>~/.zshrc
   echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
-  echo '[dotfiles] Done'
 }
 
 main() {
   core_deps
+
+  # start using zsh
+  zsh
+
   js_deps
   go_deps
   rust_deps
@@ -115,6 +118,9 @@ main() {
   git_configs
   alacritty_configs
   profile_configs
+
+  exit
+  echo '[dotfiles] Done'
 }
 
 main

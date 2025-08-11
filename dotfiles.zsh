@@ -48,11 +48,12 @@ fi
 eval "$(zoxide init --cmd cd zsh)"
 
 # atuin
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+if [ -f "$HOME/.atuin/bin/env" ]; then
   . "$HOME/.atuin/bin/env"
+fi
+if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   eval "$(atuin init zsh)"
 else
-  . "$HOME/.atuin/bin/env"
   eval "$(atuin init --disable-ctrl-r --disable-up-arrow zsh)"
 fi
 
