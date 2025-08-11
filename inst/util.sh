@@ -27,34 +27,6 @@ install() {
   fi
 }
 
-install_go() {
-  git clone --depth=1 https://github.com/kerolloz/go-installer
-  export GOROOT="$HOME/.go" # where go is installed
-  export GOPATH="$HOME/go"  # user workspace
-  bash ./go-installer/go.sh
-  export PATH="$PATH:$GOROOT/bin"
-  export PATH="$PATH:$GOPATH/bin"
-}
-
-install_fzf() {
-  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-  ~/.fzf/install --bin
-  sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf
-  fzf --version
-}
-
-install_moar() {
-  go install github.com/walles/moar@latest
-}
-
-install_gtrash() {
-  go install github.com/umlx5h/gtrash@latest
-}
-
-install_lazygit() {
-  go install github.com/jesseduffield/lazygit@latest
-}
-
 install_deno() {
   curl -fsSL https://deno.land/install.sh | sh -s -- -y
 }
