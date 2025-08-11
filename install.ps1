@@ -64,7 +64,7 @@ function PythonDeps()
   Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile $PythonExe
 
   $PythonFolder = "$env:USERPROFILE\.local\bin"
-  if (!(Test-Path -Path $PythonFolder))
+  if (-not (Test-Path -Path $PythonFolder))
   {
     New-Item -ItemType Directory $PythonFolder
   }
@@ -77,10 +77,14 @@ function PythonDeps()
 
 function JsDeps()
 {
-  Info "install javascript deps for windows"
+  Info "install node/deno/bun for windows"
 
   Install -command "scoop install deno" -target "deno"
   Install -command "scoop install bun" -target "bun"
+  Install -command "scoop install fnm" -target "fnm"
+  fnm env --shell powershell | Out-String | Invoke-Expression
+  Install -command "fnm use --install-if-missing 22" -target "node"
+ 
   npm install --silent -g trash-cli
 }
 
@@ -136,7 +140,7 @@ function AlacrittyConfigs()
 
   # alacritty_win.toml
   $AlacrittyFolder = "$env:APPDATA\alacritty"
-  if (!(Test-Path -Path $AlacrittyFolder))
+  if (-not (Test-Path -Path $AlacrittyFolder))
   {
     New-Item -ItemType Directory $AlacrittyFolder
   }
@@ -145,7 +149,7 @@ function AlacrittyConfigs()
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
-  if (!(Test-Path -Path $AlacrittyThemesFolder))
+  if (-not (Test-Path -Path $AlacrittyThemesFolder))
   {
     git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
   }
@@ -156,7 +160,7 @@ function ProfileConfigs()
   Info "install PROFILE configs for windows"
 
   $ProfileFolder = Split-Path $PROFILE
-  if (!(Test-Path -Path $ProfileFolder))
+  if (-not (Test-Path -Path $ProfileFolder))
   {
     New-Item -ItemType Directory $ProfileFolder
   }
@@ -170,6 +174,7 @@ function ProfileConfigs()
 function Main()
 {
   CoreDeps
+  PythonDeps
   JsDeps
   GoDeps
   RustDeps
