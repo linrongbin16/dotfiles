@@ -97,8 +97,6 @@ jobs:
         shell: bash
         id: extract_branch
       - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_x86
       - name: Install dotfiles
         env:
           SCCACHE_GHA_ENABLED: "true"
