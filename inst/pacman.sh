@@ -11,7 +11,7 @@ fi
 
 install_neovim() {
   if [ "$IS_ARM64" == "1" ]; then
-    yes | sudo pacman -S nvim
+    yes | sudo pacman -S neovim
   fi
 }
 
