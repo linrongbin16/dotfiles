@@ -56,6 +56,24 @@ function CoreDeps()
   pipx ensurepath
 }
 
+function PythonDeps()
+{
+  Info "install javascript deps for windows"
+  $PythonVersion = "3.13.6"
+  $PythonExe = "python-{0}-amd64.exe" -f $PythonVersion
+  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile $PythonExe
+
+  $PythonFolder = "$env:USERPROFILE\.local\bin"
+  if (!(Test-Path -Path $PythonFolder))
+  {
+    New-Item -ItemType Directory $PythonFolder
+  }
+
+  $PythonExe InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0
+
+  # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
+  Copy-Item "$PythonFolder\python3\python.exe" -Destination "$PythonFolder\python3\python3.exe"
+}
 
 function JsDeps()
 {
