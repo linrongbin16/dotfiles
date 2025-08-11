@@ -64,6 +64,12 @@ rust_deps() {
   install "cargo install --locked cpz" "cpz"
 }
 
+neovim_deps() {
+  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+  install "bob use stable" "nvim"
+}
+
 prompt_deps() {
   # agkozak-zsh-prompt
   if [ ! -d "$HOME/.zsh" ]; then
@@ -104,6 +110,7 @@ main() {
   js_deps
   go_deps
   rust_deps
+  neovim_deps
   prompt_deps
   git_configs
   alacritty_configs
