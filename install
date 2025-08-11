@@ -109,6 +109,7 @@ main() {
 
   # start using zsh
   zsh
+  touch $HOME/.zshrc
 
   js_deps
   go_deps
