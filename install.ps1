@@ -33,7 +33,9 @@ function CoreDeps()
   # deps
   scoop bucket add extras
   scoop install mingw
-  scoop install uutils-coreutils
+  # scoop install uutils-coreutils
+  scoop install coreutils
+  # scoop install vcredist2022
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
   Install -command "scoop install sed" -target "sed"
@@ -58,20 +60,24 @@ function CoreDeps()
 
 function PythonDeps()
 {
-  Info "install javascript deps for windows"
+  Info "install python deps for windows"
   $PythonVersion = "3.13.6"
   Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile "python-amd64.exe"
+  Get-ChildItem
 
-  $PythonFolder = "$env:USERPROFILE\.local\bin"
-  if (-not (Test-Path -Path $PythonFolder))
+  $LocalFolder = "$env:USERPROFILE\.local\bin"
+  if (-not (Test-Path -Path $LocalFolder))
   {
-    New-Item -ItemType Directory $PythonFolder
+    New-Item -ItemType Directory $LocalFolder
   }
 
-  python-amd64.exe InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0
+  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
+
+  Info "list $LocalFolder"
+  Get-ChildItem -Path "$LocalFolder"
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
-  Copy-Item "$PythonFolder\python3\python.exe" -Destination "$PythonFolder\python3\python3.exe"
+  Copy-Item "$LocalFolder\python3\python.exe" -Destination "$LocalFolder\python3\python3.exe"
 }
 
 function JsDeps()
@@ -97,7 +103,8 @@ function GitConfigs()
   git config --global init.defaultBranch main
 }
 
-function GoDeps() {
+function GoDeps()
+{
   Info "install go deps for windows"
 
   Install -command "scoop install go" -target "go"
@@ -128,7 +135,8 @@ function NeovimDeps()
   $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 }
 
-function PromptDeps() {
+function PromptDeps()
+{
   Install -command "scoop install starship" -target "starship"
   Install -command "scoop install mise" -target "mise"
 }
