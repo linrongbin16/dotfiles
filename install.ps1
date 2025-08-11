@@ -66,7 +66,7 @@ function PythonDeps()
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
-  if ($isArm64)
+  if ($isArm64 -eq 1)
   {
     $PythonArch = "arm64"
   }
@@ -142,7 +142,7 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  if ($isArm64)
+  if ($isArm64 -eq 1)
   {
     Install "scoop install nvim" "nvim"
   } else
