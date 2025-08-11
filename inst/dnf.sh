@@ -12,10 +12,6 @@ fi
 install_neovim() {
   if [ "$IS_ARM64" == "1" ]; then
     sudo dnf install -y nvim
-  else
-    install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-    export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-    bob use stable
   fi
 }
 

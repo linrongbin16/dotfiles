@@ -27,10 +27,6 @@ install_git() {
 install_neovim() {
   if [ "$IS_ARM64" == "1" ]; then
     sudo snap install nvim --classic
-  else
-    install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-    export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-    bob use stable
   fi
 }
 

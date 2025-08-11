@@ -2,12 +2,6 @@
 
 # set -x
 
-install_neovim() {
-  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-  bob use stable
-}
-
 install_zsh() {
   brew install zsh
   sudo chsh -s /opt/homebrew/bin/zsh $USER
@@ -48,8 +42,6 @@ install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 
 install "brew install pipx" "pipx"
 pipx ensurepath
-
-install "install_neovim" "nvim"
 
 # install arm-64 zsh for mac
 install "install_zsh" "/opt/homebrew/bin/zsh"
