@@ -45,8 +45,6 @@ install "yes | sudo pacman -S python python-pip" "python3"
 
 install "yes | sudo pacman -S nodejs npm" "node"
 
-install "yes | sudo pacman -S go" "go"
-
 install "yes | sudo pacman -S python-pipx" "pipx"
 pipx ensurepath
 

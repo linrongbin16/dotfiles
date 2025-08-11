@@ -42,6 +42,7 @@ js_deps() {
 }
 
 go_deps() {
+  install "install_go" "go"
   install "install_lazygit" "lazygit"
   install "install_fzf" "fzf"
   install "install_moar" "moar"
