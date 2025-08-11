@@ -88,7 +88,6 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: Swatinem/rust-cache@v2
-      - uses: mozilla-actions/sccache-action@v0.0.9
       - uses: MinoruSekine/setup-scoop@v4.0.2
         with:
           buckets: extras
@@ -99,8 +98,6 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Install dotfiles
         env:
-          SCCACHE_GHA_ENABLED: "true"
-          RUSTC_WRAPPER: "sccache"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo '${{ steps.extract_branch.outputs.branch }}'
