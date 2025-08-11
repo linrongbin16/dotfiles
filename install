@@ -37,8 +37,8 @@ git_configs() {
 }
 
 js_deps() {
-  install "install_deno" "deno"
-  install "install_bun" "bun"
+  install "curl -fsSL https://deno.land/install.sh | sh -s -- -y" "deno"
+  install "curl -fsSL https://bun.com/install | bash" "bun"
 }
 
 install_go() {
@@ -97,10 +97,10 @@ prompt_deps() {
   fi
 
   # atuin
-  install "install_atuin" "atuin"
+  install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh" "atuin"
 
   # mise
-  install "install_mise" "mise"
+  install "curl https://mise.run | sh" "mise"
 }
 
 alacritty_configs() {

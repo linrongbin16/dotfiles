@@ -26,19 +26,3 @@ install() {
     skip_info $target
   fi
 }
-
-install_deno() {
-  curl -fsSL https://deno.land/install.sh | sh -s -- -y
-}
-
-install_bun() {
-  curl -fsSL https://bun.com/install | bash
-}
-
-install_atuin() {
-  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
-}
-
-install_mise() {
-  curl https://mise.run | sh
-}
