@@ -3,15 +3,6 @@
 # set -x
 
 OS="$(uname -s)"
-ARCH="$(uname -m)"
-
-IS_X64=0
-IS_ARM64=0
-if [[ "$architecture" == "x86_64" ]]; then
-  IS_X64=1
-elif [[ "$architecture" == "arm64" || "$architecture" == "aarch64" ]]; then
-  IS_ARM64=1
-fi
 
 export DOTFILES_HOME="$HOME/.dotfiles"
 
@@ -73,14 +64,6 @@ rust_deps() {
   install "cargo install --locked cpz" "cpz"
 }
 
-neovim_deps() {
-  if [ "$IS_X64" == "1" ]; then
-    install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-    export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-    install "bob use stable" "nvim"
-  fi
-}
-
 prompt_deps() {
   # agkozak-zsh-prompt
   if [ ! -d "$HOME/.zsh" ]; then
@@ -121,7 +104,6 @@ main() {
   js_deps
   go_deps
   rust_deps
-  neovim_deps
   prompt_deps
   git_configs
   alacritty_configs

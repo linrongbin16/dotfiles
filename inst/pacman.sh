@@ -2,6 +2,23 @@
 
 # set -x
 
+ARCH="$(uname -m)"
+
+IS_ARM64=0
+if [[ "$architecture" == "arm64" || "$architecture" == "aarch64" ]]; then
+  IS_ARM64=1
+fi
+
+install_neovim() {
+  if [ "$IS_ARM64" == "1" ]; then
+    yes | sudo pacman -S nvim
+  else
+    install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+    export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+    bob use stable
+  fi
+}
+
 info "install deps with pacman"
 
 sudo pacman -Syy
