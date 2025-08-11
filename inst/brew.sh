@@ -37,3 +37,6 @@ install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 
 install "brew install pipx" "pipx"
 pipx ensurepath
+
+install "brew install zsh" "zsh"
+sudo chsh -s $(which zsh) $USER
