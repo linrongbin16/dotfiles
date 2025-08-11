@@ -2,13 +2,13 @@
 
 # set -x
 
+OS="$(uname -s)"
+
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
 
 core_deps() {
-  OS="$(uname -s)"
-
   case "$OS" in
   Linux)
     if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
@@ -37,15 +37,32 @@ git_configs() {
 }
 
 js_deps() {
-  install "install_deno" "deno"
-  install "install_bun" "bun"
+  install "curl -fsSL https://deno.land/install.sh | sh -s -- -y" "deno"
+  install "curl -fsSL https://bun.com/install | bash" "bun"
+}
+
+install_go() {
+  git clone --depth=1 https://github.com/kerolloz/go-installer
+  export GOROOT="$HOME/.go" # where go is installed
+  export GOPATH="$HOME/go"  # user workspace
+  bash ./go-installer/go.sh
+  export PATH="$PATH:$GOROOT/bin"
+  export PATH="$PATH:$GOPATH/bin"
+}
+
+install_fzf() {
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  ~/.fzf/install --bin
+  sudo cp ~/.fzf/bin/fzf /usr/local/bin/fzf
+  fzf --version
 }
 
 go_deps() {
-  install "install_lazygit" "lazygit"
+  install "install_go" "go"
   install "install_fzf" "fzf"
-  install "install_moar" "moar"
-  install "install_gtrash" "gtrash"
+  install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
+  install "go install github.com/walles/moar@latest" "moar"
+  install "go install github.com/umlx5h/gtrash@latest" "gtrash"
 }
 
 # rust
@@ -80,10 +97,10 @@ prompt_deps() {
   fi
 
   # atuin
-  install "install_atuin" "atuin"
+  install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh" "atuin"
 
   # mise
-  install "install_mise" "mise"
+  install "curl https://mise.run | sh" "mise"
 }
 
 alacritty_configs() {
@@ -102,7 +119,7 @@ profile_configs() {
   echo '' >>~/.zshrc
   echo '# dotfiles ' >>~/.zshrc
   echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
-  echo '[dotfiles] Done'
+  info "done"
 }
 
 main() {

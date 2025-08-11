@@ -2,7 +2,21 @@
 
 # set -x
 
+ARCH="$(uname -m)"
+
+IS_ARM64=0
+if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
+  IS_ARM64=1
+fi
+
+install_neovim() {
+  if [ "$IS_ARM64" == "1" ]; then
+    sudo dnf install -y neovim
+  fi
+}
+
 info "install deps with dnf"
+info "arch: $ARCH, arm64: $IS_ARM64"
 
 sudo dnf check-update
 
@@ -30,10 +44,10 @@ install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils"
 
 install "sudo dnf install -y nodejs npm" "node"
 
-install "install_golang" "go"
-
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
+
+install "install_neovim" "nvim"
 
 install "sudo dnf install -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER

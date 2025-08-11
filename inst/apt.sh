@@ -2,6 +2,13 @@
 
 # set -x
 
+ARCH="$(uname -m)"
+
+IS_ARM64=0
+if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
+  IS_ARM64=1
+fi
+
 install_nodejs() {
   # https://github.com/nodesource/distributions
   sudo apt-get install -y curl
@@ -17,7 +24,14 @@ install_git() {
   sudo apt-get install -q -y git
 }
 
+install_neovim() {
+  if [ "$IS_ARM64" == "1" ]; then
+    sudo snap install nvim --classic
+  fi
+}
+
 info "install deps with apt"
+info "arch: $ARCH, arm64: $IS_ARM64"
 
 sudo apt-get -q -y update
 
@@ -47,10 +61,10 @@ install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip
 install "install_nodejs" "node"
 install "install_nodejs" "npm"
 
-install "install_go" "go"
-
 install "sudo apt-get install pipx" "pipx"
 pipx ensurepath
+
+install "install_neovim" "nvim"
 
 install "sudo apt-get install -q -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER

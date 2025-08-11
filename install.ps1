@@ -1,5 +1,19 @@
 # Set-PSDebug -Trace 1
 
+$architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+$arch = switch ($architecture)
+{
+  "Arm"
+  { "arm"
+  }
+  "Arm64"
+  { "arm"
+  }
+  Default
+  { "unknown"
+  }
+}
+
 # utils {
 
 function Info([string]$content)
@@ -31,6 +45,10 @@ function CoreDeps()
   Info "install core deps for windows"
 
   # deps
+  Install -command "scoop install 7zip" -target "7z"
+  Install -command "scoop install gzip" -target "gzip"
+  Install -command "scoop install unzip" -target "unzip"
+
   scoop bucket add extras
   scoop install mingw
   # scoop install uutils-coreutils
@@ -48,10 +66,6 @@ function CoreDeps()
   Install -command "scoop install curl" -target "curl"
   Install -command "scoop install wget" -target "wget"
 
-  Install -command "scoop install 7zip" -target "7z"
-  Install -command "scoop install gzip" -target "gzip"
-  Install -command "scoop install unzip" -target "unzip"
-
   Install -command "scoop install extras/alacritty" -target "alacritty"
 
   Install -command "scoop install pipx" -target "pipx"
@@ -62,7 +76,17 @@ function PythonDeps()
 {
   Info "install python deps for windows"
   $PythonVersion = "3.13.6"
-  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile "python-amd64.exe"
+  $PythonArch = "amd64"
+
+  if ($arch -eq "arm")
+  {
+    $PythonArch = "arm64"
+  }
+
+  $PythonDownloadUrl = "https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch
+  Info "PythonDownloadUrl: $PythonDownloadUrl"
+
+  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch) -OutFile "python-installer.exe"
   Get-ChildItem
 
   $LocalFolder = "$env:USERPROFILE\.local\bin"
@@ -71,9 +95,9 @@ function PythonDeps()
     New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
+  .\python-installer.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
-  Info "list $LocalFolder"
+  Info "LocalFolder: $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
@@ -130,9 +154,15 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
-  Install -command "bob use stable" -target "nvim"
-  $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+  if ($arch -eq "arm")
+  {
+    Install "scoop install nvim" "nvim"
+  } else
+  {
+    Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
+    Install -command "bob use stable" -target "nvim"
+    $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+  }
 }
 
 function PromptDeps()

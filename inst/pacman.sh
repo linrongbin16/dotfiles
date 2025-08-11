@@ -2,7 +2,21 @@
 
 # set -x
 
+ARCH="$(uname -m)"
+
+IS_ARM64=0
+if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
+  IS_ARM64=1
+fi
+
+install_neovim() {
+  if [ "$IS_ARM64" == "1" ]; then
+    yes | sudo pacman -S neovim
+  fi
+}
+
 info "install deps with pacman"
+info "arch: $ARCH, arm64: $IS_ARM64"
 
 sudo pacman -Syy
 
@@ -31,10 +45,10 @@ install "yes | sudo pacman -S python python-pip" "python3"
 
 install "yes | sudo pacman -S nodejs npm" "node"
 
-install "yes | sudo pacman -S go" "go"
-
 install "yes | sudo pacman -S python-pipx" "pipx"
 pipx ensurepath
+
+install "install_neovim" "nvim"
 
 install "yes | sudo pacman -S zsh" "zsh"
 sudo chsh -s $(which zsh) $USER
