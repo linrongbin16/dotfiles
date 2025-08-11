@@ -106,13 +106,6 @@ profile_configs() {
 
 main() {
   core_deps
-
-  # start zsh
-  zsh
-  touch $HOME/.zshenv
-  touch $HOME/.zprofile
-  touch $HOME/.zshrc
-
   js_deps
   go_deps
   rust_deps
@@ -121,11 +114,6 @@ main() {
   git_configs
   alacritty_configs
   profile_configs
-
-  # exit zsh
-  exit
-
-  echo '[dotfiles] Done'
 }
 
 main
