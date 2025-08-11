@@ -107,7 +107,7 @@ profile_configs() {
 main() {
   core_deps
 
-  # start using zsh
+  # start zsh
   zsh
   touch $HOME/.zshenv
   touch $HOME/.zprofile
@@ -122,7 +122,9 @@ main() {
   alacritty_configs
   profile_configs
 
+  # exit zsh
   exit
+
   echo '[dotfiles] Done'
 }
 
