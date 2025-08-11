@@ -4,7 +4,7 @@
 
 install_zsh() {
   brew install zsh
-  sudo chsh -s $(/opt/home/bin/zsh) $USER
+  sudo chsh -s $(/opt/homebrew/bin/zsh) $USER
 }
 
 info "install deps with brew"
