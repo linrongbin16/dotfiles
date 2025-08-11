@@ -1,5 +1,9 @@
 # Set-PSDebug -Trace 1
 
+$processor_architecture = $Env:PROCESSOR_ARCHITECTURE
+$isX64 = $processor_architecture -eq "AMD64"
+$isArm64 = $processor_architecture -eq "ARM64"
+
 # utils {
 
 function Info([string]$content)
