@@ -11,7 +11,7 @@ fi
 
 install_neovim() {
   if [ "$IS_ARM64" == "1" ]; then
-    sudo dnf install -y nvim
+    sudo dnf install -y neovim
   fi
 }
 
