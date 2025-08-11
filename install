@@ -102,6 +102,7 @@ profile_configs() {
   echo '' >>~/.zshrc
   echo '# dotfiles ' >>~/.zshrc
   echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+  info "done"
 }
 
 main() {
