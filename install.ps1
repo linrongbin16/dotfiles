@@ -59,7 +59,7 @@ function CoreDeps()
 
 function PythonDeps()
 {
-  Info "install javascript deps for windows"
+  Info "install python deps for windows"
   $PythonVersion = "3.13.6"
   Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile "python-amd64.exe"
   Get-ChildItem
@@ -71,6 +71,8 @@ function PythonDeps()
   }
 
   .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0
+
+  Info "list $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
