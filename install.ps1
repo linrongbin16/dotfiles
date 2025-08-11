@@ -1,4 +1,4 @@
-Set-PSDebug -Trace 1
+# Set-PSDebug -Trace 1
 
 # utils {
 
@@ -35,7 +35,7 @@ function CoreDeps()
   scoop install mingw
   # scoop install uutils-coreutils
   scoop install coreutils
-  scoop install vcredist2022
+  # scoop install vcredist2022
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
   Install -command "scoop install sed" -target "sed"
@@ -71,7 +71,7 @@ function PythonDeps()
     New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-amd64.exe /quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0
+  .\python-amd64.exe /quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
   Info "list $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
@@ -103,7 +103,8 @@ function GitConfigs()
   git config --global init.defaultBranch main
 }
 
-function GoDeps() {
+function GoDeps()
+{
   Info "install go deps for windows"
 
   Install -command "scoop install go" -target "go"
@@ -134,7 +135,8 @@ function NeovimDeps()
   $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 }
 
-function PromptDeps() {
+function PromptDeps()
+{
   Install -command "scoop install starship" -target "starship"
   Install -command "scoop install mise" -target "mise"
 }
