@@ -69,7 +69,7 @@ function PythonDeps()
     New-Item -ItemType Directory $PythonFolder
   }
 
-  python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0
+  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
   Copy-Item "$PythonFolder\python3\python.exe" -Destination "$PythonFolder\python3\python3.exe"
