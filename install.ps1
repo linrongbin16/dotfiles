@@ -68,11 +68,12 @@ function PythonDeps()
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
-  if ($isArm64) {
+  if ($isArm64)
+  {
     $PythonArch = "arm64"
   }
 
-  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion $PythonArch) -OutFile "python-installer.exe"
+  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch) -OutFile "python-installer.exe"
   Get-ChildItem
 
   $LocalFolder = "$env:USERPROFILE\.local\bin"
@@ -140,9 +141,11 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  if ($isArm64) {
+  if ($isArm64)
+  {
     Install "scoop install nvim" "nvim"
-  } else {
+  } else
+  {
     Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
     Install -command "bob use stable" -target "nvim"
     $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
