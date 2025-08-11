@@ -44,6 +44,9 @@ if [ -d "$HOME/.local/share/bob/nvim-bin" ]; then
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 fi
 
+# pipx
+export PATH="$PATH:$HOME/.local/bin"
+
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
 
