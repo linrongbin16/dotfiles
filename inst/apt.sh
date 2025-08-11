@@ -35,6 +35,7 @@ install_neovim() {
 }
 
 info "install deps with apt"
+info "arch: $ARCH, arm64: $IS_ARM64"
 
 sudo apt-get -q -y update
 

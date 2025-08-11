@@ -20,6 +20,7 @@ install_neovim() {
 }
 
 info "install deps with pacman"
+info "arch: $ARCH, arm64: $IS_ARM64"
 
 sudo pacman -Syy
 
