@@ -50,5 +50,7 @@ install "yes | sudo pacman -S go" "go"
 install "yes | sudo pacman -S python-pipx" "pipx"
 pipx ensurepath
 
+install "install_neovim" "nvim"
+
 install "yes | sudo pacman -S zsh" "zsh"
 sudo chsh -s $(which zsh) $USER
