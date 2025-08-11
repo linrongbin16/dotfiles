@@ -71,7 +71,7 @@ function PythonDeps()
     New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-amd64.exe /quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
+  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
   Info "list $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
