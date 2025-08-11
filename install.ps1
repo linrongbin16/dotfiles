@@ -140,9 +140,13 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
-  Install -command "bob use stable" -target "nvim"
-  $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+  if ($isArm64) {
+    Install "scoop install nvim" "nvim"
+  } else {
+    Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
+    Install -command "bob use stable" -target "nvim"
+    $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+  }
 }
 
 function PromptDeps()
