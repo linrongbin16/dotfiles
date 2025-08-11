@@ -66,7 +66,13 @@ function PythonDeps()
 {
   Info "install python deps for windows"
   $PythonVersion = "3.13.6"
-  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile "python-amd64.exe"
+  $PythonArch = "amd64"
+
+  if ($isArm64) {
+    $PythonArch = "arm64"
+  }
+
+  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion $PythonArch) -OutFile "python-installer.exe"
   Get-ChildItem
 
   $LocalFolder = "$env:USERPROFILE\.local\bin"
@@ -75,7 +81,7 @@ function PythonDeps()
     New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
+  .\python-installer.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
   Info "list $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
