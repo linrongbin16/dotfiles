@@ -61,6 +61,7 @@ function PythonDeps()
   Info "install javascript deps for windows"
   $PythonVersion = "3.13.6"
   Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile "python-amd64.exe"
+  Get-ChildItem
 
   $PythonFolder = "$env:USERPROFILE\.local\bin"
   if (-not (Test-Path -Path $PythonFolder))
@@ -68,7 +69,7 @@ function PythonDeps()
     New-Item -ItemType Directory $PythonFolder
   }
 
-  python-amd64.exe InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0
+  python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
   Copy-Item "$PythonFolder\python3\python.exe" -Destination "$PythonFolder\python3\python3.exe"
