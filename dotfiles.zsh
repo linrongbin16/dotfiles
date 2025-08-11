@@ -40,15 +40,19 @@ if [ -d "$HOME/.bun/bin/bun" ]; then
 fi
 
 # neovim
-export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+if [ -d "$HOME/.local/share/bob/nvim-bin" ]; then
+  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+fi
 
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
 
 # atuin
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  . "$HOME/.atuin/bin/env"
   eval "$(atuin init zsh)"
 else
+  . "$HOME/.atuin/bin/env"
   eval "$(atuin init --disable-ctrl-r --disable-up-arrow zsh)"
 fi
 

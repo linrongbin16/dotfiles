@@ -5,7 +5,7 @@
 ARCH="$(uname -m)"
 
 IS_ARM64=0
-if [[ "$architecture" == "arm64" || "$architecture" == "aarch64" ]]; then
+if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
   IS_ARM64=1
 fi
 
@@ -16,6 +16,7 @@ install_neovim() {
 }
 
 info "install deps with pacman"
+info "arch: $ARCH, arm64: $IS_ARM64"
 
 sudo pacman -Syy
 

@@ -1,8 +1,18 @@
 # Set-PSDebug -Trace 1
 
-$processor_architecture = $Env:PROCESSOR_ARCHITECTURE
-$isX64 = $processor_architecture -eq "AMD64"
-$isArm64 = $processor_architecture -eq "ARM64"
+$architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+$arch = switch ($architecture)
+{
+  "Arm"
+  { "arm"
+  }
+  "Arm64"
+  { "arm"
+  }
+  Default
+  { "unknown"
+  }
+}
 
 # utils {
 
@@ -68,11 +78,15 @@ function PythonDeps()
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
-  if ($isArm64) {
+  if ($arch -eq "arm")
+  {
     $PythonArch = "arm64"
   }
 
-  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion $PythonArch) -OutFile "python-installer.exe"
+  $PythonDownloadUrl = "https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch
+  Info "PythonDownloadUrl: $PythonDownloadUrl"
+
+  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch) -OutFile "python-installer.exe"
   Get-ChildItem
 
   $LocalFolder = "$env:USERPROFILE\.local\bin"
@@ -83,7 +97,7 @@ function PythonDeps()
 
   .\python-installer.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
-  Info "list $LocalFolder"
+  Info "LocalFolder: $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
@@ -140,9 +154,11 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  if ($isArm64) {
+  if ($arch -eq "arm")
+  {
     Install "scoop install nvim" "nvim"
-  } else {
+  } else
+  {
     Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
     Install -command "bob use stable" -target "nvim"
     $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
