@@ -109,6 +109,8 @@ main() {
 
   # start using zsh
   zsh
+  touch $HOME/.zshenv
+  touch $HOME/.zprofile
   touch $HOME/.zshrc
 
   js_deps
