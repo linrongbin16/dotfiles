@@ -1,8 +1,6 @@
 # Set-PSDebug -Trace 1
 
-$processor_architecture = $Env:PROCESSOR_ARCHITECTURE
-$isX64 = $processor_architecture -eq "AMD64"
-$isArm64 = $processor_architecture -eq "ARM64"
+$isArm64 = $Env:PROCESSOR_ARCHITECTURE -eq "ARM64"
 
 # utils {
 
@@ -73,6 +71,9 @@ function PythonDeps()
     $PythonArch = "arm64"
   }
 
+  $PythonDownloadUrl = "https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch
+  Info "PythonDownloadUrl: $PythonDownloadUrl"
+
   Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch) -OutFile "python-installer.exe"
   Get-ChildItem
 
@@ -84,7 +85,7 @@ function PythonDeps()
 
   .\python-installer.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
-  Info "list $LocalFolder"
+  Info "LocalFolder: $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
