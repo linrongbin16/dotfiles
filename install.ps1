@@ -64,16 +64,17 @@ function PythonDeps()
   Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-amd64.exe" -f $PythonVersion) -OutFile "python-amd64.exe"
   Get-ChildItem
 
-  $PythonFolder = "$env:USERPROFILE\.local\bin"
-  if (-not (Test-Path -Path $PythonFolder))
+  $LocalFolder = "$env:USERPROFILE\.local\bin"
+  if (-not (Test-Path -Path $LocalFolder))
   {
-    New-Item -ItemType Directory $PythonFolder
+    New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$PythonFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0
+  .\python-amd64.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0
+  Get-ChildItem -Path "$LocalFolder"
 
   # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
-  Copy-Item "$PythonFolder\python3\python.exe" -Destination "$PythonFolder\python3\python3.exe"
+  Copy-Item "$LocalFolder\python3\python.exe" -Destination "$LocalFolder\python3\python3.exe"
 }
 
 function JsDeps()
