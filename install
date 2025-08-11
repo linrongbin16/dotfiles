@@ -5,6 +5,14 @@
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 
+IS_X64=0
+IS_ARM64=0
+if [[ "$architecture" == "x86_64" ]]; then
+  IS_X64=1
+elif [[ "$architecture" == "arm64" || "$architecture" == "aarch64" ]]; then
+  IS_ARM64=1
+fi
+
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
@@ -66,9 +74,11 @@ rust_deps() {
 }
 
 neovim_deps() {
-  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-  install "bob use stable" "nvim"
+  if [ "$IS_X64" == "1" ]; then
+    install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+    export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+    install "bob use stable" "nvim"
+  fi
 }
 
 prompt_deps() {

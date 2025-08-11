@@ -2,6 +2,13 @@
 
 # set -x
 
+ARCH="$(uname -m)"
+
+IS_ARM64=0
+if [[ "$architecture" == "arm64" || "$architecture" == "aarch64" ]]; then
+  IS_ARM64=1
+fi
+
 install_nodejs() {
   # https://github.com/nodesource/distributions
   sudo apt-get install -y curl
@@ -15,6 +22,16 @@ install_git() {
   sudo apt-add-repository ppa:git-core/ppa
   sudo apt-get -q -q -y update
   sudo apt-get install -q -y git
+}
+
+install_neovim() {
+  if [ "$IS_ARM64" == "1" ]; then
+    sudo snap install nvim --classic
+  else
+    install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
+    export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
+    bob use stable
+  fi
 }
 
 info "install deps with apt"
@@ -51,6 +68,8 @@ install "install_go" "go"
 
 install "sudo apt-get install pipx" "pipx"
 pipx ensurepath
+
+install "install_neovim" "nvim"
 
 install "sudo apt-get install -q -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER
