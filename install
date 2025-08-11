@@ -64,10 +64,14 @@ rust_deps() {
   install "cargo install --locked cpz" "cpz"
 }
 
-neovim_deps() {
+neovim_deps_impl() {
   install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-  install "bob use stable" "nvim"
+  bob use stable
+}
+
+neovim_deps() {
+  install "neovim_deps_impl" "nvim"
 }
 
 prompt_deps() {
