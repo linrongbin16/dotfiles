@@ -44,7 +44,7 @@ install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils"
 
 install "sudo dnf install -y nodejs npm" "node"
 
-install "install_golang" "go"
+install "install_go" "go"
 
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
