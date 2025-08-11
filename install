@@ -2,13 +2,14 @@
 
 # set -x
 
+OS="$(uname -s)"
+ARCH="$(uname -m)"
+
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
 
 core_deps() {
-  OS="$(uname -s)"
-
   case "$OS" in
   Linux)
     if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
