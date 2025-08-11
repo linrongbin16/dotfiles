@@ -2,6 +2,11 @@
 
 # set -x
 
+install_zsh() {
+  brew install zsh
+  sudo chsh -s $(/opt/home/bin/zsh) $USER
+}
+
 info "install deps with brew"
 
 install "xcode-select --install" "clang"
@@ -38,5 +43,5 @@ install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 install "brew install pipx" "pipx"
 pipx ensurepath
 
-install "brew install zsh" "zsh"
-sudo chsh -s $(which zsh) $USER
+# install arm-64 zsh for mac
+install "install_zsh" "/opt/homebrew/bin/zsh"
