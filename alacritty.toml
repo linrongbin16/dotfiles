@@ -3,6 +3,7 @@ import = ["themes/themes/sonokai.toml"]
 
 [window]
 startup_mode = "Maximized"
+dynamic_title = true
 
 [scrolling]
 history = 100000
@@ -25,6 +26,7 @@ bold_italic = { family = "MonoLisa Nerd Font", style = "Bold Italic" }
 italic = { family = "MonoLisa Nerd Font", style = "Italic" }
 
 [mouse]
+hide_when_typing = true
 bindings = []
 
 [keyboard]
