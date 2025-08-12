@@ -64,10 +64,12 @@ fi
 eval "$(~/.local/bin/mise activate zsh)"
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  if [ ! -n "$GHOSTTY_RESOURCES_DIR" ]; then
+    AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
+  fi
   # agkozak prompt
   AGKOZAK_PROMPT_DIRTRIM=0
   AGKOZAK_LEFT_PROMPT_ONLY=1
-  # AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
   AGKOZAK_PROMPT_CHAR=( '%F{magenta}❯%f' %# : )
   source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 fi
