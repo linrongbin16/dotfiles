@@ -72,6 +72,6 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   # agkozak prompt
   AGKOZAK_PROMPT_DIRTRIM=0
   AGKOZAK_LEFT_PROMPT_ONLY=1
-  AGKOZAK_PROMPT_CHAR=( '%F{magenta}❯%f' %# : )
+  AGKOZAK_PROMPT_CHAR=( '%F{magenta}❯%f' $ : )
   source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 fi
