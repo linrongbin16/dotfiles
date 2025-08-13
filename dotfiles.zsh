@@ -103,7 +103,7 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   fi
 
   PROMPT=$'%F{blue}%~%f %b$(gitprompt)%f
-%(12V.%F{242}%12v%f .)%(?.%F{magenta}.%F{red})❯%f '
+%(12V.%F{242}%12v%f .)%(?.%F{green}.%F{red})❯%f '
 
   RPROMPT=''
 fi
