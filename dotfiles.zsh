@@ -64,6 +64,8 @@ fi
 eval "$(~/.local/bin/mise activate zsh)"
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  source ~/.zsh/git-prompt.zsh/git-prompt.zsh
+
   ZSH_THEME_GIT_PROMPT_PREFIX="["
   ZSH_THEME_GIT_PROMPT_SUFFIX="] "
   ZSH_THEME_GIT_PROMPT_SEPARATOR="|"
@@ -97,7 +99,6 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
     ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✔"
   fi
 
-  source ~/.zsh/git-prompt.zsh/git-prompt.zsh
   PROMPT=$'%F{blue}%~%f %F{242}$(gitprompt)%f
 %(12V.%F{242}%12v%f .)%(?.%F{magenta}.%F{red})❯%f '
 
