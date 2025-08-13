@@ -64,14 +64,42 @@ fi
 eval "$(~/.local/bin/mise activate zsh)"
 
 if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
+  ZSH_THEME_GIT_PROMPT_PREFIX="["
+  ZSH_THEME_GIT_PROMPT_SUFFIX="] "
+  ZSH_THEME_GIT_PROMPT_SEPARATOR="|"
+  ZSH_THEME_GIT_PROMPT_DETACHED="%{$fg_bold[cyan]%}:"
+  ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg_bold[magenta]%}"
+  ZSH_THEME_GIT_PROMPT_UPSTREAM_PREFIX="%{$fg[red]%}(%{$fg[yellow]%}"
+  ZSH_THEME_GIT_PROMPT_UPSTREAM_SUFFIX="%{$fg[red]%})"
+
+  # ghostty doesn't support nerd fonts or unicode
   if [ -n "$GHOSTTY_RESOURCES_DIR" ]; then
-    # nothing
+    # ascii text
+    ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}^"
+    ZSH_THEME_GIT_PROMPT_BEHIND="%{$fg[red]%}v"
+    ZSH_THEME_GIT_PROMPT_AHEAD="%{$fg[green]%}^"
+    ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[red]%}x"
+    ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}o"
+    ZSH_THEME_GIT_PROMPT_UNSTAGED="%{$fg[red]%}+"
+    ZSH_THEME_GIT_PROMPT_UNTRACKED=".."
+    ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}$"
+    ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}>"
   else
-    AGKOZAK_CUSTOM_SYMBOLS=( '⇣⇡' '⇣' '⇡' '+' 'x' '!' '>' '?' 'S')
+    # nerd fonts and unicode
+    ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}⟳ "
+    ZSH_THEME_GIT_PROMPT_BEHIND="↓"
+    ZSH_THEME_GIT_PROMPT_AHEAD="↑"
+    ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[red]%}✖"
+    ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}●"
+    ZSH_THEME_GIT_PROMPT_UNSTAGED="%{$fg[red]%}✚"
+    ZSH_THEME_GIT_PROMPT_UNTRACKED="…"
+    ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}⚑"
+    ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✔"
   fi
-  # agkozak prompt
-  AGKOZAK_PROMPT_DIRTRIM=0
-  AGKOZAK_LEFT_PROMPT_ONLY=1
-  AGKOZAK_PROMPT_CHAR=( '%F{magenta}❯%f' $ : )
-  source ~/.zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
+
+  source ~/.zsh/git-prompt.zsh/git-prompt.zsh
+  PROMPT=$'%F{blue}%~%f %F{242}$(gitprompt)%f
+  %(12V.%F{242}%12v%f .)%(?.%F{magenta}.%F{red})❯%f '
+
+  RPROMPT=''
 fi
