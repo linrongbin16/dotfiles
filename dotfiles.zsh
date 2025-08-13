@@ -99,7 +99,7 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
     ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✔"
   fi
 
-  PROMPT=$'%F{blue}%~%f %F{242}$(gitprompt)%f
+  PROMPT=$'%F{blue}%~%f %b$(gitprompt)%f
 %(12V.%F{242}%12v%f .)%(?.%F{magenta}.%F{red})❯%f '
 
   RPROMPT=''
