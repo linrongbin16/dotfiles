@@ -88,7 +88,7 @@ neovim_deps() {
 }
 
 prompt_deps() {
-  # agkozak-zsh-prompt
+  # git-prompt
   if [ ! -d "$HOME/.zsh" ]; then
     mkdir -p "$HOME/.zsh"
   fi
