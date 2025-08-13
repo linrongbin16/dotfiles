@@ -99,7 +99,7 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
 
   source ~/.zsh/git-prompt.zsh/git-prompt.zsh
   PROMPT=$'%F{blue}%~%f %F{242}$(gitprompt)%f
-  %(12V.%F{242}%12v%f .)%(?.%F{magenta}.%F{red})❯%f '
+%(12V.%F{242}%12v%f .)%(?.%F{magenta}.%F{red})❯%f '
 
   RPROMPT=''
 fi
