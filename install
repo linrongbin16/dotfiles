@@ -119,7 +119,7 @@ alacritty_configs() {
   if [ "$IS_MAC" == "1" ]; then
     ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
   else
-    ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
+    ln -s $HOME/.dotfiles/alacritty_unix $HOME/.config/alacritty
   fi
 
   if [ ! -d "$HOME/.config/alacritty/alacritty-theme" ]; then
@@ -131,10 +131,14 @@ kitty_configs() {
   if [ -d "$HOME/.config/kitty" ]; then
     rm -rf $HOME/.config/kitty
   fi
-  ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/alacritty
+  if [ "$IS_MAC" == "1" ]; then
+    ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/alacritty
+  else
+    ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/alacritty
+  fi
 
-  if [ ! -f ~/.config/kitty/kitty.conf ]; then
-    cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
+  if [ ! -d "$HOME/.config/kitty/kitty-themes" ]; then
+    git clone --depth=1 https://github.com/kovidgoyal/kitty-themes $HOME/.config/kitty/kitty-themes
   fi
 }
 
