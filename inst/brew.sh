@@ -37,8 +37,6 @@ install "brew install oven-sh/bun/bun" "bun"
 install "brew install go" "go"
 install "brew install jesseduffield/lazygit/lazygit" "lazygit"
 install "brew install fzf" "fzf"
-install "brew install moar" "moar"
-install "brew install noborus/tap/ov" "ov"
 install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 
 install "brew install pipx" "pipx"
