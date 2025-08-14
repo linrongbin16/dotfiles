@@ -13,7 +13,7 @@ history = 100000
 # shell = "pwsh"
 
 [font]
-size = 12.0
+size = 13.0
 
 # normal = { family = "Monaco Nerd Font Mono", style = "Regular" }
 # bold = { family = "Monaco Nerd Font Mono", style = "Bold" }
