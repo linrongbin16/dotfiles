@@ -1,5 +1,5 @@
 [general]
-import = ["themes/themes/sonokai.toml"]
+import = ["alacritty-theme/themes/sonokai.toml"]
 
 [window]
 startup_mode = "Maximized"

@@ -4,6 +4,13 @@
 
 OS="$(uname -s)"
 
+IS_MAC=0
+case "$OS" in
+Darwin)
+  IS_MAC=1
+  ;;
+esac
+
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
@@ -105,21 +112,27 @@ prompt_deps() {
 }
 
 alacritty_configs() {
-  if [ ! -d "$HOME/.config/alacritty" ]; then
-    mkdir -p $HOME/.config/alacritty
+  if [ -d "$HOME/.config/alacritty" ]; then
+    rm -rf $HOME/.config/alacritty
   fi
-  if [ ! -f ~/.config/alacritty/alacritty.toml ]; then
-    cp $HOME/.dotfiles/alacritty.toml $HOME/.config/alacritty/alacritty.toml
+
+  if [ "$IS_MAC" == "1" ]; then
+    ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
+  else
+    ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
   fi
-  if [ ! -d "$HOME/.config/alacritty/themes" ]; then
-    git clone --depth=1 https://github.com/alacritty/alacritty-theme ~/.config/alacritty/themes
+
+  if [ ! -d "$HOME/.config/alacritty/alacritty-theme" ]; then
+    git clone --depth=1 https://github.com/alacritty/alacritty-theme $HOME/.config/alacritty/alacritty-theme
   fi
 }
 
 kitty_configs() {
-  if [ ! -d "$HOME/.config/kitty" ]; then
-    mkdir -p $HOME/.config/kitty
+  if [ -d "$HOME/.config/kitty" ]; then
+    rm -rf $HOME/.config/kitty
   fi
+  ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/alacritty
+
   if [ ! -f ~/.config/kitty/kitty.conf ]; then
     cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
   fi
