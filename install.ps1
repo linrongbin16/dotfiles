@@ -175,17 +175,17 @@ function AlacrittyConfigs()
 {
   Info "install alacritty configs for windows"
 
-  # alacritty_win.toml
+  # alacritty.toml
   $AlacrittyFolder = "$env:APPDATA\alacritty"
   if (-not (Test-Path -Path $AlacrittyFolder))
   {
     New-Item -ItemType Directory $AlacrittyFolder
   }
-  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty_win.toml"
-  Copy-Item ".\alacritty_win.toml" -Destination $AlacrittyConfig
+  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
+  Copy-Item ".\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
 
   # alacritty/themes
-  $AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
+  $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
   if (-not (Test-Path -Path $AlacrittyThemesFolder))
   {
     git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder

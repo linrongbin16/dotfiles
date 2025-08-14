@@ -1,5 +1,5 @@
 [general]
-import = ["themes/themes/sonokai.toml"]
+import = ["alacritty-theme/themes/everforest_dark.toml"]
 
 [window]
 startup_mode = "Maximized"
@@ -8,8 +8,9 @@ dynamic_title = true
 [scrolling]
 history = 100000
 
-[terminal]
-shell = "pwsh"
+# # Windows
+# [terminal]
+# shell = "pwsh"
 
 [font]
 size = 12.0
@@ -25,17 +26,27 @@ bold_italic = { family = "MonoLisa Nerd Font", style = "Bold Italic" }
 italic = { family = "MonoLisa Nerd Font", style = "Italic" }
 
 [mouse]
-bindings = []
 hide_when_typing = true
+bindings = []
 
 [keyboard]
+
+# Mac
+# bindings = [
+#   { key = "N", mods = "Control", mode = "Search", action = "SearchFocusNext" },
+#   { key = "P", mods = "Control", mode = "Search", action = "SearchFocusPrevious" },
+#   { key = "ArrowDown", mode = "Search", action = "SearchFocusNext" },
+#   { key = "ArrowUp", mode = "Search", action = "SearchFocusPrevious" },
+# ]
+
+# Linux
 bindings = [
   { key = "K", mods = "Control", mode = "~Vi|~Search", action = "ClearHistory" },
   { key = "V", mods = "Shift|Control", mode = "~Vi", action = "Paste" },
   { key = "V", mods = "Shift|Control", mode = "Vi|Search", action = "Paste" },
   { key = "C", mods = "Shift|Control", action = "Copy" },
-  { key = "N", mods = "Shift|Control", action = "SpawnNewInstance" },
-  { key = "Q", mods = "Shift|Control", action = "Quit" },
+  { key = "W", mods = "Shift|Control", action = "CreateNewWindow" },
+  { key = "T", mods = "Shift|Control", action = "CreateNewTab" },
   { key = "F", mods = "Shift|Control", mode = "~Search", action = "SearchForward" },
   { key = "B", mods = "Shift|Control", mode = "~Search", action = "SearchBackward" },
   { key = "Tab", mods = "Control", action = "SelectNextTab" },
