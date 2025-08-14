@@ -132,9 +132,9 @@ kitty_configs() {
     rm -rf $HOME/.config/kitty
   fi
   if [ "$IS_MAC" == "1" ]; then
-    ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/alacritty
+    ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/kitty
   else
-    ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/alacritty
+    ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/kitty
   fi
 
   if [ ! -d "$HOME/.config/kitty/kitty-themes" ]; then
