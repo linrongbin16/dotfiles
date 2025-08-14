@@ -61,6 +61,7 @@ go_deps() {
   install "install_go" "go"
   install "install_fzf" "fzf"
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
+  install "go install github.com/noborus/ov@latest" "ov"
   install "go install github.com/walles/moar@latest" "moar"
   install "go install github.com/umlx5h/gtrash@latest" "gtrash"
 }
