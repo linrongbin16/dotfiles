@@ -185,7 +185,7 @@ function AlacrittyConfigs()
   Copy-Item ".\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
 
   # alacritty/themes
-  $AlacrittyThemesFolder = "$env:APPDATA\alacritty\themes"
+  $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
   if (-not (Test-Path -Path $AlacrittyThemesFolder))
   {
     git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
