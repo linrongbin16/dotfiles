@@ -116,6 +116,15 @@ alacritty_configs() {
   fi
 }
 
+kitty_configs() {
+  if [ ! -d "$HOME/.config/kitty" ]; then
+    mkdir -p $HOME/.config/kitty
+  fi
+  if [ ! -f ~/.config/kitty/kitty.conf ]; then
+    cp $HOME/.dotfiles/kitty.conf $HOME/.config/kitty/kitty.conf
+  fi
+}
+
 profile_configs() {
   echo '' >>~/.zshrc
   echo '# dotfiles ' >>~/.zshrc
@@ -132,6 +141,7 @@ main() {
   prompt_deps
   git_configs
   alacritty_configs
+  kitty_configs
   profile_configs
 }
 
