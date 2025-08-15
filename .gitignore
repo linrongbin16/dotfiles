@@ -6,5 +6,6 @@ nodesource_setup.sh
 python-amd64.exe
 
 alacritty-theme
+alacritty-custom.toml
 kitty-themes
 kitty-custom.conf
