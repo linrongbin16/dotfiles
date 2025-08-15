@@ -137,6 +137,8 @@ kitty_configs() {
     ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/kitty
   fi
 
+  touch "$HOME/.config/kitty/kitty-theme.conf"
+
   if [ ! -d "$HOME/.config/kitty/kitty-themes" ]; then
     git clone --depth=1 https://github.com/kovidgoyal/kitty-themes $HOME/.config/kitty/kitty-themes
   fi
