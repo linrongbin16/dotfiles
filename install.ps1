@@ -190,7 +190,8 @@ function AlacrittyConfigs()
   }
 
   # Create symlink for alacritty config directory
-  New-Item -ItemType SymbolicLink -Path $AlacrittyFolder -Target "$env:USERPROFILE\.dotfiles\alacritty_win"
+  # New-Item -ItemType SymbolicLink -Path $AlacrittyFolder -Target "$env:USERPROFILE\.dotfiles\alacritty_win"
+  cmd /c mklink /d $AlacrittyFolder "$env:USERPROFILE\.dotfiles\alacritty_win"
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
