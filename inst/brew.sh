@@ -20,6 +20,7 @@ install "brew install cmake" "cmake"
 brew install openssl openssh
 
 install "brew install git" "git"
+install "brew install gh" "gh"
 install "brew install curl" "curl"
 install "brew install wget" "wget"
 

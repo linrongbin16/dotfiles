@@ -30,6 +30,7 @@ yes | sudo pacman -S libssl openssl openssh
 yes | sudo pacman -S cmake freetype2 fontconfig pkg-config make libxcb libxkbcommon python
 
 install "yes | sudo pacman -S git" "git"
+install "yes | sudo pacman -S github-cli" "gh"
 install "yes | sudo pacman -S curl" "curl"
 install "yes | sudo pacman -S wget" "wget"
 

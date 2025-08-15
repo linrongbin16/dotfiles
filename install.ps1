@@ -63,6 +63,7 @@ function CoreDeps()
   Install -command "scoop install cmake" -target "cmake"
 
   Install -command "scoop install git" -target "git"
+  Install -command "scoop install gh" -target "gh"
   Install -command "scoop install curl" -target "curl"
   Install -command "scoop install wget" -target "wget"
 

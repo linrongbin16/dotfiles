@@ -9,6 +9,12 @@ if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
   IS_ARM64=1
 fi
 
+install_gh() {
+  sudo dnf install dnf5-plugins
+  sudo dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
+  sudo dnf install gh --repo gh-cli
+}
+
 install_neovim() {
   if [ "$IS_ARM64" == "1" ]; then
     sudo dnf install -y neovim
@@ -30,6 +36,7 @@ sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
 sudo dnf install -y cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++
 
 install "sudo dnf install -y git" "git"
+install "install_gh" "gh"
 install "sudo dnf install -y curl" "curl"
 install "sudo dnf install -y wget" "wget"
 
