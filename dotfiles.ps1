@@ -1,3 +1,6 @@
+# set English
+Set-WinSystemLocale en-US
+
 # fnm/node
 fnm env --shell powershell | Out-String | Invoke-Expression
 
@@ -11,12 +14,21 @@ $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 # lazygit
 Set-Alias -name lg -value lazygit
 
+# mise
+mise activate pwsh | Out-String | Invoke-Expression
+
 # eza
-function MyLs1 { eza -lh $args }
-function MyLs2 { eza -lha $args }
+function MyLs1
+{
+  eza -lh $args
+}
+function MyLs2
+{
+  eza -lha $args
+}
 Set-Alias -name l -value MyLs1
 Set-Alias -name ll -value MyLs2
 
 # prompt
-$env:STARSHIP_CONFIG = "$HOME\.dotfiles\starship.toml"
+$env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
 Invoke-Expression (&starship init powershell)

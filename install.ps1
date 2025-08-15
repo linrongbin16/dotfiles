@@ -76,6 +76,13 @@ function CoreDeps()
 function PythonDeps()
 {
   Info "install python deps for windows"
+
+  if (Get-Command -Name "python" -ErrorAction SilentlyContinue)
+  {
+    SkipInfo "python"
+    return
+  }
+
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
@@ -96,7 +103,7 @@ function PythonDeps()
     New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-installer.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
+  .\python-installer.exe /quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
   Info "LocalFolder: $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
@@ -114,8 +121,6 @@ function JsDeps()
   Install -command "scoop install fnm" -target "fnm"
   fnm env --shell powershell | Out-String | Invoke-Expression
   Install -command "fnm use --install-if-missing 22" -target "node"
- 
-  npm install --silent -g trash-cli
 }
 
 function GitConfigs()
@@ -147,6 +152,7 @@ function RustDeps()
   Install -command "scoop install ripgrep" -target "rg"
   Install -command "scoop install bat" -target "bat"
   Install -command "scoop install eza" -target "eza"
+  Install -command "scoop install trashy" -target "trash"
   Install -command "cargo install --locked rmz" -target "rmz"
   Install -command "cargo install --locked cpz" -target "cpz"
 }
@@ -182,8 +188,9 @@ function AlacrittyConfigs()
   {
     New-Item -ItemType Directory $AlacrittyFolder
   }
+
   $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
-  Copy-Item ".\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
+  Copy-Item "$env:USERPROFILE\.dotfiles\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"

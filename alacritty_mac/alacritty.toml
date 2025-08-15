@@ -65,7 +65,7 @@ bindings = [
 
 [general]
 
-# Create 'alacritty-custom.conf' file, and include themes:
+# Create 'alacritty-custom.toml' file, and include themes:
 #
 # ```
 # [general]
