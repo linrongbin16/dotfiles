@@ -3,7 +3,7 @@ go-installer
 go*tar.gz
 go
 nodesource_setup.sh
-python-amd64.exe
+python-installer.exe
 
 alacritty-theme
 alacritty-custom.toml

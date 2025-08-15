@@ -1,3 +1,6 @@
+# set English
+Set-WinSystemLocale en-US
+
 # fnm/node
 fnm env --shell powershell | Out-String | Invoke-Expression
 
@@ -10,6 +13,9 @@ $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
 # lazygit
 Set-Alias -name lg -value lazygit
+
+# mise
+mise activate pwsh | Out-String | Invoke-Expression
 
 # eza
 function MyLs1

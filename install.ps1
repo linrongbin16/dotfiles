@@ -31,7 +31,8 @@ function Install([string]$command, [string]$target)
   if (Get-Command -Name $target -ErrorAction SilentlyContinue)
   {
     SkipInfo $target
-  } else
+  }
+  else
   {
     Info "install '${target}' with command: '${command}'"
     Invoke-Expression $command
@@ -76,6 +77,13 @@ function CoreDeps()
 function PythonDeps()
 {
   Info "install python deps for windows"
+
+  if (Get-Command -Name "python" -ErrorAction SilentlyContinue)
+  {
+    SkipInfo "python"
+    return
+  }
+
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
@@ -96,7 +104,7 @@ function PythonDeps()
     New-Item -ItemType Directory $LocalFolder
   }
 
-  .\python-installer.exe /quiet InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
+  .\python-installer.exe /quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
 
   Info "LocalFolder: $LocalFolder"
   Get-ChildItem -Path "$LocalFolder"
