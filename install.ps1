@@ -184,14 +184,14 @@ function AlacrittyConfigs()
 
   # alacritty.toml
   $AlacrittyFolder = "$env:APPDATA\alacritty"
-  if (Test-Path -Path $AlacrittyFolder)
+  if (-not (Test-Path -Path $AlacrittyFolder))
   {
-    Remove-Item -Path $AlacrittyFolder -Recurse -Force
+    New-Item -ItemType Directory $AlacrittyFolder
   }
 
-  # Create symlink for alacritty config directory
-  # New-Item -ItemType SymbolicLink -Path $AlacrittyFolder -Target "$env:USERPROFILE\.dotfiles\alacritty_win"
-  cmd /c mklink /d $AlacrittyFolder "$env:USERPROFILE\.dotfiles\alacritty_win"
+  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
+  Copy-Item "$env:USERPROFILE\.dotfiles\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
+  Write-Output '' >> "$env:APPDATA\alacritty\alacritty-custom.toml"
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
