@@ -35,8 +35,6 @@ install "brew install deno" "deno"
 install "brew install oven-sh/bun/bun" "bun"
 
 install "brew install go" "go"
-install "brew install jesseduffield/lazygit/lazygit" "lazygit"
-install "brew install fzf" "fzf"
 install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 
 install "brew install pipx" "pipx"
