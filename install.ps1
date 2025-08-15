@@ -31,8 +31,7 @@ function Install([string]$command, [string]$target)
   if (Get-Command -Name $target -ErrorAction SilentlyContinue)
   {
     SkipInfo $target
-  }
-  else
+  } else
   {
     Info "install '${target}' with command: '${command}'"
     Invoke-Expression $command
@@ -188,10 +187,8 @@ function AlacrittyConfigs()
   $AlacrittyFolder = "$env:APPDATA\alacritty"
   if (-not (Test-Path -Path $AlacrittyFolder))
   {
-    New-Item -ItemType Directory $AlacrittyFolder
+    New-Item -ItemType SymbolicLink -Path $AlacrittyFolder -Target "$env:USERPROFILE\.dotfiles\alacritty_win"
   }
-  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
-  Copy-Item ".\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"

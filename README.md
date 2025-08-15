@@ -36,6 +36,8 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
+#### Install [PowerShell](https://github.com/PowerShell/PowerShell)
+
 #### Install [Git for Windows](https://git-scm.com/download/win)
 
 <details>
