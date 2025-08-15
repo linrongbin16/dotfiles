@@ -191,7 +191,6 @@ function AlacrittyConfigs()
 
   $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
   Copy-Item "$env:USERPROFILE\.dotfiles\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
-  Write-Output '' >> "$env:APPDATA\alacritty\alacritty-custom.toml"
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
