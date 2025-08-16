@@ -104,5 +104,4 @@ jobs:
           echo ${{ steps.extract_branch.outputs.branch }}
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles
           cd $env:USERPROFILE\.dotfiles
-          Set-PSDebug -Trace 1
           pwsh .\install.ps1
