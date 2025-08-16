@@ -34,8 +34,8 @@ export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOPATH/bin"
 
 # deno/bun
-if [ -x "$HOME/.deno/bin/deno" ]; then
-  export PATH="$PATH:$HOME/.deno/bin"
+if [ -f "$HOME/.deno/env" ]; then
+  . "$HOME/.deno/env"
 fi
 if [ -d "$HOME/.bun/bin/bun" ]; then
   export PATH="$PATH:$HOME/.bun/bin"
