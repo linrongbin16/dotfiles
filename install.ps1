@@ -61,6 +61,7 @@ function CoreDeps()
   Install -command "scoop install llvm" -target "clang++"
   Install -command "scoop install make" -target "make"
   Install -command "scoop install cmake" -target "cmake"
+  Install -command "scoop install gsudo" -target "gsudo"
 
   Install -command "scoop install git" -target "git"
   Install -command "scoop install gh" -target "gh"
@@ -184,13 +185,12 @@ function AlacrittyConfigs()
 
   # alacritty.toml
   $AlacrittyFolder = "$env:APPDATA\alacritty"
-  if (-not (Test-Path -Path $AlacrittyFolder))
+  if (Test-Path -Path $AlacrittyFolder)
   {
-    New-Item -ItemType Directory $AlacrittyFolder
+    Remove-Item $AlacrittyFolder -Recurse -Force
   }
 
-  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
-  Copy-Item "$env:USERPROFILE\.dotfiles\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
+  gsudo { New-Item -ItemType SymbolicLink -Path "$env:APPDATA\alacritty" -Target "$env:USERPROFILE\.dotfiles\alacritty_win" }
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
