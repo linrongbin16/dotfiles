@@ -5,38 +5,11 @@ dynamic_title = true
 [scrolling]
 history = 100000
 
-# # Windows
-# [terminal]
-# shell = "pwsh"
-
-[font]
-size = 12.0
-
-# normal = { family = "Monaco Nerd Font Mono", style = "Regular" }
-# bold = { family = "Monaco Nerd Font Mono", style = "Bold" }
-# bold_italic = { family = "Monaco Nerd Font Mono", style = "Bold Italic" }
-# italic = { family = "Monaco Nerd Font Mono", style = "Italic" }
-
-normal = { family = "MonoLisa Nerd Font", style = "Regular" }
-bold = { family = "MonoLisa Nerd Font", style = "Bold" }
-bold_italic = { family = "MonoLisa Nerd Font", style = "Bold Italic" }
-italic = { family = "MonoLisa Nerd Font", style = "Italic" }
-
 [mouse]
 hide_when_typing = true
 bindings = []
 
 [keyboard]
-
-# Mac
-# bindings = [
-#   { key = "N", mods = "Control", mode = "Search", action = "SearchFocusNext" },
-#   { key = "P", mods = "Control", mode = "Search", action = "SearchFocusPrevious" },
-#   { key = "ArrowDown", mode = "Search", action = "SearchFocusNext" },
-#   { key = "ArrowUp", mode = "Search", action = "SearchFocusPrevious" },
-# ]
-
-# Linux
 bindings = [
   { key = "K", mods = "Control", mode = "~Vi|~Search", action = "ClearHistory" },
   { key = "V", mods = "Shift|Control", mode = "~Vi", action = "Paste" },
@@ -69,5 +42,11 @@ bindings = [
 # ```
 # [general]
 # import = ["alacritty-theme/themes/everforest_dark.toml"]
+# [font]
+# size = 12.0
+# normal = { family = "MonoLisa Nerd Font", style = "Regular" }
+# bold = { family = "MonoLisa Nerd Font", style = "Bold" }
+# bold_italic = { family = "MonoLisa Nerd Font", style = "Bold Italic" }
+# italic = { family = "MonoLisa Nerd Font", style = "Italic" }
 # ```
 import = ["alacritty-custom.toml"]
