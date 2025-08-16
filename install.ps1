@@ -185,13 +185,12 @@ function AlacrittyConfigs()
 
   # alacritty.toml
   $AlacrittyFolder = "$env:APPDATA\alacritty"
-  if (-not (Test-Path -Path $AlacrittyFolder))
+  if (Test-Path -Path $AlacrittyFolder)
   {
-    New-Item -ItemType Directory $AlacrittyFolder
+    Remove-Item $AlacrittyFolder -Recurse -Force
   }
 
-  $AlacrittyConfig = "$env:APPDATA\alacritty\alacritty.toml"
-  Copy-Item "$env:USERPROFILE\.dotfiles\alacritty_win\alacritty.toml" -Destination $AlacrittyConfig
+  gsudo { New-Item -ItemType Symbolic -Path $AlacrittyFolder -Target "$env:USERPROFILE\.dotfiles\alacritty_win" }
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
