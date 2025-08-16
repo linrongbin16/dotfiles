@@ -190,7 +190,7 @@ function AlacrittyConfigs()
     Remove-Item $AlacrittyFolder -Recurse -Force
   }
 
-  gsudo { New-Item -ItemType SymbolicLink -Path $AlacrittyFolder -Target "$env:USERPROFILE\.dotfiles\alacritty_win" }
+  gsudo { New-Item -ItemType SymbolicLink -Path "$env:APPDATA\alacritty" -Target "$env:USERPROFILE\.dotfiles\alacritty_win" }
 
   # alacritty/themes
   $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
