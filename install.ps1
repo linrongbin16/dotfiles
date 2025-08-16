@@ -153,9 +153,9 @@ function RustDeps()
   Install -command "scoop install ripgrep" -target "rg"
   Install -command "scoop install bat" -target "bat"
   Install -command "scoop install eza" -target "eza"
-  Install -command "scoop install trashy" -target "trash"
   Install -command "cargo install --locked rmz" -target "rmz"
   Install -command "cargo install --locked cpz" -target "cpz"
+  Install -command "cargo install trashy" -target "trashy"
 }
 
 function NeovimDeps()

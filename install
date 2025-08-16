@@ -87,6 +87,7 @@ rust_deps() {
   install "cargo install --locked zoxide" "zoxide"
   install "cargo install --locked rmz" "rmz"
   install "cargo install --locked cpz" "cpz"
+  install "cargo install trashy" "trashy"
 }
 
 neovim_deps() {
