@@ -100,7 +100,7 @@ prompt_deps() {
   if [ ! -d "$HOME/.zsh" ]; then
     mkdir -p "$HOME/.zsh"
   fi
-  if [ ! -d "$HOME/.zsh/agkozak-zsh-prompt" ]; then
+  if [ ! -d "$HOME/.zsh/git-prompt.zsh" ]; then
     git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-prompt.zsh
   fi
 
