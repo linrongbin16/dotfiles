@@ -65,11 +65,20 @@ After this step, **git.exe** and builtin shell commands(such as **echo.exe**, **
 
 #### Run PowerShell Command
 
+> [!CAUTION]
+> Run below PowerShell commands with the builtin "PowerShell" prompt, not any other third party terminal apps.
+> Since this script will use 'gsudo' as administrator, and it may panic.
+
 ```powershell
+# Remove 'python3' App Alias from Windows
+Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
+Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
+
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
 
+# Run 'install.ps1'
 cd $env:USERPROFILE
 git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
