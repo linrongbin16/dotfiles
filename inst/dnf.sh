@@ -15,7 +15,7 @@ install_neovim() {
 }
 
 info "install deps with dnf"
-info "arch: $ARCH, arm64: $IS_ARM"
+info "arch: $ARCH, arm: $IS_ARM"
 
 sudo dnf check-update
 
