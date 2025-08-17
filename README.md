@@ -44,8 +44,14 @@ winget install Microsoft.PowerShell
 
 #### Install [Git for Windows](https://git-scm.com/downloads/win)
 
+> [!CAUTION]
+> The "Git for Windows" is mandatory, other third party git versions (such as `scoop install git`) may not work with `gh` authorization.
+
+> [!NOTE]
+> This command will install `git` in `~\.local\bin\git` directory, and enable unix command lines such as `bash`, `sh`, `echo` for Cmd/PowerShell, making windows terminal behave more like a unix shell.
+
 ```powershell
-winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --id Git.Git -e --source winget
+winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom /LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini --id Git.Git -e --source winget
 ```
 
 #### Install [7-Zip](https://www.7-zip.org/)
