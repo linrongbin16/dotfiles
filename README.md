@@ -36,23 +36,21 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install [PowerShell](https://github.com/PowerShell/PowerShell)
-
-Install latest PowerShell `pwsh` with:
-
-```powershell
-winget install Microsoft.PowerShell
-```
-
 #### Install [7-Zip](https://www.7-zip.org/)
 
 #### Run PowerShell Command
 
 > [!CAUTION]
-> Run below PowerShell commands with the builtin "PowerShell" prompt, not any other third party terminal apps.
-> Since this script will use 'gsudo' as administrator, and it may panic.
+> Run below commands with builtin "PowerShell 7" terminal, not any other third party terminals.
+> Since they may panic with 'gsudo' administrator privilege.
 
 ```powershell
+# pwsh
+winget install Microsoft.PowerShell
+
+# git
+winget install --id Git.Git -e --source winget
+
 # Remove 'python3' App Alias from Windows
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
@@ -60,9 +58,6 @@ Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
-
-# git
-scoop install git
 
 # Run 'install.ps1'
 cd $env:USERPROFILE
