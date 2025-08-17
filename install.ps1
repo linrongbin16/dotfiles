@@ -51,9 +51,10 @@ function CoreDeps()
 
   scoop bucket add extras
   scoop install mingw
-  # scoop install uutils-coreutils
   scoop install coreutils
-  # scoop install vcredist2022
+  # scoop install uutils-coreutils
+  # scoop install extras/vcredist2022
+
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
   Install -command "scoop install sed" -target "sed"
