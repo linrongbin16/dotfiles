@@ -38,47 +38,45 @@ Install with below components:
 
 #### Install [PowerShell](https://github.com/PowerShell/PowerShell)
 
-#### Install [Git for Windows](https://git-scm.com/download/win)
+```powershell
+winget install Microsoft.PowerShell
+```
 
-<details>
-<summary>Click here to see how to install git with builtin shell commands for windows console.</summary>
+#### Install [Git for Windows](https://git-scm.com/downloads/win)
 
-Install git with the below 3 options:
+> [!CAUTION]
+> The "Git for Windows" is mandatory, other third party git versions (such as `scoop install git`) may not work with `gh` authorization.
 
-- In **Select Components**, select **Associate .sh files to be run with Bash**.
+> [!NOTE]
+> This command installs `git` in `~\.local\bin\git` directory, with specific setup options via `/LOADINF`. It enables unix command lines such as `bash`, `sh`, `echo` in Cmd/PowerShell, making windows terminal behave more like a unix shell.
 
-  <img width="70%" alt="image" src="https://github.com/linrongbin16/fzfx.nvim/assets/6496887/495d894b-49e4-4c58-b74e-507920a11048" />
-
-- In **Adjusting your PATH environment**, select **Use Git and optional Unix tools from the Command Prompt**.
-
-  <img width="70%" alt="image" src="https://github.com/linrongbin16/fzfx.nvim/assets/6496887/b4f477ad-4436-4027-baa6-8320806801e2" />
-
-- In **Configuring the terminal emulator to use with Git Bash**, select **Use Windows's default console window**.
-
-  <img width="70%" alt="image" src="https://github.com/linrongbin16/fzfx.nvim/assets/6496887/f9174330-ca58-4117-a58d-9e84826c13d1" />
-
-After this step, **git.exe** and builtin shell commands(such as **echo.exe**, **ls.exe**, **curl.exe**) will be available in `%PATH%`.
-
-</details>
+```powershell
+winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom /LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini --id Git.Git -e --source winget
+```
 
 #### Install [7-Zip](https://www.7-zip.org/)
+
+#### Disable `python3` Application Execution Alias
+
+```powershell
+Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
+Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
+```
+
+#### Install [Scoop](https://scoop.sh/)
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+```
 
 #### Run PowerShell Command
 
 > [!CAUTION]
-> Run below PowerShell commands with the builtin "PowerShell" prompt, not any other third party terminal apps.
-> Since this script will use 'gsudo' as administrator, and it may panic.
+> Run below commands with builtin "PowerShell 7" terminal, not any other third party terminals.
+> Since they may panic with 'gsudo' administrator privilege.
 
 ```powershell
-# Remove 'python3' App Alias from Windows
-Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
-Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
-
-# scoop
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.sh | iex
-
-# Run 'install.ps1'
 cd $env:USERPROFILE
 git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
