@@ -1,16 +1,16 @@
 # Set-PSDebug -Trace 1
 
 $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-$arch = switch ($architecture)
+$isArm = switch ($architecture)
 {
   "Arm"
-  { "arm"
+  { True
   }
   "Arm64"
-  { "arm"
+  { True
   }
   Default
-  { "unknown"
+  { False
   }
 }
 
@@ -87,7 +87,7 @@ function PythonDeps()
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
-  if ($arch -eq "arm")
+  if ($isArm)
   {
     $PythonArch = "arm64"
   }
@@ -162,7 +162,7 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  if ($arch -eq "arm")
+  if ($isArm)
   {
     Install "scoop install nvim" "nvim"
   } else
