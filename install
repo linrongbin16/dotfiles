@@ -3,6 +3,12 @@
 # set -x
 
 OS="$(uname -s)"
+ARCH="$(uname -m)"
+
+IS_ARM=0
+if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
+  IS_ARM=1
+fi
 
 IS_MAC=0
 case "$OS" in

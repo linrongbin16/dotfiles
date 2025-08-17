@@ -1,16 +1,16 @@
 # Set-PSDebug -Trace 1
 
 $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-$arch = switch ($architecture)
+$isArm = switch ($architecture)
 {
   "Arm"
-  { "arm"
+  { True
   }
   "Arm64"
-  { "arm"
+  { True
   }
   Default
-  { "unknown"
+  { False
   }
 }
 
@@ -51,9 +51,10 @@ function CoreDeps()
 
   scoop bucket add extras
   scoop install mingw
-  # scoop install uutils-coreutils
   scoop install coreutils
-  # scoop install vcredist2022
+  # scoop install uutils-coreutils
+  # scoop install extras/vcredist2022
+
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
   Install -command "scoop install sed" -target "sed"
@@ -87,7 +88,7 @@ function PythonDeps()
   $PythonVersion = "3.13.6"
   $PythonArch = "amd64"
 
-  if ($arch -eq "arm")
+  if ($isArm)
   {
     $PythonArch = "arm64"
   }
@@ -162,7 +163,7 @@ function NeovimDeps()
 {
   Info "install neovim deps for windows"
 
-  if ($arch -eq "arm")
+  if ($isArm)
   {
     Install "scoop install nvim" "nvim"
   } else

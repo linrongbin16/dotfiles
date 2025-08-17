@@ -2,13 +2,6 @@
 
 # set -x
 
-ARCH="$(uname -m)"
-
-IS_ARM64=0
-if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
-  IS_ARM64=1
-fi
-
 install_gh() {
   sudo dnf install dnf5-plugins
   sudo dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
@@ -16,13 +9,13 @@ install_gh() {
 }
 
 install_neovim() {
-  if [ "$IS_ARM64" == "1" ]; then
+  if [ "$IS_ARM" == "1" ]; then
     sudo dnf install -y neovim
   fi
 }
 
 info "install deps with dnf"
-info "arch: $ARCH, arm64: $IS_ARM64"
+info "arch: $ARCH, arm: $IS_ARM"
 
 sudo dnf check-update
 

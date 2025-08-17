@@ -2,21 +2,14 @@
 
 # set -x
 
-ARCH="$(uname -m)"
-
-IS_ARM64=0
-if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
-  IS_ARM64=1
-fi
-
 install_neovim() {
-  if [ "$IS_ARM64" == "1" ]; then
+  if [ "$IS_ARM" == "1" ]; then
     yes | sudo pacman -S neovim
   fi
 }
 
 info "install deps with pacman"
-info "arch: $ARCH, arm64: $IS_ARM64"
+info "arch: $ARCH, arm: $IS_ARM"
 
 sudo pacman -Syy
 

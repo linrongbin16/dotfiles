@@ -2,13 +2,6 @@
 
 # set -x
 
-ARCH="$(uname -m)"
-
-IS_ARM64=0
-if [[ "$ARCH" == "arm64" || "$ARCH" == "aarch64" ]]; then
-  IS_ARM64=1
-fi
-
 install_nodejs() {
   # https://github.com/nodesource/distributions
   sudo apt-get install -y curl
@@ -37,13 +30,13 @@ install_gh() {
 }
 
 install_neovim() {
-  if [ "$IS_ARM64" == "1" ]; then
+  if [ "$IS_ARM" == "1" ]; then
     sudo snap install nvim --classic
   fi
 }
 
 info "install deps with apt"
-info "arch: $ARCH, arm64: $IS_ARM64"
+info "arch: $ARCH, arm: $IS_ARM"
 
 sudo apt-get -q -y update
 
