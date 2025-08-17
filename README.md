@@ -40,13 +40,13 @@ Install with below components:
 
 ```powershell
 # pwsh
-winget install --disable-interactivity Microsoft.PowerShell
+winget install --no-upgrade --disable-interactivity Microsoft.PowerShell
 
 # git for windows
 winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom "/LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini" --id Git.Git -e --source winget
 
 # 7zip
-winget install --disable-interactivity -e --id 7zip.7zip
+winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 
 # disable `python3` app execution alias
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
