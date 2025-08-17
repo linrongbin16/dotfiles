@@ -36,6 +36,18 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
+#### Install [PowerShell](https://github.com/PowerShell/PowerShell)
+
+```powershell
+winget install Microsoft.PowerShell
+```
+
+#### Install [Git for Windows](https://git-scm.com/downloads/win)
+
+```powershell
+winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --id Git.Git -e --source winget
+```
+
 #### Install [7-Zip](https://www.7-zip.org/)
 
 #### Run PowerShell Command
