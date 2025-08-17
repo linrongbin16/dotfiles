@@ -56,6 +56,20 @@ winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPRO
 
 #### Install [7-Zip](https://www.7-zip.org/)
 
+#### Disable `python3` Application Execution Alias
+
+```powershell
+Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
+Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
+```
+
+#### Install [Scoop](https://scoop.sh/)
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+```
+
 #### Run PowerShell Command
 
 > [!CAUTION]
@@ -63,21 +77,6 @@ winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPRO
 > Since they may panic with 'gsudo' administrator privilege.
 
 ```powershell
-# pwsh
-winget install Microsoft.PowerShell
-
-# git
-winget install --id Git.Git -e --source winget
-
-# Remove 'python3' App Alias from Windows
-Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
-Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
-
-# scoop
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.sh | iex
-
-# Run 'install.ps1'
 cd $env:USERPROFILE
 git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
