@@ -10,8 +10,6 @@ My dot files.
 
 > MacOS please install [xcode](https://developer.apple.com/support/xcode/) and [homebrew](https://brew.sh/) as pre-requirements.
 
-Zsh/Bash:
-
 ```bash
 cd ~
 git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
