@@ -40,24 +40,19 @@ Install with below components:
 
 ```powershell
 # pwsh
-winget install Microsoft.PowerShell
+winget install --disable-interactivity Microsoft.PowerShell
 
 # git for windows
 winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom "/LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini" --id Git.Git -e --source winget
-```
 
-#### Install [7-Zip](https://www.7-zip.org/)
+# 7zip
+winget install --disable-interactivity -e --id 7zip.7zip
 
-#### Disable `python3` Application Execution Alias
-
-```powershell
+# disable `python3` app execution alias
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
-```
 
-#### Install [Scoop](https://scoop.sh/)
-
-```powershell
+# scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
 ```
