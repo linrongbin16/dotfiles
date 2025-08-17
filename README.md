@@ -38,6 +38,12 @@ Install with below components:
 
 #### Install [PowerShell](https://github.com/PowerShell/PowerShell)
 
+Install latest PowerShell `pwsh` with:
+
+```powershell
+winget install Microsoft.PowerShell
+```
+
 #### Install [Git for Windows](https://git-scm.com/download/win)
 
 <details>
@@ -77,6 +83,9 @@ Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
+
+# git
+scoop install git
 
 # Run 'install.ps1'
 cd $env:USERPROFILE
