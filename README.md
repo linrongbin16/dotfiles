@@ -36,36 +36,23 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install [PowerShell](https://github.com/PowerShell/PowerShell)
+#### Install Third-Party Pre-Requirements
 
 ```powershell
-winget install Microsoft.PowerShell
-```
+# pwsh
+winget install --no-upgrade --disable-interactivity Microsoft.PowerShell
 
-#### Install [Git for Windows](https://git-scm.com/downloads/win)
+# git for windows
+winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom "/LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini" --id Git.Git -e --source winget
 
-> [!CAUTION]
-> The "Git for Windows" is mandatory, other third party git versions (such as `scoop install git`) may not work with `gh` authorization.
+# 7zip
+winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 
-> [!NOTE]
-> This command installs `git` in `~\.local\bin\git` directory, with specific setup options via `/LOADINF`. It enables unix command lines such as `bash`, `sh`, `echo` in Cmd/PowerShell, making windows terminal behave more like a unix shell.
-
-```powershell
-winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom /LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini --id Git.Git -e --source winget
-```
-
-#### Install [7-Zip](https://www.7-zip.org/)
-
-#### Disable `python3` Application Execution Alias
-
-```powershell
+# disable `python3` app execution alias
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
-```
 
-#### Install [Scoop](https://scoop.sh/)
-
-```powershell
+# scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
 ```
