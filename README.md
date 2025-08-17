@@ -36,22 +36,14 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install [PowerShell](https://github.com/PowerShell/PowerShell)
+#### Install Multiple Pre-Requirements
 
 ```powershell
+# pwsh
 winget install Microsoft.PowerShell
-```
 
-#### Install [Git for Windows](https://git-scm.com/downloads/win)
-
-> [!CAUTION]
-> The "Git for Windows" is mandatory, other third party git versions (such as `scoop install git`) may not work with `gh` authorization.
-
-> [!NOTE]
-> This command installs `git` in `~\.local\bin\git` directory, with specific setup options via `/LOADINF`. It enables unix command lines such as `bash`, `sh`, `echo` in Cmd/PowerShell, making windows terminal behave more like a unix shell.
-
-```powershell
-winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom /LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini --id Git.Git -e --source winget
+# git for windows
+winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom "/LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini" --id Git.Git -e --source winget
 ```
 
 #### Install [7-Zip](https://www.7-zip.org/)
