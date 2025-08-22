@@ -57,6 +57,7 @@ winget install --no-upgrade --disable-interactivity --id=Python.Python.3.13 -e -
 Copy-Item "$env:USERPROFILE\.local\bin\python3\python.exe" -Destination "$env:USERPROFILE\.local\bin\python3\python3.exe"
 
 # node.js
+winget install --no-upgrade --disable-interactivity OpenJS.NodeJS.LTS --scope user -l $env:USERPROFILE\.local\bin\node OpenJS.NodeJS.LTS
 
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
