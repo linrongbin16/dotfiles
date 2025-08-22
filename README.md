@@ -51,7 +51,7 @@ Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
 
 # python3
-winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\python3 --custom "/quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$env:USERPROFILE\.local\bin\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0" --id Python.Python
+winget install --no-upgrade --disable-interactivity --id=Python.Python.3.13 -e --scope user -l $env:USERPROFILE\.local\bin\python3 --custom "/quiet /passive InstallAllUsers=0 PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0"
 
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
