@@ -53,6 +53,9 @@ Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
 # python3
 winget install --no-upgrade --disable-interactivity --id=Python.Python.3.13 -e --scope user -l $env:USERPROFILE\.local\bin\python3 --custom "/quiet /passive InstallAllUsers=0 PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0"
 
+# windows python doesn't provide the 'python3.exe' command, thus we copy it
+Copy-Item "$env:USERPROFILE\.local\bin\python3\python.exe" -Destination "$env:USERPROFILE\.local\bin\python3\python3.exe"
+
 # node.js
 
 # scoop

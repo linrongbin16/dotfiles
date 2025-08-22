@@ -74,19 +74,6 @@ function CoreDeps()
   pipx ensurepath
 }
 
-function PythonDeps()
-{
-  Info "install python deps for windows"
-
-  $LocalFolder = "$env:USERPROFILE\.local\bin"
-
-  Info "LocalFolder: $LocalFolder"
-  Get-ChildItem -Path "$LocalFolder"
-
-  # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
-  Copy-Item "$LocalFolder\python3\python.exe" -Destination "$LocalFolder\python3\python3.exe"
-}
-
 function JsDeps()
 {
   Info "install node/deno/bun for windows"
@@ -193,7 +180,6 @@ function ProfileConfigs()
 function Main()
 {
   CoreDeps
-  PythonDeps
   JsDeps
   GoDeps
   RustDeps
