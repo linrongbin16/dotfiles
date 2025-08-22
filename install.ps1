@@ -76,13 +76,10 @@ function CoreDeps()
 
 function JsDeps()
 {
-  Info "install node/deno/bun for windows"
+  Info "install deno/bun for windows"
 
   Install -command "scoop install deno" -target "deno"
   Install -command "scoop install bun" -target "bun"
-  Install -command "scoop install fnm" -target "fnm"
-  fnm env --shell powershell | Out-String | Invoke-Expression
-  Install -command "fnm use --install-if-missing 22" -target "node"
 }
 
 function GitConfigs()
