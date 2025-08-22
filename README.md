@@ -50,6 +50,9 @@ winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python.exe
 Remove-Item $env:LOCALAPPDATA\Microsoft\WindowsApps\python3.exe
 
+# python3
+winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\python3 --custom "/quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$env:USERPROFILE\.local\bin\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0" --id Python.Python
+
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
