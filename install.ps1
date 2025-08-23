@@ -74,54 +74,12 @@ function CoreDeps()
   pipx ensurepath
 }
 
-function PythonDeps()
-{
-  Info "install python deps for windows"
-
-  if (Get-Command -Name "python" -ErrorAction SilentlyContinue)
-  {
-    SkipInfo "python"
-    return
-  }
-
-  $PythonVersion = "3.13.6"
-  $PythonArch = "amd64"
-
-  if ($isArm)
-  {
-    $PythonArch = "arm64"
-  }
-
-  $PythonDownloadUrl = "https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch
-  Info "PythonDownloadUrl: $PythonDownloadUrl"
-
-  Invoke-WebRequest -UseBasicParsing -Uri ("https://www.python.org/ftp/python/{0}/python-{0}-{1}.exe" -f $PythonVersion, $PythonArch) -OutFile "python-installer.exe"
-  Get-ChildItem
-
-  $LocalFolder = "$env:USERPROFILE\.local\bin"
-  if (-not (Test-Path -Path $LocalFolder))
-  {
-    New-Item -ItemType Directory $LocalFolder
-  }
-
-  .\python-installer.exe /quiet /passive InstallAllUsers=0 DefaultJustForMeTargetDir="$LocalFolder\python3" PrependPath=1 InstallLauncherAllUsers=0 Include_launcher=0 | Wait-Process
-
-  Info "LocalFolder: $LocalFolder"
-  Get-ChildItem -Path "$LocalFolder"
-
-  # Python Windows installer doesn't provide the 'python3.exe' executable, thus here we create a copy for it.
-  Copy-Item "$LocalFolder\python3\python.exe" -Destination "$LocalFolder\python3\python3.exe"
-}
-
 function JsDeps()
 {
-  Info "install node/deno/bun for windows"
+  Info "install deno/bun for windows"
 
   Install -command "scoop install deno" -target "deno"
   Install -command "scoop install bun" -target "bun"
-  Install -command "scoop install fnm" -target "fnm"
-  fnm env --shell powershell | Out-String | Invoke-Expression
-  Install -command "fnm use --install-if-missing 22" -target "node"
 }
 
 function GitConfigs()
@@ -219,7 +177,6 @@ function ProfileConfigs()
 function Main()
 {
   CoreDeps
-  PythonDeps
   JsDeps
   GoDeps
   RustDeps

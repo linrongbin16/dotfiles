@@ -1,9 +1,6 @@
 # set English
 Set-WinSystemLocale en-US
 
-# fnm/node
-fnm env --shell powershell | Out-String | Invoke-Expression
-
 # go
 $env:GOPATH="$env:USERPROFILE\go"
 $env:PATH += ";$env:GOPATH\bin"
