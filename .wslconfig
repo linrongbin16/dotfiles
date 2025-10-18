@@ -1,0 +1,13 @@
+# [experimental]
+# # requires dnsTunneling but are also OPTIONAL
+# bestEffortDnsParsing=true
+# useWindowsDnsCache=true
+
+[wsl2]
+memory=10GB
+swap=10GB
+# proxy
+networkingMode=mirrored
+dnsTunneling=true
+firewall=true
+autoProxy=true
