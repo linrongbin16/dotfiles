@@ -114,6 +114,7 @@ function RustDeps()
   Install -command "scoop install trashy" -target "trash"
   Install -command "cargo install --locked rmz" -target "rmz"
   Install -command "cargo install --locked cpz" -target "cpz"
+  Install -command "cargo install --locked tree-sitter-cli" -target "tree-sitter"
 }
 
 function NeovimDeps()
