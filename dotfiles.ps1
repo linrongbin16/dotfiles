@@ -1,6 +1,9 @@
 # set English
 Set-WinSystemLocale en-US
 
+# rust/cargo
+$env:PATH += ";$env:USERPROFILE\.cargo\bin"
+
 # go
 $env:GOPATH="$env:USERPROFILE\go"
 $env:PATH += ";$env:GOPATH\bin"

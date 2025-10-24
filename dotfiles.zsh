@@ -4,6 +4,7 @@
 ulimit -n 200000
 ulimit -u 2048
 
+
 # ls
 alias l="eza -lh"
 alias ll="eza -alh"
@@ -24,6 +25,9 @@ alias ga="git add"
 alias gb="git branch"
 alias gm="git merge"
 alias gc="git commit"
+
+# rust/cargo
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # go
 if [ -x "$HOME/.go/bin/go" ]; then
