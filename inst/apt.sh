@@ -60,6 +60,7 @@ install "sudo apt-get install -q -y unzip" "unzip"
 
 install "sudo apt-get install -q -y xsel" "xsel"
 install "sudo apt-get install -q -y xclip" "xclip"
+install "curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir /usr/local/bin --sudo" "zoxide"
 
 install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
 install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
