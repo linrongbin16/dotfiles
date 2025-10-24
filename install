@@ -83,14 +83,11 @@ go_deps() {
 rust_deps() {
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
-  if [ -f $HOME/.cargo/env ]; then
-    . "$HOME/.cargo/env"
-  fi
+  export PATH="$HOME/.cargo/bin:$PATH"
   install "cargo install fd-find" "fd"
   install "cargo install ripgrep" "rg"
   install "cargo install --locked bat" "bat"
   install "cargo install eza" "eza"
-  install "cargo install --locked zoxide" "zoxide"
   install "cargo install --locked rmz" "rmz"
   install "cargo install --locked cpz" "cpz"
   install "cargo install --locked tree-sitter-cli" "tree-sitter"

@@ -34,6 +34,7 @@ install "yes | sudo pacman -S atool" "atool"
 
 install "yes | sudo pacman -S xsel" "xsel"
 install "yes | sudo pacman -S xclip" "xclip"
+install "yes | sudo pacman -S zoxide" "zoxide"
 
 install "yes | sudo pacman -S python python-pip" "python3"
 

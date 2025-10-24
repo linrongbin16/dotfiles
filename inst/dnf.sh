@@ -39,6 +39,7 @@ install "sudo dnf install -y unzip" "unzip"
 
 install "sudo dnf install -y xsel" "xsel"
 install "sudo dnf install -y xclip" "xclip"
+install "sudo dnf install -y zoxide" "zoxide"
 
 install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 

@@ -37,6 +37,7 @@ install "brew install oven-sh/bun/bun" "bun"
 
 install "brew install go" "go"
 install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
+install "brew install zoxide" "zoxide"
 
 install "brew install pipx" "pipx"
 pipx ensurepath
