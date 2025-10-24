@@ -34,7 +34,7 @@ install "yes | sudo pacman -S atool" "atool"
 
 install "yes | sudo pacman -S xsel" "xsel"
 install "yes | sudo pacman -S xclip" "xclip"
-install "curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir /usr/local/bin --sudo" "zoxide"
+install "yes | sudo pacman -S zoxide" "zoxide"
 
 install "yes | sudo pacman -S python python-pip" "python3"
 

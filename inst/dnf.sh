@@ -39,7 +39,7 @@ install "sudo dnf install -y unzip" "unzip"
 
 install "sudo dnf install -y xsel" "xsel"
 install "sudo dnf install -y xclip" "xclip"
-install "curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir /usr/local/bin --sudo" "zoxide"
+install "sudo dnf install -y zoxide" "zoxide"
 
 install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 
