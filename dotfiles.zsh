@@ -89,17 +89,8 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   ZSH_THEME_GIT_PROMPT_AHEAD="↑"
   ZSH_THEME_GIT_PROMPT_UNTRACKED="…"
   ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
-
-  # # ghostty doesn't support nerd fonts or unicode
-  # if [ -n "$GHOSTTY_RESOURCES_DIR" ]; then
-  #   # ascii text
-  #   ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}^"
-  #   ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}$"
-  # else
-    # nerd fonts and unicode
-    ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}⟳"
-    ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}⚑"
-  # fi
+  ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}⟳"
+  ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}⚑"
 
   PROMPT=$'%F{blue}%~%f %b$(gitprompt)%f
 %(12V.%F{242}%12v%f .)%(?.%F{cyan}.%F{red})❯%f '
