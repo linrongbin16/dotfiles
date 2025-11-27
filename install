@@ -101,9 +101,8 @@ neovim_deps() {
 
 prompt_deps() {
   # git-prompt
-  if [ ! -d "$HOME/.zsh" ]; then
-    mkdir -p "$HOME/.zsh"
-  fi
+  mkdir -p "$HOME/.config"
+  mkdir -p "$HOME/.zsh"
   if [ ! -d "$HOME/.zsh/git-prompt.zsh" ]; then
     git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-prompt.zsh
   fi
@@ -116,6 +115,7 @@ prompt_deps() {
 }
 
 alacritty_configs() {
+  mkdir -p "$HOME/.config"
   if [ -d "$HOME/.config/alacritty" ]; then
     rm -rf $HOME/.config/alacritty
   fi
@@ -132,6 +132,7 @@ alacritty_configs() {
 }
 
 kitty_configs() {
+  mkdir -p "$HOME/.config"
   if [ -d "$HOME/.config/kitty" ]; then
     rm -rf $HOME/.config/kitty
   fi
@@ -149,6 +150,7 @@ kitty_configs() {
 }
 
 ghostty_configs() {
+  mkdir -p "$HOME/.config"
   if [ -d "$HOME/.config/ghostty" ]; then
     rm -rf $HOME/.config/ghostty
   fi
