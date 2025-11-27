@@ -1,0 +1,45 @@
+# include kitty-themes/themes/everforest_dark_hard.conf
+# include kitty-themes/themes/Monokai_Classic.conf
+# include kitty-themes/themes/gruvbox-dark.conf
+# include kitty-themes/themes/zenburned.conf
+# include kitty-themes/themes/selenized-dark.conf
+include kitty-themes/themes/GruvboxMaterialDarkMedium.conf
+
+# Fonts {{{
+
+disable_ligatures cursor
+# modify_font baseline 1
+# modify_font cell_height +2px
+
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+
+font_family      Maple Mono NF CN
+font_size 14.0
+
+# font_family      SauceCodePro Nerd Font Mono
+# font_size 14.0
+
+# font_family      JuliaMono Nerd Font
+# font_size 14.0
+
+# font_family      RecMonoLinear Nerd Font Mono
+# font_size 14.0
+
+# font_family      FiraMono Nerd Font Mono
+# font_size 14.0
+
+# font_family      MonoLisa Nerd Font
+# font_size 14.0
+
+# font_family      CodeNewRoman Nerd Font Mono
+# font_size 15.0
+
+# font_family      Monaco Nerd Font
+# font_size 13.0
+
+# font_family      CaskaydiaMono Nerd Font Mono
+# font_size 14.0
+
+# Fonts }}}

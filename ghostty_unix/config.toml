@@ -1,0 +1,5 @@
+config-file=?ghostty-custom.toml
+
+maximize = true
+cursor-style = "block"
+cursor-style-blink = false
