@@ -1,0 +1,5 @@
+config-file = custom-config
+
+maximize = true
+cursor-style = "block"
+cursor-style-blink = false

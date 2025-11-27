@@ -153,12 +153,12 @@ ghostty_configs() {
     rm -rf $HOME/.config/ghostty
   fi
   if [ "$IS_MAC" == "1" ]; then
-    cp -rf $HOME/.dotfiles/ghostty_mac $HOME/.config/ghostty
+    ln -s $HOME/.dotfiles/ghostty_mac $HOME/.config/ghostty
   else
-    cp -rf $HOME/.dotfiles/ghostty_unix $HOME/.config/ghostty
+    ln -s $HOME/.dotfiles/ghostty_unix $HOME/.config/ghostty
   fi
 
-  touch "$HOME/.config/ghostty/ghostty-custom.toml"
+  touch "$HOME/.config/ghostty/ghostty-custom"
 }
 
 profile_configs() {
