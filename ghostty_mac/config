@@ -1,22 +1,18 @@
 config-file = ghostty-custom
 
-## Window {{{
-
 maximize = true
 window-padding-balance = true
-
-## Window }}}
-
-## Cursor/Mouse {{{
+quit-after-last-window-closed = true
 
 cursor-style = "block"
 cursor-style-blink = false
 mouse-hide-while-typing = true
 
-## Cursor/Mouse }}}
-
-## Scrollback {{{
-
 scrollback-limit = 500000
 
-## Scrollback }}}
+clipboard-read = allow
+clipboard-write = allow
+
+title-report = true
+shell-integration = detect
+shell-integration-features = true
