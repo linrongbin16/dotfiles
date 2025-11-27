@@ -4,3 +4,4 @@ maximize = true
 cursor-style = "block"
 cursor-style-blink = false
 mouse-hide-while-typing = true
+scrollback-limit = 500000
