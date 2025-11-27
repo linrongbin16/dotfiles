@@ -158,7 +158,7 @@ ghostty_configs() {
     ln -s $HOME/.dotfiles/ghostty_unix $HOME/.config/ghostty
   fi
 
-  touch "$HOME/.config/ghostty/ghostty-custom.conf"
+  touch "$HOME/.config/ghostty/ghostty-custom.toml"
 }
 
 profile_configs() {
