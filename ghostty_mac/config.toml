@@ -1,4 +1,4 @@
-config-file=?ghostty-custom.toml
+config-file=ghostty-custom.toml
 
 maximize = true
 cursor-style = "block"
