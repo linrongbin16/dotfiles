@@ -1,3 +1,5 @@
+auto-update = download
+auto-update-channel = tip
 config-file = ghostty-custom
 
 maximize = true
@@ -12,6 +14,7 @@ scrollback-limit = 500000
 
 clipboard-read = allow
 clipboard-write = allow
+macos-shortcuts = true
 
 title-report = true
 shell-integration = detect
