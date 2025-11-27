@@ -1,7 +1,22 @@
 config-file = ghostty-custom
 
+## Window {{{
+
 maximize = true
+window-padding-balance = true
+
+## Window }}}
+
+## Cursor/Mouse {{{
+
 cursor-style = "block"
 cursor-style-blink = false
 mouse-hide-while-typing = true
+
+## Cursor/Mouse }}}
+
+## Scrollback {{{
+
 scrollback-limit = 500000
+
+## Scrollback }}}
