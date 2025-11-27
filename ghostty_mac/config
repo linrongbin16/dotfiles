@@ -3,3 +3,4 @@ config-file = ghostty-custom
 maximize = true
 cursor-style = "block"
 cursor-style-blink = false
+mouse-hide-while-typing = true
