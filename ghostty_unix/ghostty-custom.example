@@ -1,0 +1,37 @@
+auto-update-channel = tip
+
+## Fonts {{{
+
+# font-family="CodeNewRoman Nerd Font Mono"
+# font-size=15.0
+
+# font-family="RecMonoLinear Nerd Font Mono"
+# font-size=14.0
+
+font-family = "Maple Mono NF CN"
+font-size = 14.0
+
+# font-family="SauceCodePro Nerd Font Mono"
+# font-size=15.0
+
+# font-family="MonoLisa Nerd Font"
+# font-size=14.0
+
+# font-family="InputMonoNarrow Nerd Font"
+# font-style="Light"
+# font-size=13.0
+
+# font-family="Monaco Nerd Font"
+# font-size=13.0
+
+## Fonts }}}
+
+## Themes {{{
+
+# theme=catppuccin-macchiato
+# theme=gruvbox-material
+# theme=sonokai
+
+## Themes }}}
+
+

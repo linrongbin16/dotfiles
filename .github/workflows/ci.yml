@@ -72,6 +72,7 @@ jobs:
           brew install bat
           brew install eza
           brew install bob
+          brew install neovim
           echo '${{ steps.extract_branch.outputs.branch }}'
           echo ${{ steps.extract_branch.outputs.branch }}
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
