@@ -14,7 +14,7 @@ scrollback-limit = 500000
 
 clipboard-read = allow
 clipboard-write = allow
-macos-shortcuts = true
+macos-shortcuts = allow
 
 title-report = true
 shell-integration = detect
