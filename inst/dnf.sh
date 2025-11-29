@@ -44,7 +44,7 @@ install "sudo dnf install -y zoxide" "zoxide"
 install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 
 install "sudo dnf install -y nodejs npm" "node"
-install "sudo dnf install -y go" "go"
+install "sudo dnf install -y golang" "go"
 
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
