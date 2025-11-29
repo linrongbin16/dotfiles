@@ -31,8 +31,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 # go
 if [ -x "$HOME/.go/bin/go" ]; then
-  export GOROOT="$HOME/.go" # where go is installed
-  export PATH="$PATH:$GOROOT/bin"
+  export PATH="$PATH:$HOME/.go/bin"
 fi
 export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOPATH/bin"
