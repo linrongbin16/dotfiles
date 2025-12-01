@@ -25,9 +25,11 @@ core_deps() {
   case "$OS" in
   Linux)
     if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
-      . "$DOTFILES_HOME/inst/pacman.sh"
+      # . "$DOTFILES_HOME/inst/pacman.sh"
+      info "$OS is not supported, exit..."
     elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
-      . "$DOTFILES_HOME/inst/dnf.sh"
+      # . "$DOTFILES_HOME/inst/dnf.sh"
+      info "$OS is not supported, exit..."
     else
       . "$DOTFILES_HOME/inst/apt.sh"
     fi
@@ -54,15 +56,6 @@ js_deps() {
   install "curl -fsSL https://bun.com/install | bash" "bun"
 }
 
-install_go() {
-  git clone --depth=1 https://github.com/kerolloz/go-installer
-  export GOROOT="$HOME/.go" # where go is installed
-  export GOPATH="$HOME/go"  # user workspace
-  bash ./go-installer/go.sh
-  export PATH="$PATH:$GOROOT/bin"
-  export PATH="$PATH:$GOPATH/bin"
-}
-
 install_fzf() {
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install --bin
@@ -71,7 +64,6 @@ install_fzf() {
 }
 
 go_deps() {
-  install "install_go" "go"
   install "install_fzf" "fzf"
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
   install "go install github.com/noborus/ov@latest" "ov"
