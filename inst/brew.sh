@@ -40,6 +40,11 @@ install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
 install "brew install zoxide" "zoxide"
 install "brew install lazygit" "lazygit"
 install "brew install moor" "moor"
+install "brew install ripgrep" "rg"
+install "brew install bat" "bat"
+install "brew install fd" "fd"
+install "brew install eza" "eza"
+install "brew install tree-sitter-cli" "tree-sitter"
 
 install "brew install pipx" "pipx"
 pipx ensurepath

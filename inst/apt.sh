@@ -29,6 +29,12 @@ install_gh() {
     sudo apt install gh -y
 }
 
+install_go() {
+  sudo add-apt-repository -y ppa:longsleep/golang-backports
+  sudo apt update
+  sudo apt-get install -q -y golang-go
+}
+
 install_neovim() {
   if [ "$IS_ARM" == "1" ]; then
     sudo snap install nvim --classic
@@ -68,9 +74,7 @@ install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip
 install "install_nodejs" "node"
 install "install_nodejs" "npm"
 
-install "sudo add-apt-repository -y ppa:longsleep/golang-backports" "go"
-install "sudo apt update" "go"
-install "sudo apt-get install -q -y golang-go" "go"
+install "install_go" "go"
 
 install "sudo apt-get install pipx" "pipx"
 pipx ensurepath
