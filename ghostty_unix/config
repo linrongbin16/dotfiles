@@ -10,7 +10,7 @@ cursor-style = "block"
 cursor-style-blink = false
 mouse-hide-while-typing = true
 
-scrollback-limit = 500000
+scrollback-limit = 8000000
 
 clipboard-read = allow
 clipboard-write = allow
