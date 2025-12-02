@@ -52,6 +52,9 @@ install "sudo dnf install -y nodejs npm" "node"
 
 install "sudo dnf install -y golang" "go"
 install "install_lazygit" "lazygit"
+install "sudo dnf install ripgrep" "rg"
+install "sudo dnf install bat" "bat"
+install "sudo dnf install fd-find" "fd"
 
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
