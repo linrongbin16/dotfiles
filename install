@@ -28,8 +28,7 @@ core_deps() {
       # . "$DOTFILES_HOME/inst/pacman.sh"
       info "$OS is not supported, exit..."
     elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
-      # . "$DOTFILES_HOME/inst/dnf.sh"
-      info "$OS is not supported, exit..."
+      . "$DOTFILES_HOME/inst/dnf.sh"
     else
       . "$DOTFILES_HOME/inst/apt.sh"
     fi
