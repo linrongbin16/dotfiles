@@ -4,7 +4,6 @@
 ulimit -n 200000
 ulimit -u 2048
 
-
 # ls
 alias l="eza -lh"
 alias ll="eza -alh"

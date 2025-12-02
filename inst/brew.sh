@@ -36,7 +36,7 @@ install "brew install deno" "deno"
 install "brew install oven-sh/bun/bun" "bun"
 
 install "brew install go" "go"
-install "brew install trash" "/opt/homebrew/opt/trash/bin/trash"
+install "brew install macos-trash" "/opt/homebrew/opt/macos-trash/bin/trash"
 install "brew install zoxide" "zoxide"
 install "brew install lazygit" "lazygit"
 install "brew install moor" "moor"
