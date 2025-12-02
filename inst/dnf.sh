@@ -8,6 +8,11 @@ install_gh() {
   sudo dnf install gh --repo gh-cli
 }
 
+install_lazygit() {
+  sudo dnf copr enable dejan/lazygit
+  sudo dnf install lazygit
+}
+
 install_neovim() {
   if [ "$IS_ARM" == "1" ]; then
     sudo dnf install -y neovim
@@ -44,7 +49,12 @@ install "sudo dnf install -y zoxide" "zoxide"
 install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils" "python3"
 
 install "sudo dnf install -y nodejs npm" "node"
+
 install "sudo dnf install -y golang" "go"
+install "install_lazygit" "lazygit"
+install "sudo dnf install ripgrep" "rg"
+install "sudo dnf install bat" "bat"
+install "sudo dnf install fd-find" "fd"
 
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath

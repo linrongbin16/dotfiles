@@ -39,7 +39,13 @@ install "yes | sudo pacman -S zoxide" "zoxide"
 install "yes | sudo pacman -S python python-pip" "python3"
 
 install "yes | sudo pacman -S nodejs npm" "node"
+
 install "yes | sudo pacman -S go" "go"
+install "yes | sudo pacman -S lazygit" "lazygit"
+install "yes | sudo pacman -S ripgrep" "rg"
+install "yes | sudo pacman -S bat" "bat"
+install "yes | sudo pacman -S fd" "fd"
+install "yes | sudo pacman -S eza" "eza"
 
 install "yes | sudo pacman -S python-pipx" "pipx"
 pipx ensurepath

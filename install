@@ -25,11 +25,9 @@ core_deps() {
   case "$OS" in
   Linux)
     if [ -f "/etc/arch-release" ] || [ -f "/etc/artix-release" ]; then
-      # . "$DOTFILES_HOME/inst/pacman.sh"
-      info "$OS is not supported, exit..."
+      . "$DOTFILES_HOME/inst/pacman.sh"
     elif [ -f "/etc/fedora-release" ] || [ -f "/etc/redhat-release" ]; then
-      # . "$DOTFILES_HOME/inst/dnf.sh"
-      info "$OS is not supported, exit..."
+      . "$DOTFILES_HOME/inst/dnf.sh"
     else
       . "$DOTFILES_HOME/inst/apt.sh"
     fi
