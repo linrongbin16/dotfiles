@@ -13,12 +13,6 @@ install_lazygit() {
   sudo dnf install lazygit
 }
 
-install_neovim() {
-  if [ "$IS_ARM" == "1" ]; then
-    sudo dnf install -y neovim
-  fi
-}
-
 info "install deps with dnf"
 info "arch: $ARCH, arm: $IS_ARM"
 
@@ -59,7 +53,7 @@ install "sudo dnf install fd-find" "fd"
 install "sudo dnf install -y pipx" "pipx"
 pipx ensurepath
 
-install "install_neovim" "nvim"
+install "sudo dnf install -y neovim" "nvim"
 
 install "sudo dnf install -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER

@@ -2,12 +2,6 @@
 
 # set -x
 
-install_neovim() {
-  if [ "$IS_ARM" == "1" ]; then
-    yes | sudo pacman -S neovim
-  fi
-}
-
 info "install deps with pacman"
 info "arch: $ARCH, arm: $IS_ARM"
 
@@ -50,7 +44,7 @@ install "yes | sudo pacman -S eza" "eza"
 install "yes | sudo pacman -S python-pipx" "pipx"
 pipx ensurepath
 
-install "install_neovim" "nvim"
+install "yes | sudo pacman -S neovim" "nvim"
 
 install "yes | sudo pacman -S zsh" "zsh"
 sudo chsh -s $(which zsh) $USER
