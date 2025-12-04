@@ -37,13 +37,7 @@ jobs:
           RUSTC_WRAPPER: "sccache"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          sudo apt-get install -q -y fd-find
-          sudo apt-get install -q -y ripgrep
-          sudo apt-get install -q -y bat
-          sudo apt-get install -q -y eza
           sudo snap install nvim --classic
-          sudo ln -s $(which fdfind) /usr/local/bin/fd
-          sudo ln -s $(which batcat) /usr/local/bin/bat
           echo '${{ steps.extract_branch.outputs.branch }}'
           export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
           sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install"
@@ -67,10 +61,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -x
-          brew install fd
-          brew install ripgrep
-          brew install bat
-          brew install eza
           brew install bob
           brew install neovim
           echo '${{ steps.extract_branch.outputs.branch }}'
