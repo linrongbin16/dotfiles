@@ -25,16 +25,12 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: Swatinem/rust-cache@v2
-      - uses: mozilla-actions/sccache-action@v0.0.9
       - name: Get branch
         shell: bash
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       - name: Install dotfiles
         env:
-          SCCACHE_GHA_ENABLED: "true"
-          RUSTC_WRAPPER: "sccache"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -x
@@ -49,15 +45,11 @@ jobs:
         with:
           xcode-version: latest-stable
       - uses: Homebrew/actions/setup-homebrew@master
-      - uses: Swatinem/rust-cache@v2
-      - uses: mozilla-actions/sccache-action@v0.0.9
       - name: Get branch
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         id: extract_branch
       - name: Install dotfiles
         env:
-          SCCACHE_GHA_ENABLED: "true"
-          RUSTC_WRAPPER: "sccache"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -x
@@ -74,7 +66,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
-      - uses: Swatinem/rust-cache@v2
       - uses: MinoruSekine/setup-scoop@v4.0.2
         with:
           buckets: extras
