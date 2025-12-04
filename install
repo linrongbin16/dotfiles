@@ -64,7 +64,6 @@ install_fzf() {
 go_deps() {
   install "install_fzf" "fzf"
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
-  install "go install github.com/noborus/ov@latest" "ov"
   install "go install github.com/walles/moor/v2/cmd/moor@latest" "moor"
   install "go install github.com/umlx5h/gtrash@latest" "gtrash"
 }
