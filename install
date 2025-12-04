@@ -64,7 +64,6 @@ install_fzf() {
 go_deps() {
   install "install_fzf" "fzf"
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
-  install "go install github.com/noborus/ov@latest" "ov"
   install "go install github.com/walles/moor/v2/cmd/moor@latest" "moor"
   install "go install github.com/umlx5h/gtrash@latest" "gtrash"
 }
@@ -81,12 +80,6 @@ rust_deps() {
   install "cargo install --locked rmz" "rmz"
   install "cargo install --locked cpz" "cpz"
   install "cargo install --locked tree-sitter-cli" "tree-sitter"
-}
-
-neovim_deps() {
-  install "cargo install --git https://github.com/MordechaiHadad/bob --locked" "bob"
-  export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
-  install "bob use stable" "nvim"
 }
 
 prompt_deps() {
@@ -167,7 +160,6 @@ main() {
   js_deps
   go_deps
   rust_deps
-  neovim_deps
   prompt_deps
   git_configs
   alacritty_configs

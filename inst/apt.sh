@@ -56,14 +56,13 @@ install_bat() {
 }
 
 install_fd() {
-  sudo apt-get install -q -y fdfind
+  sudo apt-get install -q -y fd-find
   sudo ln -s $(which fdfind) /usr/bin/fd
 }
 
 install_neovim() {
-  if [ "$IS_ARM" == "1" ]; then
-    sudo snap install nvim --classic
-  fi
+  sudo apt install -y snapd
+  sudo snap install nvim --classic
 }
 
 info "install deps with apt"
