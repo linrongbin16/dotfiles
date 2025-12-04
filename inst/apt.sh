@@ -60,6 +60,11 @@ install_fd() {
   sudo ln -s $(which fdfind) /usr/bin/fd
 }
 
+install_neovim() {
+  sudo apt install -y snapd
+  sudo snap install nvim --classic
+}
+
 info "install deps with apt"
 info "arch: $ARCH, arm: $IS_ARM"
 
@@ -104,7 +109,7 @@ install "install_eza" "eza"
 install "sudo apt-get install pipx" "pipx"
 pipx ensurepath
 
-install "sudo snap install nvim --classic" "nvim"
+install "install_neovim" "nvim"
 
 install "sudo apt-get install -q -y zsh" "zsh"
 sudo chsh -s $(which zsh) $USER
