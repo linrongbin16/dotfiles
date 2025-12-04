@@ -120,16 +120,7 @@ function RustDeps()
 function NeovimDeps()
 {
   Info "install neovim deps for windows"
-
-  if ($isArm)
-  {
-    Install "scoop install nvim" "nvim"
-  } else
-  {
-    Install -command "cargo install --git https://github.com/MordechaiHadad/bob --locked" -target "bob"
-    Install -command "bob use stable" -target "nvim"
-    $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
-  }
+  Install "scoop install nvim" "nvim"
 }
 
 function PromptDeps()
