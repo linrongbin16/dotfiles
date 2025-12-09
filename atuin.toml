@@ -1,1 +1,7 @@
 filter_mode = "session"
+inline_height = 5
+max_preview_height = 4
+enter_accept = true
+
+[sync]
+records = true
