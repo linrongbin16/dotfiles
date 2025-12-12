@@ -19,7 +19,7 @@ info "arch: $ARCH, arm: $IS_ARM"
 sudo dnf check-update
 
 sudo dnf group install -y "Development Tools"
-sudo dnf group install -y clang clang-tools-extra libcxx-devel
+sudo dnf group install -y clang clang-tools-extra libcxx-devel lld
 install "sudo dnf install -y autoconf" "autoconf"
 install "sudo dnf install -y automake" "automake"
 install "sudo dnf install -y pkg-config" "pkg-config"

@@ -71,7 +71,7 @@ info "arch: $ARCH, arm: $IS_ARM"
 sudo apt-get -q -y update
 
 sudo apt-get install -q -y build-essential
-sudo apt-get install -q -y llvm llvm-dev clang
+sudo apt-get install -q -y llvm llvm-dev clang lld
 install "sudo apt-get install -q -y autoconf" "autoconf"
 install "sudo apt-get install -q -y automake" "automake"
 install "sudo apt-get install -q -y pkg-config" "pkg-config"

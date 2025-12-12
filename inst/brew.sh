@@ -13,6 +13,7 @@ install "xcode-select --install" "clang"
 install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
 brew update
 
+brew install lld
 install "brew install autoconf" "autoconf"
 install "brew install automake" "automake"
 install "brew install pkg-config" "pkg-config"
