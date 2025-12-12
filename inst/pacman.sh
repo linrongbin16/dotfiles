@@ -7,8 +7,8 @@ info "arch: $ARCH, arm: $IS_ARM"
 
 sudo pacman -Syy
 
-install "yes | sudo pacman -S base-devel" "gcc"
-install "yes | sudo pacman -S base-devel" "make"
+yes | sudo pacman -S base-devel
+yes | sudo pacman -S llvm clang
 install "yes | sudo pacman -S autoconf" "autoconf"
 install "yes | sudo pacman -S automake" "automake"
 install "yes | sudo pacman -S pkg-config" "pkg-config"

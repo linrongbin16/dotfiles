@@ -18,8 +18,8 @@ info "arch: $ARCH, arm: $IS_ARM"
 
 sudo dnf check-update
 
-install "sudo dnf group install -y \"Development Tools\"" "gcc"
-install "sudo dnf group install -y \"Development Tools\"" "make"
+sudo dnf group install -y "Development Tools"
+sudo dnf group install -y clang clang-tools-extra libcxx-devel
 install "sudo dnf install -y autoconf" "autoconf"
 install "sudo dnf install -y automake" "automake"
 install "sudo dnf install -y pkg-config" "pkg-config"

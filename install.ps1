@@ -49,11 +49,13 @@ function CoreDeps()
   Install -command "scoop install gzip" -target "gzip"
   Install -command "scoop install unzip" -target "unzip"
 
+  scoop install llvm
+  scoop install extras/vcredist2022
+
   scoop bucket add extras
   scoop install mingw
   scoop install coreutils
   # scoop install uutils-coreutils
-  # scoop install extras/vcredist2022
 
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
