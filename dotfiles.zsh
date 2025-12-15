@@ -96,6 +96,5 @@ if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
   RPROMPT=''
 fi
 
-# if [[ $KITTY_TERMINAL == "1" ]]; then
+# Compatible with xterm
 export TERM="xterm-256color"
-# fi
