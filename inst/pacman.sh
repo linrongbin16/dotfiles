@@ -8,7 +8,7 @@ info "arch: $ARCH, arm: $IS_ARM"
 sudo pacman -Syy
 
 yes | sudo pacman -S base-devel
-yes | sudo pacman -S llvm clang lld
+yes | sudo pacman -S llvm clang lld mold
 install "yes | sudo pacman -S autoconf" "autoconf"
 install "yes | sudo pacman -S automake" "automake"
 install "yes | sudo pacman -S pkg-config" "pkg-config"
