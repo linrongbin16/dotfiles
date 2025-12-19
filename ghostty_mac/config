@@ -1,23 +1,34 @@
+# channel
 auto-update = download
 auto-update-channel = tip
+
+# custom configs
 config-file = ghostty-custom
 
+# window
 maximize = true
 window-padding-balance = true
 quit-after-last-window-closed = true
 
+# cursor
 cursor-style = "block"
 cursor-style-blink = false
 mouse-hide-while-typing = true
 
+# behavior
 scrollback-limit = 8000000
-
 clipboard-read = allow
 clipboard-write = allow
-
 title-report = true
 shell-integration = detect
 shell-integration-features = true
 
 # mac only
 macos-shortcuts = allow
+
+# Keybinding {{{
+
+# disable toggle_fullscreen
+keybind = super + enter = unbind
+
+# Keybinding }}}
