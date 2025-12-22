@@ -29,6 +29,6 @@ macos-shortcuts = allow
 # Keybinding {{{
 
 # disable toggle_fullscreen
-keybind = super + enter = unbind
+keybind = super+enter=unbind
 
 # Keybinding }}}
