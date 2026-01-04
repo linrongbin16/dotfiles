@@ -100,6 +100,7 @@ install "install_nodejs" "npm"
 
 install "install_go" "go"
 
+install "sudo apt-get install -q -y fzf" "fzf"
 install "install_lazygit" "lazygit"
 install "sudo apt-get install -q -y ripgrep" "rg"
 install "install_bat" "bat"

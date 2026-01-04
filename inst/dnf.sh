@@ -45,6 +45,7 @@ install "sudo dnf install -y python3 python3-devel python3-pip python3-docutils"
 install "sudo dnf install -y nodejs npm" "node"
 
 install "sudo dnf install -y golang" "go"
+install "sudo dnf install -y fzf" "fzf"
 install "install_lazygit" "lazygit"
 install "sudo dnf install ripgrep" "rg"
 install "sudo dnf install bat" "bat"
