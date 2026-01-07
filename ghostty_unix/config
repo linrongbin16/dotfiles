@@ -22,3 +22,36 @@ clipboard-write = allow
 title-report = true
 shell-integration = detect
 shell-integration-features = true
+
+# Keybinding {{{
+
+# disable useless default keybinds
+keybind = super+enter=unbind
+keybind = super+alt+shift+j=unbind
+keybind = super+alt+shift+w=unbind
+keybind = super+ctrl+shift+j=unbind
+keybind = super+alt+arrow_down=unbind
+keybind = super+alt+arrow_left=unbind
+keybind = super+alt+arrow_up=unbind
+keybind = super+alt+arrow_right=unbind
+keybind = super+ctrl+equal=unbind
+keybind = super+ctrl+arrow_down=unbind
+keybind = super+ctrl+arrow_left=unbind
+keybind = super+ctrl+arrow_up=unbind
+keybind = super+ctrl+arrow_right=unbind
+keybind = super+ctrl+f=unbind
+keybind = super+shift+d=unbind
+keybind = super+shift+j=unbind
+keybind = super+shift+enter=unbind
+keybind = super+shift+arrow_down=unbind
+keybind = super+shift+arrow_up=unbind
+keybind = super+shift+p=unbind
+keybind = super+bracket_left=unbind
+keybind = super+bracket_right=unbind
+keybind = super+equal=unbind
+keybind = super++=unbind
+keybind = super+-=unbind
+keybind = super+0=unbind
+keybind = super+enter=unbind
+
+# Keybinding }}}
