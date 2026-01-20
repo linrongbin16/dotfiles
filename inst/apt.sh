@@ -107,7 +107,7 @@ install "install_bat" "bat"
 install "install_fd" "fd"
 install "install_eza" "eza"
 
-install "sudo apt-get install pipx" "pipx"
+install "sudo apt-get install -q -y pipx" "pipx"
 pipx ensurepath
 
 install "install_neovim" "nvim"
