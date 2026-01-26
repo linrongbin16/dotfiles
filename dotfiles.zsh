@@ -23,7 +23,7 @@ alias gP="git push"
 alias ga="git add -A"
 alias gb="git branch"
 alias gm="git merge"
-alias gc="git commit"
+alias gc="git commit -m"
 
 # rust/cargo
 export PATH="$HOME/.cargo/bin:$PATH"
