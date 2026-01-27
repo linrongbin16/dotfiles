@@ -24,7 +24,7 @@ install "sudo dnf install -y autoconf" "autoconf"
 install "sudo dnf install -y automake" "automake"
 install "sudo dnf install -y pkg-config" "pkg-config"
 install "sudo dnf install -y cmake" "cmake"
-sudo dnf install -y openssl-devel openssl openssh-clients openssh-server
+sudo dnf install -y openssl-devel openssl openssh-clients openssh-server perl-core
 sudo dnf install -y cmake freetype-devel fontconfig-devel libxcb-devel libxkbcommon-devel g++
 
 install "sudo dnf install -y git" "git"
