@@ -9,7 +9,7 @@ install_gh() {
 }
 
 install_lazygit() {
-  sudo dnf copr enable dejan/lazygit
+  sudo dnf copr -y enable dejan/lazygit
   sudo dnf install -y lazygit
 }
 
