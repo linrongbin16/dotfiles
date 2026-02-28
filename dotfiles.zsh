@@ -20,7 +20,8 @@ fi
 alias gs="git status"
 alias gp="git pull"
 alias gP="git push"
-alias ga="git add -A"
+alias ga="git add"
+alias gA="git add -A"
 alias gc="git commit -m"
 
 # rust/cargo
