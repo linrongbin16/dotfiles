@@ -40,7 +40,7 @@ keybind = super+ctrl+arrow_up=unbind
 keybind = super+ctrl+arrow_right=unbind
 keybind = super+ctrl+f=unbind
 keybind = super+shift+d=unbind
-keybind = super+shift+j=unbind
+# keybind = super+shift+j=unbind
 keybind = super+shift+enter=unbind
 keybind = super+shift+arrow_down=unbind
 keybind = super+shift+arrow_up=unbind
