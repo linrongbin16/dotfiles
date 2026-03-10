@@ -1,7 +1,3 @@
-# channel
-auto-update = download
-auto-update-channel = tip
-
 # custom configs
 config-file = ghostty-custom
 

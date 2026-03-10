@@ -1,3 +1,7 @@
+# Channel
+auto-update = download
+auto-update-channel = tip
+
 ## Fonts {{{
 
 # font-family="CodeNewRoman Nerd Font Mono"
