@@ -12,7 +12,7 @@ cursor-style-blink = false
 mouse-hide-while-typing = true
 
 # behavior
-scrollback-limit = 8000000
+scrollback-limit = 500000000
 clipboard-read = allow
 clipboard-write = allow
 title-report = true
