@@ -1,6 +1,21 @@
 # set English
 Set-WinSystemLocale en-US
 
+# eza
+function DotfilesLs1
+{
+  eza -lh $args
+}
+function DotfilesLs2
+{
+  eza -lha $args
+}
+Set-Alias -name l -value DotfilesLs1
+Set-Alias -name ll -value DotfilesLs2
+
+# lazygit
+Set-Alias -name lg -value lazygit
+
 # rust/cargo
 $env:PATH += ";$env:USERPROFILE\.cargo\bin"
 
@@ -8,27 +23,12 @@ $env:PATH += ";$env:USERPROFILE\.cargo\bin"
 $env:GOPATH="$env:USERPROFILE\go"
 $env:PATH += ";$env:GOPATH\bin"
 
-# neovim
+# bob-nvim
 $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
-
-# lazygit
-Set-Alias -name lg -value lazygit
 
 # mise
 mise activate pwsh | Out-String | Invoke-Expression
 
-# eza
-function MyLs1
-{
-  eza -lh $args
-}
-function MyLs2
-{
-  eza -lha $args
-}
-Set-Alias -name l -value MyLs1
-Set-Alias -name ll -value MyLs2
-
-# prompt
+# starship prompt
 $env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
 Invoke-Expression (&starship init powershell)

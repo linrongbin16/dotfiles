@@ -20,11 +20,11 @@ fi
 alias gs="git status"
 alias gp="git pull"
 alias gP="git push"
-alias ga="git add"
-alias gA="git add -A"
+alias gA="git add"
+alias ga="git add -A"
 alias gc="git commit -m"
 
-# rust/cargo
+# cargo
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # go
@@ -34,15 +34,17 @@ fi
 export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOPATH/bin"
 
-# deno/bun
+# deno
 if [ -f "$HOME/.deno/env" ]; then
   . "$HOME/.deno/env"
 fi
+
+# bun
 if [ -x "$HOME/.bun/bin/bun" ]; then
   export PATH="$PATH:$HOME/.bun/bin"
 fi
 
-# neovim
+# bob-nvim
 if [ -d "$HOME/.local/share/bob/nvim-bin" ]; then
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 fi
@@ -57,43 +59,39 @@ eval "$(zoxide init --cmd cd zsh)"
 if [ -f "$HOME/.atuin/bin/env" ]; then
   . "$HOME/.atuin/bin/env"
 fi
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  eval "$(atuin init zsh)"
-else
-  eval "$(atuin init --disable-ctrl-r --disable-up-arrow zsh)"
-fi
+eval "$(atuin init zsh)"
 
 # mise
 eval "$(~/.local/bin/mise activate zsh)"
 
-if [[ $TERM_PROGRAM != "WarpTerminal" ]]; then
-  source ~/.zsh/git-prompt.zsh/git-prompt.zsh
+# git-prompt.zsh {{{
+source ~/.zsh/git-prompt.zsh/git-prompt.zsh
 
-  # ZSH_THEME_GIT_PROMPT_PREFIX="["
-  # ZSH_THEME_GIT_PROMPT_SUFFIX="] "
-  # ZSH_THEME_GIT_PROMPT_SEPARATOR="|"
-  ZSH_THEME_GIT_PROMPT_PREFIX=""
-  ZSH_THEME_GIT_PROMPT_SUFFIX=""
-  ZSH_THEME_GIT_PROMPT_SEPARATOR=" "
-  ZSH_THEME_GIT_PROMPT_DETACHED="%{$fg_bold[cyan]%}:"
-  ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg_bold[magenta]%}"
-  ZSH_THEME_GIT_PROMPT_UPSTREAM_PREFIX="%{$fg[red]%}(%{$fg[yellow]%}"
-  ZSH_THEME_GIT_PROMPT_UPSTREAM_SUFFIX="%{$fg[red]%})"
-  ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[red]%}x"
-  ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}o"
-  ZSH_THEME_GIT_PROMPT_UNSTAGED="%{$fg[red]%}+"
-  ZSH_THEME_GIT_PROMPT_BEHIND="↓"
-  ZSH_THEME_GIT_PROMPT_AHEAD="↑"
-  ZSH_THEME_GIT_PROMPT_UNTRACKED="…"
-  ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
-  ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}⟳"
-  ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}⚑"
+# ZSH_THEME_GIT_PROMPT_PREFIX="["
+# ZSH_THEME_GIT_PROMPT_SUFFIX="] "
+# ZSH_THEME_GIT_PROMPT_SEPARATOR="|"
+ZSH_THEME_GIT_PROMPT_PREFIX=""
+ZSH_THEME_GIT_PROMPT_SUFFIX=""
+ZSH_THEME_GIT_PROMPT_SEPARATOR=" "
+ZSH_THEME_GIT_PROMPT_DETACHED="%{$fg_bold[cyan]%}:"
+ZSH_THEME_GIT_PROMPT_BRANCH="%{$fg_bold[magenta]%}"
+ZSH_THEME_GIT_PROMPT_UPSTREAM_PREFIX="%{$fg[red]%}(%{$fg[yellow]%}"
+ZSH_THEME_GIT_PROMPT_UPSTREAM_SUFFIX="%{$fg[red]%})"
+ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[red]%}x"
+ZSH_THEME_GIT_PROMPT_STAGED="%{$fg[green]%}o"
+ZSH_THEME_GIT_PROMPT_UNSTAGED="%{$fg[red]%}+"
+ZSH_THEME_GIT_PROMPT_BEHIND="↓"
+ZSH_THEME_GIT_PROMPT_AHEAD="↑"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="…"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}✓"
+ZSH_THEME_GIT_PROMPT_UPSTREAM_SYMBOL="%{$fg_bold[yellow]%}⟳"
+ZSH_THEME_GIT_PROMPT_STASHED="%{$fg[blue]%}⚑"
 
-  PROMPT=$'%F{blue}%~%f %b$(gitprompt)%f
+PROMPT=$'%F{blue}%~%f %b$(gitprompt)%f
 %(12V.%F{242}%12v%f .)%(?.%F{cyan}.%F{red})❯%f '
 
-  RPROMPT=''
-fi
+RPROMPT=''
+# git-prompt.zsh }}}
 
-# Compatible with xterm
+# xterm
 export TERM="xterm-256color"
