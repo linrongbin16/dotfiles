@@ -43,9 +43,6 @@ Install with below components:
 # pwsh
 winget install --no-upgrade --disable-interactivity Microsoft.PowerShell
 
-# git for windows
-winget install --no-upgrade --disable-interactivity --scope user -l $env:USERPROFILE\.local\bin\git --custom "/LOADINF=$env:USERPROFILE\.dotfiles\git_for_windows.ini" --id Git.Git -e --source winget
-
 # 7zip
 winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 
@@ -65,6 +62,9 @@ winget install --no-upgrade --disable-interactivity OpenJS.NodeJS.LTS --scope us
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
+
+# git
+scoop install git
 ```
 
 #### Run PowerShell Command
