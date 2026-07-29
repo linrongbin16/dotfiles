@@ -65,7 +65,6 @@ function CoreDeps()
   Install -command "scoop install llvm" -target "clang++"
   Install -command "scoop install make" -target "make"
   Install -command "scoop install cmake" -target "cmake"
-  Install -command "scoop install gsudo" -target "gsudo"
 
   Install -command "scoop install gh" -target "gh"
   Install -command "scoop install curl" -target "curl"
@@ -132,27 +131,6 @@ function PromptDeps()
   Install -command "scoop install mise" -target "mise"
 }
 
-function AlacrittyConfigs()
-{
-  Info "install alacritty configs for windows"
-
-  # alacritty.toml
-  $AlacrittyFolder = "$env:APPDATA\alacritty"
-  if (Test-Path -Path $AlacrittyFolder)
-  {
-    Remove-Item $AlacrittyFolder -Recurse -Force
-  }
-
-  gsudo { New-Item -ItemType SymbolicLink -Path "$env:APPDATA\alacritty" -Target "$env:USERPROFILE\.dotfiles\alacritty_win" }
-
-  # alacritty/themes
-  $AlacrittyThemesFolder = "$env:APPDATA\alacritty\alacritty-theme"
-  if (-not (Test-Path -Path $AlacrittyThemesFolder))
-  {
-    git clone --depth=1 https://github.com/alacritty/alacritty-theme $AlacrittyThemesFolder
-  }
-}
-
 function ProfileConfigs()
 {
   Info "install PROFILE configs for windows"
@@ -178,7 +156,6 @@ function Main()
   NeovimDeps
   PromptDeps
   GitConfigs
-  AlacrittyConfigs
   ProfileConfigs
 }
 
