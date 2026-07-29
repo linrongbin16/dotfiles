@@ -49,7 +49,7 @@ if [ -d "$HOME/.local/share/bob/nvim-bin" ]; then
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 fi
 
-# pipx
+# local bins
 export PATH="$PATH:$HOME/.local/bin"
 
 # zoxide
