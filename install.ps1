@@ -55,7 +55,7 @@ function CoreDeps()
   scoop bucket add extras
   scoop install mingw
   scoop install microsoft-coreutils
-  # scoop install coreutils
+  scoop install coreutils
   # scoop install uutils-coreutils
 
   Install -command "scoop install which" -target "which"
