@@ -51,9 +51,6 @@ install "sudo dnf install -y ripgrep" "rg"
 install "sudo dnf install -y bat" "bat"
 install "sudo dnf install -y fd-find" "fd"
 
-install "sudo dnf install -y pipx" "pipx"
-pipx ensurepath
-
 install "sudo dnf install -y neovim" "nvim"
 
 install "sudo dnf install -y zsh" "zsh"

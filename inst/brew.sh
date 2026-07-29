@@ -48,9 +48,6 @@ install "brew install fd" "fd"
 install "brew install eza" "eza"
 install "brew install tree-sitter-cli" "tree-sitter"
 
-install "brew install pipx" "pipx"
-pipx ensurepath
-
 install "brew install neovim" "nvim"
 
 # install arm-64 zsh for mac

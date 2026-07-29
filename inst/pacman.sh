@@ -42,9 +42,6 @@ install "yes | sudo pacman -S bat" "bat"
 install "yes | sudo pacman -S fd" "fd"
 install "yes | sudo pacman -S eza" "eza"
 
-install "yes | sudo pacman -S python-pipx" "pipx"
-pipx ensurepath
-
 install "yes | sudo pacman -S neovim" "nvim"
 
 install "yes | sudo pacman -S zsh" "zsh"
