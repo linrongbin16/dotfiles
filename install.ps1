@@ -1,7 +1,6 @@
 # Set-PSDebug -Trace 1
 
-$architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-$isArm = $architecture == "Arm" || $architecture == "Arm64"
+$isArm = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64
 
 # utils {
 
