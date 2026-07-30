@@ -40,7 +40,7 @@ if [ -f "$HOME/.deno/env" ]; then
 fi
 
 # bun
-if [ -x "$HOME/.bun/bin/bun" ]; then
+if [ -x "$HOME/.bun/bin" ]; then
   export PATH="$PATH:$HOME/.bun/bin"
 fi
 
