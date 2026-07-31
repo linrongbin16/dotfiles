@@ -91,7 +91,7 @@ prompt_deps() {
   fi
 
   # atuin
-  install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh" "atuin"
+  install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --non-interactive" "atuin"
   mkdir -p $HOME/.config/atuin
   cp $HOME/.dotfiles/atuin.toml $HOME/.config/atuin/config.toml
 
