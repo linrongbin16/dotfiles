@@ -42,6 +42,7 @@ function CoreDeps()
   scoop install mingw
   scoop install microsoft-coreutils
   scoop install coreutils
+  scoop install file
   # scoop install uutils-coreutils
   scoop install extras/vcredist2022
 
