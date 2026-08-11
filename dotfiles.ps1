@@ -2,19 +2,46 @@
 Set-WinSystemLocale en-US
 
 # eza
-function DotfilesLs1
+function DotLs1
 {
   eza -lh $args
 }
-function DotfilesLs2
+function DotLs2
 {
   eza -lha $args
 }
-Set-Alias -name l -value DotfilesLs1
-Set-Alias -name ll -value DotfilesLs2
+Set-Alias -name l -value DotLs1
+Set-Alias -name ll -value DotLs2
 
 # lazygit
 Set-Alias -name lg -value lazygit
+
+# git
+function DotGitStatus
+{
+  git status $args
+}
+Set-Alias -name gs -value DotGitStatus
+function DotGitPull
+{
+  git pull $args
+}
+Set-Alias -name gpl -value DotGitPull
+function DotGitPush
+{
+  git push $args
+}
+Set-Alias -name gps -value DotGitPush
+function DotGitAdd
+{
+  git add $args
+}
+Set-Alias -name ga -value DotGitAdd
+function DotGitCommit
+{
+  git commit $args
+}
+Set-Alias -name gco -value DotGitCommit
 
 # rust/cargo
 $env:PATH += ";$env:USERPROFILE\.cargo\bin"

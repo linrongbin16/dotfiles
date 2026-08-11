@@ -18,11 +18,10 @@ fi
 
 # git
 alias gs="git status"
-alias gp="git pull"
-alias gP="git push"
-alias gA="git add"
-alias ga="git add -A"
-alias gc="git commit -m"
+alias gpl="git pull"
+alias gps="git push"
+alias ga="git add"
+alias gco="git commit"
 
 # cargo
 export PATH="$HOME/.cargo/bin:$PATH"
