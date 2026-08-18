@@ -61,7 +61,9 @@ fi
 eval "$(atuin init zsh)"
 
 # mise
-eval "$(~/.local/bin/mise activate zsh)"
+if [ -f "$HOME/.local/bin/mise" ]; then
+  eval "$(~/.local/bin/mise activate zsh)"
+fi
 
 # git-prompt.zsh {{{
 source ~/.zsh/git-prompt.zsh/git-prompt.zsh
