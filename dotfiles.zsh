@@ -58,7 +58,9 @@ eval "$(zoxide init --cmd cd zsh)"
 if [ -f "$HOME/.atuin/bin/env" ]; then
   . "$HOME/.atuin/bin/env"
 fi
-eval "$(atuin init zsh)"
+if [ -f "$HOME/.atuin/bin/atuin" ]; then
+  eval "$(atuin init zsh)"
+fi
 
 # mise
 if [ -f "$HOME/.local/bin/mise" ]; then
