@@ -99,40 +99,40 @@ prompt_deps() {
   install "curl https://mise.run | sh" "mise"
 }
 
-# alacritty_configs() {
-#   mkdir -p "$HOME/.config"
-#   if [ -d "$HOME/.config/alacritty" ]; then
-#     rm -rf $HOME/.config/alacritty
-#   fi
-#
-#   if [ "$IS_MAC" == "1" ]; then
-#     ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
-#   else
-#     ln -s $HOME/.dotfiles/alacritty_unix $HOME/.config/alacritty
-#   fi
-#
-#   if [ ! -d "$HOME/.config/alacritty/alacritty-theme" ]; then
-#     git clone --depth=1 https://github.com/alacritty/alacritty-theme $HOME/.config/alacritty/alacritty-theme
-#   fi
-# }
+alacritty_configs() {
+  mkdir -p "$HOME/.config"
+  if [ -d "$HOME/.config/alacritty" ]; then
+    rm -rf $HOME/.config/alacritty
+  fi
 
-# kitty_configs() {
-#   mkdir -p "$HOME/.config"
-#   if [ -d "$HOME/.config/kitty" ]; then
-#     rm -rf $HOME/.config/kitty
-#   fi
-#   if [ "$IS_MAC" == "1" ]; then
-#     ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/kitty
-#   else
-#     ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/kitty
-#   fi
-#
-#   touch "$HOME/.config/kitty/kitty-custom.conf"
-#
-#   if [ ! -d "$HOME/.config/kitty/kitty-themes" ]; then
-#     git clone --depth=1 https://github.com/kovidgoyal/kitty-themes $HOME/.config/kitty/kitty-themes
-#   fi
-# }
+  if [ "$IS_MAC" == "1" ]; then
+    ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
+  else
+    ln -s $HOME/.dotfiles/alacritty_unix $HOME/.config/alacritty
+  fi
+
+  if [ ! -d "$HOME/.config/alacritty/alacritty-theme" ]; then
+    git clone --depth=1 https://github.com/alacritty/alacritty-theme $HOME/.config/alacritty/alacritty-theme
+  fi
+}
+
+kitty_configs() {
+  mkdir -p "$HOME/.config"
+  if [ -d "$HOME/.config/kitty" ]; then
+    rm -rf $HOME/.config/kitty
+  fi
+  if [ "$IS_MAC" == "1" ]; then
+    ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/kitty
+  else
+    ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/kitty
+  fi
+
+  touch "$HOME/.config/kitty/kitty-custom.conf"
+
+  if [ ! -d "$HOME/.config/kitty/kitty-themes" ]; then
+    git clone --depth=1 https://github.com/kovidgoyal/kitty-themes $HOME/.config/kitty/kitty-themes
+  fi
+}
 
 ghostty_configs() {
   mkdir -p "$HOME/.config"
