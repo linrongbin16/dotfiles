@@ -26,12 +26,12 @@ function DotGitPull
 {
   git pull $args
 }
-Set-Alias -name gpl -value DotGitPull
+# Set-Alias -name gpl -value DotGitPull
 function DotGitPush
 {
   git push $args
 }
-Set-Alias -name gps -value DotGitPush
+# Set-Alias -name gps -value DotGitPush
 function DotGitAdd
 {
   git add $args
