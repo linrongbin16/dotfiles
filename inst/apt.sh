@@ -52,12 +52,12 @@ install_eza() {
 
 install_bat() {
   sudo apt-get install -q -y bat
-  sudo ln -s $(which batcat) /usr/bin/bat
+  sudo ln -s /usr/bin/batcat /usr/bin/bat
 }
 
 install_fd() {
   sudo apt-get install -q -y fd-find
-  sudo ln -s $(which fdfind) /usr/bin/fd
+  sudo ln -s /usr/bin/fdfind /usr/bin/fd
 }
 
 install_neovim() {
