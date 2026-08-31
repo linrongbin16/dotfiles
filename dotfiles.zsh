@@ -18,8 +18,8 @@ fi
 
 # git
 alias gs="git status"
-alias gpl="git pull"
-alias gps="git push"
+alias gp="git pull"
+alias gP="git push"
 alias ga="git add"
 alias gco="git commit"
 
