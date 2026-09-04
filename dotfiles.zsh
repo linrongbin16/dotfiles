@@ -54,14 +54,6 @@ export PATH="$PATH:$HOME/.local/bin"
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
 
-# atuin
-if [ -f "$HOME/.atuin/bin/env" ]; then
-  . "$HOME/.atuin/bin/env"
-fi
-if [ -f "$HOME/.atuin/bin/atuin" ]; then
-  eval "$(atuin init zsh)"
-fi
-
 # git-prompt.zsh {{{
 source ~/.zsh/git-prompt.zsh/git-prompt.zsh
 
