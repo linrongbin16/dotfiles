@@ -67,10 +67,6 @@ scoop install git
 
 #### Run PowerShell Command
 
-> [!CAUTION]
-> Run below commands with builtin "PowerShell 7" terminal, not any other third party terminals.
-> Since they may panic with 'gsudo' administrator privilege.
-
 ```powershell
 cd $env:USERPROFILE
 git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
