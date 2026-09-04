@@ -2,11 +2,6 @@
 
 # set -x
 
-install_zsh() {
-  brew install zsh
-  sudo chsh -s /opt/homebrew/bin/zsh $USER
-}
-
 info "install deps with brew"
 
 install "xcode-select --install" "clang"
@@ -49,6 +44,3 @@ install "brew install eza" "eza"
 install "brew install tree-sitter-cli" "tree-sitter"
 
 install "brew install neovim" "nvim"
-
-# install arm-64 zsh for mac
-install "install_zsh" "/opt/homebrew/bin/zsh"

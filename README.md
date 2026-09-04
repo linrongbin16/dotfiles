@@ -10,8 +10,8 @@ My dot files.
 
 #### Pre-Requirements
 
-- For Linux, please install [zsh](https://www.zsh.org/) and use it as your default login shell.
-- For MacOS, please install [xcode](https://developer.apple.com/support/xcode/) and use [homebrew](https://brew.sh/) as your package manager.
+- For both macOS and Linux, please install [zsh](https://www.zsh.org/) and set it as default login shell.
+- For macOS, please install [xcode](https://developer.apple.com/support/xcode/) and use [homebrew](https://brew.sh/) as your package manager.
 
 ```bash
 cd ~

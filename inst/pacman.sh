@@ -43,6 +43,3 @@ install "yes | sudo pacman -S fd" "fd"
 install "yes | sudo pacman -S eza" "eza"
 
 install "yes | sudo pacman -S neovim" "nvim"
-
-install "yes | sudo pacman -S zsh" "zsh"
-sudo chsh -s $(which zsh) $USER
