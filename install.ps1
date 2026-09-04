@@ -61,7 +61,7 @@ function CoreDeps()
   Install -command "scoop install curl" -target "curl"
   Install -command "scoop install wget" -target "wget"
 
-  Install -command "scoop install extras/alacritty" -target "alacritty"
+  # Install -command "scoop install extras/alacritty" -target "alacritty"
 }
 
 function JsDeps()

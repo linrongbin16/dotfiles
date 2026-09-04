@@ -23,7 +23,6 @@ install "brew install wget" "wget"
 install "brew install gzip" "gzip"
 install "brew install p7zip" "7z"
 install "brew install unzip" "unzip"
-install "brew install alacritty" "alacritty"
 
 install "brew install python3" "python3"
 
