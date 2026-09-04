@@ -22,8 +22,6 @@ cd .dotfiles
 
 ### Windows
 
-> Please choose x86_64 for all below dependencies.
-
 #### Enable developer mode
 
 Please see: [active developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development#activate-developer-mode).
