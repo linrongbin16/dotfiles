@@ -2,7 +2,7 @@
 
 # performance
 ulimit -n 200000
-ulimit -u 2048
+ulimit -u 8192
 
 # ls
 alias l="eza -lh"
