@@ -53,8 +53,8 @@ $env:PATH += ";$env:GOPATH\bin"
 # bob-nvim
 $env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
 
-# mise
-mise activate pwsh | Out-String | Invoke-Expression
+# mise is disabled
+# mise activate pwsh | Out-String | Invoke-Expression
 
 # starship prompt
 $env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"

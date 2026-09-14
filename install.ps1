@@ -116,7 +116,9 @@ function NeovimDeps()
 function PromptDeps()
 {
   Install -command "scoop install starship" -target "starship"
-  Install -command "scoop install mise" -target "mise"
+
+  # mise is disabled
+  # Install -command "scoop install mise" -target "mise"
 }
 
 function ProfileConfigs()
