@@ -85,3 +85,6 @@ RPROMPT=''
 
 # xterm
 export TERM="xterm-256color"
+
+# zsh disable vi-mode, enforce emacs-mode
+bindkey -e
