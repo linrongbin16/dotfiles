@@ -35,10 +35,6 @@ install_go() {
   sudo apt-get install -q -y golang-go
 }
 
-install_lazygit() {
-  go install github.com/jesseduffield/lazygit@latest
-}
-
 install_eza() {
   sudo apt update
   sudo apt install -y gpg
@@ -101,7 +97,7 @@ install "install_nodejs" "npm"
 install "install_go" "go"
 
 install "sudo apt-get install -q -y fzf" "fzf"
-install "install_lazygit" "lazygit"
+install "sudo apt-get install -q -y lazygit" "lazygit"
 install "sudo apt-get install -q -y ripgrep" "rg"
 install "install_bat" "bat"
 install "install_fd" "fd"
