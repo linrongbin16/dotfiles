@@ -47,6 +47,9 @@ fi
 if [ -d "$HOME/.local/share/bob/nvim-bin" ]; then
   export PATH="$PATH:$HOME/.local/share/bob/nvim-bin"
 fi
+if [ -d "$HOME/Library/Application Support/bob/nvim-bin" ]; then
+  export PATH="$PATH:$HOME/Library/Application Support/bob/nvim-bin"
+fi
 
 # local bins
 export PATH="$PATH:$HOME/.local/bin"
