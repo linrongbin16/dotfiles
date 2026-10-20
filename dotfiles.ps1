@@ -1,5 +1,5 @@
 # set English
-Set-WinSystemLocale en-US
+# Set-WinSystemLocale en-US
 
 # eza
 function DotLs1
