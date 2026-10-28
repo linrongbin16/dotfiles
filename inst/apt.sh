@@ -2,6 +2,18 @@
 
 # set -x
 
+# debian/ubuntu package architecture name, i.e. amd64/arm64
+ARCH="$(uname -m)"
+case "$ARCH" in
+x86_64) ARCH="amd64" ;;
+aarch64 | arm64) ARCH="arm64" ;;
+esac
+
+IS_ARM=0
+if [[ "$ARCH" == arm* ]]; then
+  IS_ARM=1
+fi
+
 install_nodejs() {
   # https://github.com/nodesource/distributions
   sudo apt-get install -y curl
@@ -61,6 +73,15 @@ install_neovim() {
   sudo snap install nvim --classic
 }
 
+install_mo() {
+  # https://github.com/k1LoW/mo
+  local tag version
+  tag="$(basename "$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/k1LoW/mo/releases/latest)")"
+  version="${tag#v}"
+  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/mo_${version}-1_${ARCH}.deb"
+  sudo apt-get install -q -y "./mo_${version}-1_${ARCH}.deb"
+}
+
 info "install deps with apt"
 info "arch: $ARCH, arm: $IS_ARM"
 
@@ -104,3 +125,5 @@ install "install_fd" "fd"
 install "install_eza" "eza"
 
 install "install_neovim" "nvim"
+
+install "install_mo" "mo"
