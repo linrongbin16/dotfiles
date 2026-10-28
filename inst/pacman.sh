@@ -2,6 +2,28 @@
 
 # set -x
 
+# package architecture name, i.e. amd64/arm64
+ARCH="$(uname -m)"
+case "$ARCH" in
+x86_64) ARCH="amd64" ;;
+aarch64 | arm64) ARCH="arm64" ;;
+esac
+
+IS_ARM=0
+if [[ "$ARCH" == arm* ]]; then
+  IS_ARM=1
+fi
+
+install_mo() {
+  # https://github.com/k1LoW/mo
+  local tag version tarball
+  tag="$(basename "$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/k1LoW/mo/releases/latest)")"
+  version="${tag#v}"
+  tarball="mo_v${version}_linux_${ARCH}.tar.gz"
+  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/${tarball}"
+  sudo tar -xzf "$tarball" -C /usr/local/bin mo
+}
+
 info "install deps with pacman"
 info "arch: $ARCH, arm: $IS_ARM"
 
@@ -41,5 +63,6 @@ install "yes | sudo pacman -S ripgrep" "rg"
 install "yes | sudo pacman -S bat" "bat"
 install "yes | sudo pacman -S fd" "fd"
 install "yes | sudo pacman -S eza" "eza"
+install "install_mo" "mo"
 
 install "yes | sudo pacman -S neovim" "nvim"

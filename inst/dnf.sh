@@ -2,6 +2,18 @@
 
 # set -x
 
+# package architecture name, i.e. amd64/arm64
+ARCH="$(uname -m)"
+case "$ARCH" in
+x86_64) ARCH="amd64" ;;
+aarch64 | arm64) ARCH="arm64" ;;
+esac
+
+IS_ARM=0
+if [[ "$ARCH" == arm* ]]; then
+  IS_ARM=1
+fi
+
 install_gh() {
   sudo dnf install -y dnf5-plugins
   sudo dnf config-manager addrepo --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
@@ -11,6 +23,15 @@ install_gh() {
 install_lazygit() {
   sudo dnf copr -y enable dejan/lazygit
   sudo dnf install -y lazygit
+}
+
+install_mo() {
+  # https://github.com/k1LoW/mo
+  local tag version
+  tag="$(basename "$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/k1LoW/mo/releases/latest)")"
+  version="${tag#v}"
+  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/mo_${version}-1_${ARCH}.rpm"
+  sudo dnf install -y "./mo_${version}-1_${ARCH}.rpm"
 }
 
 info "install deps with dnf"
@@ -50,5 +71,7 @@ install "install_lazygit" "lazygit"
 install "sudo dnf install -y ripgrep" "rg"
 install "sudo dnf install -y bat" "bat"
 install "sudo dnf install -y fd-find" "fd"
+install "sudo dnf install -y eza" "eza"
+install "install_mo" "mo"
 
 install "sudo dnf install -y neovim" "nvim"
