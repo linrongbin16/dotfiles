@@ -123,7 +123,6 @@ install "sudo apt-get install -q -y ripgrep" "rg"
 install "install_bat" "bat"
 install "install_fd" "fd"
 install "install_eza" "eza"
+install "install_mo" "mo"
 
 install "install_neovim" "nvim"
-
-install "install_mo" "mo"
