@@ -63,7 +63,6 @@ install "yes | sudo pacman -S ripgrep" "rg"
 install "yes | sudo pacman -S bat" "bat"
 install "yes | sudo pacman -S fd" "fd"
 install "yes | sudo pacman -S eza" "eza"
+install "install_mo" "mo"
 
 install "yes | sudo pacman -S neovim" "nvim"
-
-install "install_mo" "mo"
