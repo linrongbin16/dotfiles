@@ -36,8 +36,6 @@ function InstallMo()
     return
   }
 
-  Info "install 'mo' from github release"
-
   $latestUrl = & curl.exe -fsSL -o NUL -w "%{url_effective}" "https://github.com/k1LoW/mo/releases/latest"
   if ($LASTEXITCODE -ne 0 -or -not $latestUrl)
   {
@@ -53,18 +51,16 @@ function InstallMo()
     New-Item -ItemType Directory -Force -Path $localBin | Out-Null
   }
 
-  $archive = Join-Path $env:TEMP $asset
-  & curl.exe -fsSL -o $archive $url
+  & curl.exe -fsSL -o $asset $url
   if ($LASTEXITCODE -ne 0)
   {
     throw "failed to download ${url}"
   }
-  tar -xzf $archive -C $localBin mo.exe
+  tar -xzf $asset -C $localBin mo.exe
   if ($LASTEXITCODE -ne 0)
   {
-    throw "failed to extract ${archive}"
+    throw "failed to extract ${asset}"
   }
-  Remove-Item -Force $archive
 
   # add ~/.local/bin to user PATH
   $userPath = [Environment]::GetEnvironmentVariable("Path", "User")

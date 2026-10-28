@@ -4,7 +4,9 @@ go*tar.gz
 go
 nodesource_setup.sh
 python-installer.exe
-*.deb
+mo*.deb
+mo*.rpm
+mo*.tar.gz
 
 alacritty-theme
 alacritty-custom.toml
