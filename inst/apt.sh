@@ -118,7 +118,6 @@ install "install_nodejs" "npm"
 install "install_go" "go"
 
 install "sudo apt-get install -q -y fzf" "fzf"
-install "sudo apt-get install -q -y lazygit" "lazygit"
 install "sudo apt-get install -q -y ripgrep" "rg"
 install "install_bat" "bat"
 install "install_fd" "fd"
