@@ -28,6 +28,57 @@ function Install([string]$command, [string]$target)
 
 # utils }
 
+function InstallMo()
+{
+  if (Get-Command -Name "mo" -ErrorAction SilentlyContinue)
+  {
+    SkipInfo "mo"
+    return
+  }
+
+  Info "install 'mo' from github release"
+
+  $latestUrl = & curl.exe -fsSL -o NUL -w "%{url_effective}" "https://github.com/k1LoW/mo/releases/latest"
+  if ($LASTEXITCODE -ne 0 -or -not $latestUrl)
+  {
+    throw "failed to resolve the latest release of mo"
+  }
+  $tag = "$latestUrl".Trim().Split("/")[-1]
+  $asset = "mo_${tag}_windows_amd64.tar.gz"
+  $url = "https://github.com/k1LoW/mo/releases/download/${tag}/${asset}"
+
+  $localBin = Join-Path $HOME ".local\bin"
+  if (-not (Test-Path -Path $localBin))
+  {
+    New-Item -ItemType Directory -Force -Path $localBin | Out-Null
+  }
+
+  $archive = Join-Path $env:TEMP $asset
+  & curl.exe -fsSL -o $archive $url
+  if ($LASTEXITCODE -ne 0)
+  {
+    throw "failed to download ${url}"
+  }
+  tar -xzf $archive -C $localBin mo.exe
+  if ($LASTEXITCODE -ne 0)
+  {
+    throw "failed to extract ${archive}"
+  }
+  Remove-Item -Force $archive
+
+  # add ~/.local/bin to user PATH
+  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+  $pathParts = @($userPath -split ";" | Where-Object { $_ })
+  if ($pathParts -notcontains $localBin)
+  {
+    [Environment]::SetEnvironmentVariable("Path", (@($pathParts) + $localBin) -join ";", "User")
+  }
+  if (($env:Path -split ";") -notcontains $localBin)
+  {
+    $env:Path = "$env:Path;$localBin"
+  }
+}
+
 function CoreDeps()
 {
   Info "install core deps for windows"
@@ -60,6 +111,8 @@ function CoreDeps()
   Install -command "scoop install gh" -target "gh"
   Install -command "scoop install curl" -target "curl"
   Install -command "scoop install wget" -target "wget"
+
+  InstallMo
 
   # Install -command "scoop install extras/alacritty" -target "alacritty"
 }
