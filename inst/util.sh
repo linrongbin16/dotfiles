@@ -18,11 +18,22 @@ skip_info() {
 install() {
   local command="$1"
   local target="$2"
-  if ! type "$target" >/dev/null 2>&1; then
-    info "install '$target' with: '$command'"
-    eval "$command"
-    info "install '$target' with: '$command' - done"
-  else
+  local status=0
+  if type "$target" >/dev/null 2>&1; then
     skip_info $target
+    return 0
   fi
+
+  info "install '$target' with: '$command'"
+  # Run inside `if` so that errexit (`bash -e`, used by CI) doesn't abort
+  # before we get a chance to report which command failed.
+  if eval "$command"; then
+    info "install '$target' with: '$command' - done"
+    return 0
+  else
+    status=$?
+  fi
+
+  info "install '$target' with: '$command' - failed (exit $status)"
+  return "$status"
 }
