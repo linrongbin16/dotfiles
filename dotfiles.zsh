@@ -52,7 +52,7 @@ if [ -d "$HOME/Library/Application Support/bob/nvim-bin" ]; then
 fi
 
 # local bins
-export PATH="$PATH:$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
 
 # zoxide
 eval "$(zoxide init --cmd cd zsh)"
