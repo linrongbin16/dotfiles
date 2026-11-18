@@ -55,10 +55,14 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # zoxide
-eval "$(zoxide init --cmd cd zsh)"
+if [ -x "zoxide" ]; then
+  eval "$(zoxide init --cmd cd zsh)"
+fi
 
 # git-prompt.zsh {{{
-source ~/.zsh/git-prompt.zsh/git-prompt.zsh
+if [ -f "$HOME/.zsh/git-prompt.zsh/git-prompt.zsh" ]; then
+  source $HOME/.zsh/git-prompt.zsh/git-prompt.zsh
+fi
 
 # ZSH_THEME_GIT_PROMPT_PREFIX="["
 # ZSH_THEME_GIT_PROMPT_SUFFIX="] "
@@ -90,4 +94,6 @@ RPROMPT=''
 export TERM="xterm-256color"
 
 # zsh disable vi-mode, enforce emacs-mode
-bindkey -e
+if [[ "$SHELL" == *zsh ]]; then
+  bindkey -e
+fi
