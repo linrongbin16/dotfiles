@@ -378,17 +378,13 @@ function RustDeps()
 function NeovimDeps()
 {
   Info "install neovim deps for windows"
-  # bob manages `nvim` in this setup; scoop's `neovim` would shadow it on PATH, so an `nvim`
-  # from anywhere is enough. The scoop package is named `neovim`, it ships the `nvim` binary.
   InstallScoop "neovim" "nvim"
 }
 
 function PromptDeps()
 {
   InstallScoop "starship"
-
-  # mise is disabled
-  # InstallScoop "mise"
+  InstallScoop "mise"
 }
 
 # Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
@@ -440,8 +436,7 @@ function GetProfileEncoding([string]$path)
     try
     {
       $read = $stream.Read($head, 0, $head.Length)
-    }
-    finally
+    } finally
     {
       $stream.Dispose()
     }
