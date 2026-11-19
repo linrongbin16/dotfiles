@@ -172,7 +172,19 @@ main() {
   # alacritty_configs
   # kitty_configs
   ghostty_configs
-  profile_configs
+  # `profile_configs` reports its own failure via a non-zero return. Guard it
+  # with `||` so `bash -e` (CI) doesn't abort here, then record it like any
+  # other failure so both paths end up in the same summary.
+  profile_configs || record_failure "zshrc"
+
+  # Individual `install()` calls record their failures instead of aborting, so
+  # without this the script used to exit 0 even when everything failed. Under
+  # CI's `bash -e` it exited 1 at the first failure instead - same script, two
+  # different outcomes. Report once at the end so both paths agree.
+  if ! report_failures; then
+    exit 1
+  fi
+  info "all done"
 }
 
 main
