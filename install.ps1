@@ -153,6 +153,34 @@ function RunCommand([string]$command)
   InvokeChecked -command $command -action "run command: '${command}'"
 }
 
+# Add `$dir` to the PATH of the current process, when it is not there yet.
+#
+# The entry is appended at the end, the same way `dotfiles.ps1` appends the directories it
+# manages, and it is never added twice: a duplicated entry makes every command in that
+# directory go through two PATH lookups.
+function AddProcessPathEntry([string]$dir)
+{
+  if (($env:Path -split ";") -notcontains $dir)
+  {
+    $env:Path = "$env:Path;$dir"
+  }
+}
+
+# Add `$dir` to the PATH of the current user, when it is not there yet.
+#
+# The persisted PATH is a different list from the one of the running process: changing only
+# the former would not make the directory usable until the next login, changing only the
+# latter would be lost at the next start. Both are updated, in the same order.
+function AddUserPathEntry([string]$dir)
+{
+  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+  $pathParts = @($userPath -split ";" | Where-Object { $_ })
+  if ($pathParts -notcontains $dir)
+  {
+    [Environment]::SetEnvironmentVariable("Path", (@($pathParts) + $dir) -join ";", "User")
+  }
+}
+
 function AddScoopBucket([string]$name)
 {
   # `scoop bucket add` exits with 2 when the bucket exists (scoop's `lib/buckets.ps1:
@@ -176,6 +204,7 @@ function AddScoopBucket([string]$name)
 
 # utils }
 
+# Install `mo`, the GitHub issue formatter, from its upstream release archive.
 function InstallMo()
 {
   if (Get-Command -Name "mo" -ErrorAction SilentlyContinue)
@@ -190,37 +219,100 @@ function InstallMo()
     throw "failed to resolve the latest release of mo"
   }
   $tag = "$latestUrl".Trim().Split("/")[-1]
-  $asset = "mo_${tag}_windows_amd64.tar.gz"
-  $url = "https://github.com/k1LoW/mo/releases/download/${tag}/${asset}"
 
-  $localBin = Join-Path $HOME ".local\bin"
-  if (-not (Test-Path -Path $localBin))
+  # Download and unpack in a private temporary directory. The archive used to be saved into the
+  # current working directory, which left a `mo_<tag>_windows_amd64.tar.gz` behind in the
+  # repository root -- hidden only by the `mo*.tar.gz` rule in `.gitignore`.
+  $tempBase = $env:TEMP
+  if (-not $tempBase) { $tempBase = $env:TMP }
+  if (-not $tempBase) { $tempBase = [System.IO.Path]::GetTempPath() }
+  $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
+  $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("mo-install-" + [guid]::NewGuid().ToString("N"))))
+
+  try
   {
+    New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+    $archive = Join-Path $workDir "mo.tar.gz"
+
+    # Upstream publishes a Windows build for x86-64 only (`mo_<tag>_windows_amd64.tar.gz`), so an
+    # ARM64 Windows has to run that build under emulation. Ask for a native build first and fall
+    # back to x86-64, so a future upstream release is picked up without another change here.
+    $architectures = @('amd64')
+    if ($isArm)
+    {
+      $architectures = @('arm64', 'amd64')
+    }
+
+    $url = ''
+    $architecture = ''
+    $failure = ''
+    foreach ($arch in $architectures)
+    {
+      $asset = "mo_${tag}_windows_${arch}.tar.gz"
+      $candidateUrl = "https://github.com/k1LoW/mo/releases/download/${tag}/${asset}"
+      try
+      {
+        & curl.exe -fsSL -o $archive $candidateUrl
+        if ($LASTEXITCODE -eq 0)
+        {
+          $url = $candidateUrl
+          $architecture = $arch
+          break
+        }
+        $failure = "curl exited with ${LASTEXITCODE}"
+      } catch
+      {
+        # A host that turns a native exit code into a terminating error must not abort the
+        # whole installation: the next architecture may still be available.
+        $failure = $_.Exception.Message
+      }
+      if ($arch -eq $architectures[-1])
+      {
+        break
+      }
+      Info "no ${arch} build of mo ${tag} (${failure}), trying the next architecture"
+    }
+    if (-not $url)
+    {
+      throw "failed to download mo ${tag} for windows ($($architectures -join ', ')): ${failure}"
+    }
+    if ($isArm -and $architecture -eq 'amd64')
+    {
+      Info "upstream publishes no Windows/arm64 build of mo, using the x86-64 build (windows runs it under emulation)"
+    }
+
+    # Unpack into the temporary directory first, and copy only the binary into `~/.local\bin`:
+    # the archive also holds the license and the readme.
+    $extractDir = Join-Path $workDir "extract"
+    New-Item -ItemType Directory -Force -Path $extractDir | Out-Null
+    tar -xzf $archive -C $extractDir mo.exe
+    if ($LASTEXITCODE -ne 0)
+    {
+      throw "failed to extract ${url}"
+    }
+    $exe = Join-Path $extractDir "mo.exe"
+    if (-not (Test-Path -Path $exe))
+    {
+      throw "the archive ${url} does not contain mo.exe"
+    }
+
+    $localBin = Join-Path $HOME ".local\bin"
     New-Item -ItemType Directory -Force -Path $localBin | Out-Null
-  }
-
-  & curl.exe -fsSL -o $asset $url
-  if ($LASTEXITCODE -ne 0)
+    Copy-Item -Path $exe -Destination (Join-Path $localBin "mo.exe") -Force
+    Info "installed mo ${tag} into ${localBin}"
+  } finally
   {
-    throw "failed to download ${url}"
-  }
-  tar -xzf $asset -C $localBin mo.exe
-  if ($LASTEXITCODE -ne 0)
-  {
-    throw "failed to extract ${asset}"
+    # Remove only the directory this function created, and only when it really is a child of
+    # the temporary directory. A leftover must not fail an otherwise finished installation.
+    if ((Split-Path -Path $workDir -Parent) -eq $tempRoot)
+    {
+      Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
   }
 
   # add ~/.local/bin to user PATH
-  $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
-  $pathParts = @($userPath -split ";" | Where-Object { $_ })
-  if ($pathParts -notcontains $localBin)
-  {
-    [Environment]::SetEnvironmentVariable("Path", (@($pathParts) + $localBin) -join ";", "User")
-  }
-  if (($env:Path -split ";") -notcontains $localBin)
-  {
-    $env:Path = "$env:Path;$localBin"
-  }
+  AddUserPathEntry -dir $localBin
+  AddProcessPathEntry -dir $localBin
 }
 
 function CoreDeps()
