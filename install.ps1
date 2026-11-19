@@ -35,10 +35,6 @@ function InvokeChecked([string]$command, [string]$action)
 }
 
 # Whether `$command` is on PATH *and* actually runs, e.g. `cargo --version` exiting 0.
-#
-# `-Arguments` defaults to `--version` because that is what every tool probed here answers, but it
-# is a parameter for `cargo-binstall`: its `--version` takes a *crate* version as the value, so a
-# bare `--version` exits 2 even on a healthy install. That call site passes `-V` instead.
 function TestCommand([string]$command, [string]$Arguments = "--version")
 {
   # `-First 1`: PATH can hold two copies of the same binary (say a scoop shim and the one in
@@ -137,16 +133,6 @@ function GetCargoCrates()
 
 # Install a crate unless it is already in this `CARGO_HOME`. `tree-sitter-cli` is the reason this
 # cannot be `Get-Command`: the crate ships `tree-sitter.exe`, not `tree-sitter-cli.exe`.
-#
-# `cargo binstall` instead of `cargo install`: it downloads a prebuilt release when the crate
-# publishes one and only falls back to compiling. That turns the slowest part of this script
-# (`tree-sitter-cli` alone is minutes of C compilation) into a download. It records installs in
-# the same `.crates.toml` `cargo install` writes, so `GetCargoCrates` sees both.
-#
-# `--no-confirm` because binstall asks "do you wish to continue?" before every install and this
-# script runs unattended; `--disable-telemetry` because without it `--no-confirm` silently leaves
-# the QuickInstall install-statistics consent enabled (`consent_asked = false`), i.e. it would
-# report what this machine installs without ever having asked.
 function InstallCargo([string]$crate)
 {
   if ((GetCargoCrates) -contains $crate)
@@ -360,15 +346,6 @@ function InstallRustup()
 }
 
 # Install `cargo-binstall`, the `cargo install` replacement `InstallCargo` uses.
-#
-# Not `cargo install cargo-binstall`: the crate takes several minutes to compile, which is exactly
-# the cost binstall exists to avoid, so it is installed from its own prebuilt release instead.
-# The project's installer is the one its README points at, and it picks the release asset for this
-# architecture itself, honours `CARGO_HOME`, and falls back to `-y --force cargo-binstall` if its
-# `--self-install` step does not work out.
-#
-# The probe is `-V`, not the `--version` default of `TestCommand`: binstall's `--version` takes a
-# crate version as its value, so a bare `--version` exits 2 on a perfectly healthy install.
 function InstallCargoBinstall()
 {
   if (TestCommand "cargo-binstall" "-V")
