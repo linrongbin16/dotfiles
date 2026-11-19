@@ -151,11 +151,6 @@ function CoreDeps()
   AddScoopBucket -name "extras"
 
   RunCommand -command "scoop install mingw"
-  # Not `microsoft-coreutils`: it shims GNU `link` as `~\scoop\shims\link.exe`, and scoop
-  # puts its shims on PATH ahead of the MSVC toolchain, so rustc picks it up as the linker
-  # and every `cargo install` in `RustDeps` fails with `error: 2 values required for
-  # '<FILES> <FILES>' but 34 were provided`. `coreutils` provides the shell utilities this
-  # setup needs and ships no `link`.
   RunCommand -command "scoop install coreutils"
   RunCommand -command "scoop install file"
   # RunCommand -command "scoop install uutils-coreutils"
