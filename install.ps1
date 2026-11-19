@@ -237,16 +237,49 @@ function ProfileConfigs()
 {
   Info "install PROFILE configs for windows"
 
-  $ProfileFolder = Split-Path $PROFILE
-  if (-not (Test-Path -Path $ProfileFolder))
+  $line = '. $env:USERPROFILE\.dotfiles\dotfiles.ps1'
+
+  New-Item -ItemType Directory -Path (Split-Path $PROFILE) -Force | Out-Null
+
+  $content = ''
+  if (Test-Path -Path $PROFILE)
   {
-    New-Item -ItemType Directory $ProfileFolder
+    $content = [System.IO.File]::ReadAllText($PROFILE, [System.Text.Encoding]::UTF8)
   }
 
-  Write-Output '' >>$PROFILE
-  Write-Output '# dotfiles' >>$PROFILE
-  Write-Output '. $env:USERPROFILE\.dotfiles\dotfiles.ps1' >>$PROFILE
-  Write-Output '[dotfiles] Done'
+  # Probe before appending: the block used to be written unconditionally, so every re-run
+  # added another copy and `dotfiles.ps1` got sourced once more per run, stacking the PATH
+  # entries it appends.
+  foreach ($existing in $content -split "\r?\n")
+  {
+    if ($existing.Trim() -eq $line)
+    {
+      Info "source '${line}' is already in '${PROFILE}', skip..."
+      return
+    }
+  }
+
+  # Append through `[System.IO.File]::AppendAllText` with an explicit BOM-less UTF-8 encoder.
+  # `>>` is not usable here: under Windows PowerShell 5.1 it appends UTF-16LE, which
+  # corrupts a UTF-8 profile and makes it fail to parse. `Add-Content -Encoding utf8` is
+  # closer but still writes a BOM when it has to create the file.
+  #
+  # `AppendAllText` does not terminate the previous line, so close it first when the file
+  # does not end with a newline; keep the blank separator line the old version wrote.
+  $prefix = ''
+  if ($content.Length -gt 0)
+  {
+    if (-not $content.EndsWith("`n"))
+    {
+      $prefix += "`r`n"
+    }
+    $prefix += "`r`n"
+  }
+
+  $block = "${prefix}# dotfiles`r`n${line}`r`n"
+  [System.IO.File]::AppendAllText($PROFILE, $block, [System.Text.UTF8Encoding]::new($false))
+
+  Info "append '${line}' to '${PROFILE}' - done"
 }
 
 function Main()
