@@ -66,14 +66,6 @@ AddPathEntry (Join-Path $env:GOPATH 'bin')
 AddPathEntry "$env:LOCALAPPDATA\bob\nvim-bin"
 
 # starship prompt
-#
-# `starship init powershell` is what writes the prompt of the shell, so it may run only when
-# starship is installed: without the guard every shell reports the missing command as a
-# non-terminating error. The config of starship belongs to starship, so it goes with the init.
-#
-# `Get-Command` reports a missing command as an error, and `-ErrorAction SilentlyContinue` still
-# writes that error into `$Error`. `-ErrorAction Ignore` writes it nowhere, so a shell without
-# starship starts with an empty `$Error`.
 if (Get-Command starship -ErrorAction Ignore)
 {
   $env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
@@ -84,10 +76,6 @@ if (Get-Command starship -ErrorAction Ignore)
 #
 # `install.ps1` installs mise on windows, so the shell activates it here: the shims of mise have
 # to be in front of the PATH, otherwise the tool that wins is the one of scoop or of cargo.
-#
-# The activation comes after the starship prompt on purpose: starship replaces the `prompt`
-# function and mise wraps the `prompt` function that it finds. The other way round, the wrapper
-# of mise would be gone and `mise use` would only take effect after the next `cd`.
 #
 # `mise activate pwsh` writes the PATH, so it may run only once per shell: a second run puts the
 # shims of mise into the PATH a second time. `__MISE_ORIG_PATH` is the marker that mise itself
