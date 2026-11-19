@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# Fail fast: any command that fails aborts the whole installation with its own
+# exit code, instead of running to the end and reporting success because the
+# last step happened to work.
+#
+# `-u` catches typos in variable names (`$HOM` instead of `$HOME` would
+# otherwise expand to nothing and quietly install into the wrong place).
+#
+# `-E` propagates the ERR trap into functions and subshells. Without it the trap
+# set in `install()` never fires for the command it evaluates, so a failure
+# would kill the script with no hint about which tool was being installed.
+#
+# `pipefail` makes `curl ... | sh` report curl's failure rather than the exit
+# code of `sh`, which happily reads an empty script and exits 0.
+#
+# These only apply to commands run unprotected. Anything wrapped in `if`, `||`
+# or `&&` is exempt from errexit, so `install()` deliberately runs its command
+# bare.
+set -Eeuo pipefail
+
 # set -x
 
 OS="$(uname -s)"
@@ -20,6 +39,11 @@ esac
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
+
+# Installed once, after `util.sh` defines `report_failure`. Covers the bare
+# commands in `inst/apt.sh` and `inst/brew.sh` too, which are just as likely to
+# fail as anything wrapped in `install()`.
+trap 'report_failure' ERR
 
 core_deps() {
   case "$OS" in
@@ -49,8 +73,13 @@ js_deps() {
 }
 
 install_fzf() {
-  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-  ~/.fzf/install --bin
+  # `git clone` refuses to write into a non-empty directory (exit 128), which
+  # under `set -e` would abort the whole re-run. Skipping an existing checkout
+  # also keeps a locally modified one from being clobbered.
+  if [ ! -d "$HOME/.fzf" ]; then
+    git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+  fi
+  "$HOME/.fzf/install" --bin
   export PATH="$PATH:$HOME/.fzf/bin"
   fzf --version
 }
@@ -172,18 +201,7 @@ main() {
   # alacritty_configs
   # kitty_configs
   ghostty_configs
-  # `profile_configs` reports its own failure via a non-zero return. Guard it
-  # with `||` so `bash -e` (CI) doesn't abort here, then record it like any
-  # other failure so both paths end up in the same summary.
-  profile_configs || record_failure "zshrc"
-
-  # Individual `install()` calls record their failures instead of aborting, so
-  # without this the script used to exit 0 even when everything failed. Under
-  # CI's `bash -e` it exited 1 at the first failure instead - same script, two
-  # different outcomes. Report once at the end so both paths agree.
-  if ! report_failures; then
-    exit 1
-  fi
+  profile_configs
   info "all done"
 }
 

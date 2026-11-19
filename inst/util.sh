@@ -15,59 +15,65 @@ skip_info() {
   IFS=$old
 }
 
-# Targets that failed to install. `install()` appends to these and
-# `report_failures()` turns them into a non-zero exit code at the end of `main`.
-# Plain strings rather than an array: macOS ships bash 3.2, where expanding an
-# empty array under `set -u` (CI runs `bash -euxo pipefail`) aborts the script.
-DOTFILES_FAILURES=0
-DOTFILES_FAILED_TARGETS=""
+# Target that `install()` is currently working on, or empty when the failing
+# command came from somewhere else (a bare `apt-get` at the top level of
+# `inst/apt.sh`, for instance).
+DOTFILES_CURRENT_TARGET=""
 
-record_failure() {
-  DOTFILES_FAILURES=$((DOTFILES_FAILURES + 1))
-  if [ -z "$DOTFILES_FAILED_TARGETS" ]; then
-    DOTFILES_FAILED_TARGETS="$1"
+# ERR trap handler, installed once by `install`. Reports what broke, then exits
+# non-zero so the script stops either way.
+#
+# Without this, `set -e` kills the script silently: the reader sees the last
+# line of output and has no idea which command failed, let alone which tool it
+# was installing.
+report_failure() {
+  local status=$?
+  # `exit 0` would turn a failure into success; `set -e` only fires on non-zero,
+  # but stay explicit in case this is ever called by hand.
+  if [ "$status" -eq 0 ]; then
+    status=1
+  fi
+
+  # A function that returns non-zero has already said what went wrong (see
+  # `profile_configs`), so naming the `return` statement itself would only add
+  # noise like "'return 1' failed (exit 1)". Still name the target when there is
+  # one - `install "some_installer" "tool"` is exactly the case where the
+  # installer's own message may not say which tool it was.
+  case "$BASH_COMMAND" in
+  return* | exit*)
+    if [ -n "$DOTFILES_CURRENT_TARGET" ]; then
+      info "install '$DOTFILES_CURRENT_TARGET' - failed (exit $status)"
+    fi
+    exit "$status"
+    ;;
+  esac
+
+  if [ -n "$DOTFILES_CURRENT_TARGET" ]; then
+    info "install '$DOTFILES_CURRENT_TARGET' with: '$BASH_COMMAND' - failed (exit $status)"
   else
-    DOTFILES_FAILED_TARGETS="$DOTFILES_FAILED_TARGETS $1"
+    info "'$BASH_COMMAND' failed (exit $status)"
   fi
-}
-
-# Print every target that failed and return non-zero so the caller can exit 1.
-# Kept as a separate step so that one broken tool doesn't hide the others.
-report_failures() {
-  if [ "$DOTFILES_FAILURES" -eq 0 ]; then
-    return 0
-  fi
-
-  info "$DOTFILES_FAILURES target(s) failed to install: $DOTFILES_FAILED_TARGETS"
-  info "re-run './install' after fixing the cause, or install them by hand"
-  return 1
+  exit "$status"
 }
 
 install() {
   local command="$1"
   local target="$2"
-  local status=0
   if type "$target" >/dev/null 2>&1; then
     skip_info $target
     return 0
   fi
 
   info "install '$target' with: '$command'"
-  # Run inside `if` so that errexit (`bash -e`, used by CI) doesn't abort
-  # before we get a chance to report which command failed.
-  if eval "$command"; then
-    info "install '$target' with: '$command' - done"
-    return 0
-  else
-    status=$?
-  fi
-
-  info "install '$target' with: '$command' - failed (exit $status)"
-  # Record and keep going instead of returning the failure: the remaining
-  # targets still deserve a try, and `report_failures()` reports them all at
-  # once. Returning non-zero here would make `bash -e` (CI) stop at the first
-  # failure while a plain `./install` carries on, so the two runs would end up
-  # installing different things.
-  record_failure "$target"
-  return 0
+  # Run the command bare - not inside `if`, and not behind `||`.
+  #
+  # Both of those would disable errexit for everything the command runs, so a
+  # multi-step installer (say `install_git`, which chains several apt calls)
+  # would keep going after its first failure and report success as long as its
+  # last step happened to work. `set -e` can only fast-fail through here if this
+  # line is left unprotected.
+  DOTFILES_CURRENT_TARGET="$target"
+  eval "$command"
+  DOTFILES_CURRENT_TARGET=""
+  info "install '$target' with: '$command' - done"
 }
