@@ -137,7 +137,13 @@ function CoreDeps()
   Info "install core deps for windows"
 
   # deps
-  Install -command "scoop install 7zip" -target "7z"
+  # `7zip` must be installed *through scoop*, not merely be present on PATH: scoop unpacks
+  # `.7z` / `.tar.xz` / `.tar.lzma` downloads with its own copy of `7z.exe`
+  # (`lib/decompress.ps1` -> `Get-HelperPath -Helper 7zip`, which only looks at scoop apps).
+  # Probing `7z` with `Get-Command` therefore skipped this install on the CI images, which
+  # ship a standalone 7-Zip that scoop cannot see, and the next `.7z` package (`mingw`)
+  # failed to extract. Every package below needs it, so keep it first.
+  RunCommand -command "scoop install 7zip"
   Install -command "scoop install gzip" -target "gzip"
   Install -command "scoop install unzip" -target "unzip"
 
