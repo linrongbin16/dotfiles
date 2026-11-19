@@ -12,7 +12,7 @@ alias ll="eza -alh"
 alias lg="lazygit"
 
 # fzf
-if [ -x "$HOME/.fzf/bin" ]; then
+if [ -d "$HOME/.fzf/bin" ]; then
   export PATH="$PATH:$HOME/.fzf/bin"
 fi
 
@@ -27,9 +27,6 @@ alias gco="git commit"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # go
-if [ -x "$HOME/.go/bin/go" ]; then
-  export PATH="$PATH:$HOME/.go/bin"
-fi
 export GOPATH="$HOME/go"  # user workspace
 export PATH="$PATH:$GOPATH/bin"
 
@@ -39,7 +36,7 @@ if [ -f "$HOME/.deno/env" ]; then
 fi
 
 # bun
-if [ -x "$HOME/.bun/bin" ]; then
+if [ -d "$HOME/.bun/bin" ]; then
   export PATH="$PATH:$HOME/.bun/bin"
 fi
 
