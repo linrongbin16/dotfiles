@@ -2,12 +2,6 @@
 
 # Fail fast: a failing cmdlet (a bad path, a failed redirect, a missing command) aborts the
 # installation instead of being printed and then silently ignored.
-#
-# Native commands (`scoop`, `git`, `cargo`, ...) are unaffected by this preference as long as
-# their streams are not redirected: their stderr goes straight to the console, and their exit
-# code is checked explicitly by `InvokeChecked` below. Redirecting it (`2>$null`) would change
-# that under PowerShell 5.1, where each redirected line becomes an error record -- see
-# `GetCargoCrates`.
 $ErrorActionPreference = 'Stop'
 
 $isArm = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64
@@ -25,11 +19,6 @@ function SkipInfo([string]$content)
 }
 
 # Run `$command` and abort the whole installation when it exits with a non-zero code.
-#
-# This is what keeps CI honest. On Windows CI only runs `pwsh .\install.ps1` (see
-# `.github/workflows/ci.yml`), so a bare `Invoke-Expression` would let a failed step pass
-# unnoticed and leave the job green, unlike the bash installers there that run under
-# `bash -e`. It mirrors `install()` in `inst/util.sh` for the unix side.
 function InvokeChecked([string]$command, [string]$action)
 {
   # Cmdlets never touch $LASTEXITCODE, so a stale value from some earlier command would be
@@ -46,17 +35,6 @@ function InvokeChecked([string]$command, [string]$action)
 }
 
 # Whether `$command` is on PATH *and* actually runs, e.g. `cargo --version` exiting 0.
-#
-# Both halves are needed. Being on PATH proves nothing for the rustup proxies: they stay there
-# as files after the toolchain they dispatch to is gone, so a bare `Get-Command cargo` answers
-# happily while every `cargo` call fails. `-CommandType Application` is not decoration either:
-# under PowerShell 5.1 a bare `Get-Command curl` resolves to the `Invoke-WebRequest` alias, and
-# calling that with `--version` throws instead of returning an exit code.
-#
-# The probe's output is dropped because the exit code already says everything the caller needs.
-# Doing that takes the local `Continue`: under 5.1 every redirected stderr line becomes an error
-# record, and `$ErrorActionPreference = 'Stop'` would turn the first `info:` line of a healthy
-# `rustup --version` into a terminating error before `$LASTEXITCODE` could be read.
 function TestCommand([string]$command)
 {
   $exe = Get-Command -Name $command -CommandType Application -ErrorAction SilentlyContinue
@@ -69,8 +47,7 @@ function TestCommand([string]$command)
   try
   {
     & $exe --version 2>&1 | Out-Null
-  }
-  finally
+  } finally
   {
     $ErrorActionPreference = $previous
   }
@@ -79,12 +56,6 @@ function TestCommand([string]$command)
 
 # The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes
 # two dozen packages and one `scoop list` costs ~0.3s.
-#
-# `Get-Command` cannot answer "is this scoop package installed". Under PowerShell 5.1 it
-# resolves `curl` and `wget` to the `Invoke-WebRequest` alias, and unrelated tools earlier
-# on PATH answer for packages scoop never installed (`niubash`'s `winuxcmd` provides
-# `which`/`awk`/`sed`/`fd`/`rg`). Probing the package name is the only way to see what
-# scoop itself sees.
 function GetScoopApps()
 {
   if ($null -eq $script:ScoopApps)
@@ -133,17 +104,6 @@ function InstallScoop([string]$app, [string]$target)
 # The crates `cargo install` has put on this machine, e.g. `rmz`. `cargo install --list`
 # prints `<name> v<version>:` followed by the binaries it installed, so the version line is
 # the crate name. Cached for the same reason as `GetScoopApps`.
-#
-# The exit code is ignored on purpose: a broken or absent `--list` yields no names, i.e.
-# "nothing is installed", and the `cargo install` that follows fails loudly with the real
-# error instead of the installer quietly skipping a dependency.
-#
-# Its stderr is left alone rather than redirected to `$null`: under PowerShell 5.1 every
-# redirected stderr line from a native command becomes an error record, and the
-# `$ErrorActionPreference = 'Stop'` above turns the first one into a terminating error. `cargo`
-# writes its diagnostics there (any warning, any failing `--list`), so discarding them would make
-# the probe throw instead of returning "nothing installed" and letting the real `cargo install`
-# report the error.
 function GetCargoCrates()
 {
   if ($null -eq $script:CargoCrates)
@@ -331,22 +291,6 @@ function GoDeps()
 }
 
 # Install `rustup` and its default (stable) toolchain from the Rust project instead of scoop.
-#
-# `rustup-init.exe` is the official installer -- the unix `install` script reaches the same
-# thing through `sh.rustup.rs` -- and `static.rust-lang.org` serves one binary per host triple,
-# so the ARM64 and x64 images get their own. It downloads the stable toolchain and puts
-# `rustup.exe`/`cargo.exe`/`rustc.exe` proxies in `%USERPROFILE%\.cargo\bin`, the directory
-# `dotfiles.ps1` already appends to PATH, so nothing lands in a second location that could
-# shadow it later.
-#
-# Two probes, two questions. `rustup` itself decides whether the installer has to run at all:
-# when it is present, `rustup-init.exe` would only re-download what is already there. `rustc`
-# and `cargo` decide whether that rustup is *usable*: they are the proxies it dispatches
-# through, so `rustup toolchain uninstall stable`, `rustup-init --default-toolchain none` or a
-# fresh `RUSTUP_HOME` all leave `rustup --version` answering happily while `cargo --version`
-# fails with "rustup could not choose a version of cargo to run" -- which is what used to break
-# the `cargo install` calls below. `rustup default stable` repairs that without touching any
-# toolchain that is already installed, and it is the only network work a healthy machine skips.
 function InstallRustup()
 {
   # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
@@ -384,10 +328,6 @@ function InstallRustup()
     throw "failed to download ${url}"
   }
 
-  # `-y` takes the answers the interactive prompt would ask for; `--default-toolchain stable`
-  # is explicit because it is the whole point of the step, and the default profile brings
-  # `rustc`, `cargo`, `rust-std`, `rust-docs`, `rustfmt` and `clippy`. The user PATH is left
-  # to the installer, which appends `%USERPROFILE%\.cargo\bin` itself.
   InvokeChecked -command "& '${installer}' -y --default-toolchain stable" -action "install rustup with the stable toolchain"
   # Cleanup only: a leftover installer in TEMP must not fail an otherwise finished install.
   Remove-Item -Path $installer -Force -ErrorAction SilentlyContinue
@@ -404,10 +344,6 @@ function RustDeps()
 {
   Info "install rust deps for windows"
 
-  # `rustup` plus the stable `rustc`/`cargo` come from the Rust project itself, not from scoop:
-  # that is the supported installer (the unix `install` script does the same through
-  # `sh.rustup.rs`) and it installs into `%USERPROFILE%\.cargo`, which `dotfiles.ps1` already
-  # puts on PATH.
   InstallRustup
   InstallScoop "fd"
   InstallScoop "ripgrep"
@@ -432,16 +368,6 @@ function PromptDeps()
 }
 
 # Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
-#
-# `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` (README.md) is not enough: run under
-# pwsh 7 it writes `Documents\PowerShell\powershell.config.json`, a file `powershell.exe`
-# never reads. 5.1 reads `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell`
-# and, left at the Windows default `Restricted`, refuses to source any profile -- every launch
-# then prints `running scripts is disabled on this system` and `dotfiles.ps1` never runs.
-#
-# The value is written straight to the registry instead of shelling out to
-# `powershell.exe -Command Set-ExecutionPolicy`: no child process, and the result is the same
-# no matter which host ran the installer. Policies that already allow local scripts are kept.
 function SetExecutionPolicyForWindowsPowerShell()
 {
   $key = 'HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
