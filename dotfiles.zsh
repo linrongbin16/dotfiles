@@ -1,8 +1,8 @@
 #!/bin/zsh
 
 # performance
-ulimit -n 200000
-ulimit -u 8192
+ulimit -n 10240
+ulimit -u 2660
 
 # ls
 alias l="eza -lh"
