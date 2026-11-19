@@ -3,9 +3,11 @@
 # Fail fast: a failing cmdlet (a bad path, a failed redirect, a missing command) aborts the
 # installation instead of being printed and then silently ignored.
 #
-# Native commands (`scoop`, `git`, `cargo`, ...) are unaffected by this preference: their
-# stderr still goes straight to the console, and their exit code is checked explicitly by
-# `InvokeChecked` below.
+# Native commands (`scoop`, `git`, `cargo`, ...) are unaffected by this preference as long as
+# their streams are not redirected: their stderr goes straight to the console, and their exit
+# code is checked explicitly by `InvokeChecked` below. Redirecting it (`2>$null`) would change
+# that under PowerShell 5.1, where each redirected line becomes an error record -- see
+# `GetCargoCrates`.
 $ErrorActionPreference = 'Stop'
 
 $isArm = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64
@@ -43,6 +45,13 @@ function InvokeChecked([string]$command, [string]$action)
   Info "${action} - done"
 }
 
+# Install a package when *any* provider of `$target` will do, i.e. when the requirement is
+# "this command must exist", not "this package must be installed by this manager".
+#
+# Only for the two cases where a foreign installation is the intended setup -- bob owns
+# `nvim`, a rustup.rs toolchain owns `rustc`/`cargo` -- because scoop installing its own copy
+# next to them puts a second `nvim.exe`/`rustc.exe` on PATH. Everything else probes the
+# package with `InstallScoop` / `InstallCargo` below.
 function Install([string]$command, [string]$target)
 {
   if (Get-Command -Name $target -ErrorAction SilentlyContinue)
@@ -51,6 +60,95 @@ function Install([string]$command, [string]$target)
   } else
   {
     InvokeChecked -command $command -action "install '${target}' with command: '${command}'"
+  }
+}
+
+# The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes
+# two dozen packages and one `scoop list` costs ~0.3s.
+#
+# `Get-Command` cannot answer "is this scoop package installed". Under PowerShell 5.1 it
+# resolves `curl` and `wget` to the `Invoke-WebRequest` alias, and unrelated tools earlier
+# on PATH answer for packages scoop never installed (`niubash`'s `winuxcmd` provides
+# `which`/`awk`/`sed`/`fd`/`rg`). Probing the package name is the only way to see what
+# scoop itself sees.
+function GetScoopApps()
+{
+  if ($null -eq $script:ScoopApps)
+  {
+    # `scoop list` prints its header through `Write-Host`, i.e. the information stream, and
+    # the rows as objects with a `Name` property. The exit code only reports "nothing is
+    # installed at all" (1) -- a filter that matches nothing still exits 0 -- so the names
+    # are the only usable signal. Empty means "assume nothing is installed" and install.
+    $script:ScoopApps = @(& scoop list 6>$null | ForEach-Object { $_.Name } | Where-Object { $_ })
+  }
+  return $script:ScoopApps
+}
+
+# Install a scoop package unless scoop already has it.
+#
+# `$app` is the name scoop knows, not the binary the package ships: `gawk` provides `awk`,
+# `neovim` provides `nvim`, `trashy` provides `trash`. A bucket prefix is allowed
+# (`extras/lazygit`) because `scoop install` accepts it, but `scoop list` reports the bare
+# name, hence the split.
+function InstallScoop([string]$app)
+{
+  $name = $app.Split('/')[-1]
+  if ((GetScoopApps) -contains $name)
+  {
+    SkipInfo $name
+  } else
+  {
+    InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
+  }
+}
+
+# The crates `cargo install` has put on this machine, e.g. `rmz`. `cargo install --list`
+# prints `<name> v<version>:` followed by the binaries it installed, so the version line is
+# the crate name. Cached for the same reason as `GetScoopApps`.
+#
+# The exit code is ignored on purpose: a broken or absent `--list` yields no names, i.e.
+# "nothing is installed", and the `cargo install` that follows fails loudly with the real
+# error instead of the installer quietly skipping a dependency.
+#
+# Its stderr is left alone rather than redirected to `$null`: under PowerShell 5.1 every
+# redirected stderr line from a native command becomes an error record, and the
+# `$ErrorActionPreference = 'Stop'` above turns the first one into a terminating error. `cargo`
+# writes its diagnostics there (any warning, any failing `--list`), so discarding them would make
+# the probe throw instead of returning "nothing installed" and letting the real `cargo install`
+# report the error.
+function GetCargoCrates()
+{
+  if ($null -eq $script:CargoCrates)
+  {
+    if (Get-Command -Name cargo -ErrorAction SilentlyContinue)
+    {
+      $script:CargoCrates = @(
+        & cargo install --list | ForEach-Object {
+          if ($_ -match '^(\S+) v\d')
+          {
+            $Matches[1]
+          }
+        }
+      )
+    } else
+    {
+      # No toolchain yet: let the `cargo install` below fail loudly instead of guessing.
+      $script:CargoCrates = @()
+    }
+  }
+  return $script:CargoCrates
+}
+
+# Install a crate unless `cargo install` already put it here. `tree-sitter-cli` is the reason
+# this cannot be `Get-Command`: the crate ships `tree-sitter.exe`, not `tree-sitter-cli.exe`.
+function InstallCargo([string]$crate)
+{
+  if ((GetCargoCrates) -contains $crate)
+  {
+    SkipInfo $crate
+  } else
+  {
+    InvokeChecked -command "cargo install --locked ${crate}" -action "install '${crate}' with command: 'cargo install --locked ${crate}'"
   }
 }
 
@@ -144,8 +242,8 @@ function CoreDeps()
   # ship a standalone 7-Zip that scoop cannot see, and the next `.7z` package (`mingw`)
   # failed to extract. Every package below needs it, so keep it first.
   RunCommand -command "scoop install 7zip"
-  Install -command "scoop install gzip" -target "gzip"
-  Install -command "scoop install unzip" -target "unzip"
+  InstallScoop "gzip"
+  InstallScoop "unzip"
 
   # `extras` bucket is required by `extras/vcredist2022` below.
   AddScoopBucket -name "extras"
@@ -155,34 +253,34 @@ function CoreDeps()
   RunCommand -command "scoop install file"
   RunCommand -command "scoop install extras/vcredist2022"
 
-  Install -command "scoop install which" -target "which"
-  Install -command "scoop install gawk" -target "awk"
-  Install -command "scoop install sed" -target "sed"
+  InstallScoop "which"
+  InstallScoop "gawk"
+  InstallScoop "sed"
   if ($isArm)
   {
-    Install -command "scoop install llvm-arm64" -target "clang"
+    InstallScoop "llvm-arm64"
   } else
   {
-    Install -command "scoop install llvm" -target "clang"
+    InstallScoop "llvm"
   }
-  Install -command "scoop install make" -target "make"
-  Install -command "scoop install cmake" -target "cmake"
+  InstallScoop "make"
+  InstallScoop "cmake"
 
-  Install -command "scoop install gh" -target "gh"
-  Install -command "scoop install curl" -target "curl"
-  Install -command "scoop install wget" -target "wget"
+  InstallScoop "gh"
+  InstallScoop "curl"
+  InstallScoop "wget"
 
   InstallMo
 
-  # Install -command "scoop install extras/alacritty" -target "alacritty"
+  # InstallScoop "extras/alacritty"
 }
 
 function JsDeps()
 {
   Info "install deno/bun for windows"
 
-  Install -command "scoop install deno" -target "deno"
-  Install -command "scoop install bun" -target "bun"
+  InstallScoop "deno"
+  InstallScoop "bun"
 }
 
 function GitConfigs()
@@ -199,40 +297,42 @@ function GoDeps()
 {
   Info "install go deps for windows"
 
-  Install -command "scoop install go" -target "go"
-  Install -command "scoop install extras/lazygit" -target "lazygit"
-  Install -command "scoop install main/fzf" -target "fzf"
+  InstallScoop "go"
+  InstallScoop "extras/lazygit"
+  InstallScoop "main/fzf"
 }
 
 function RustDeps()
 {
   Info "install rust deps for windows"
 
+  # A rustup.rs toolchain already provides `rustc`/`cargo` outside scoop, and scoop's `rustup`
+  # would add a second pair to PATH, so a working toolchain is reason enough to skip.
   Install -command "scoop install rustup" -target "rustc"
-  Install -command "scoop install rustup" -target "cargo"
-  Install -command "scoop install fd" -target "fd"
-  Install -command "scoop install ripgrep" -target "rg"
-  Install -command "scoop install bat" -target "bat"
-  Install -command "scoop install eza" -target "eza"
-  Install -command "scoop install trashy" -target "trash"
-  Install -command "cargo install --locked rmz" -target "rmz"
-  Install -command "cargo install --locked cpz" -target "cpz"
-  Install -command "cargo install --locked tree-sitter-cli" -target "tree-sitter"
+  InstallScoop "fd"
+  InstallScoop "ripgrep"
+  InstallScoop "bat"
+  InstallScoop "eza"
+  InstallScoop "trashy"
+  InstallCargo "rmz"
+  InstallCargo "cpz"
+  InstallCargo "tree-sitter-cli"
 }
 
 function NeovimDeps()
 {
   Info "install neovim deps for windows"
-  # the scoop package is named `neovim`, it installs the `nvim` binary.
+  # bob manages `nvim` in this setup; scoop's `neovim` would shadow it on PATH, so an `nvim`
+  # from anywhere is enough. The scoop package is named `neovim`, it ships the `nvim` binary.
   Install -command "scoop install neovim" -target "nvim"
 }
 
 function PromptDeps()
 {
-  Install -command "scoop install starship" -target "starship"
+  InstallScoop "starship"
 
   # mise is disabled
-  # Install -command "scoop install mise" -target "mise"
+  # InstallScoop "mise"
 }
 
 # Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
