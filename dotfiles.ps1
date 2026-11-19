@@ -66,22 +66,21 @@ AddPathEntry (Join-Path $env:GOPATH 'bin')
 AddPathEntry "$env:LOCALAPPDATA\bob\nvim-bin"
 
 # starship prompt
-$env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
-Invoke-Expression (&starship init powershell)
+if (Get-Command starship -ErrorAction Ignore)
+{
+  $env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
+  Invoke-Expression (&starship init powershell)
+}
 
 # mise
 #
 # `install.ps1` installs mise on windows, so the shell activates it here: the shims of mise have
 # to be in front of the PATH, otherwise the tool that wins is the one of scoop or of cargo.
 #
-# The activation comes after the starship prompt on purpose: starship replaces the `prompt`
-# function and mise wraps the `prompt` function that it finds. The other way round, the wrapper
-# of mise would be gone and `mise use` would only take effect after the next `cd`.
-#
 # `mise activate pwsh` writes the PATH, so it may run only once per shell: a second run puts the
 # shims of mise into the PATH a second time. `__MISE_ORIG_PATH` is the marker that mise itself
 # sets on the first activation, so it tells whether mise is already active.
-if (-not (Test-Path -Path Env:/__MISE_ORIG_PATH) -and (Get-Command mise -ErrorAction SilentlyContinue))
+if (-not (Test-Path -Path Env:/__MISE_ORIG_PATH) -and (Get-Command mise -ErrorAction Ignore))
 {
   (&mise activate pwsh) | Out-String | Invoke-Expression
 }
