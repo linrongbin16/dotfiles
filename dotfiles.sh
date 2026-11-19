@@ -1,8 +1,21 @@
 #!/bin/zsh
 
+# Sourced by `.zshrc`, and safe to source from `bash` as well. zsh is the
+# primary target: the blocks that need it (`git-prompt.zsh`, `bindkey`,
+# `setopt`) are skipped instead of emulated, so the aliases, PATH entries and
+# `TERM` below still apply to bash.
+
 # performance
 ulimit -n 10240
 ulimit -u 2660
+
+# Which shell is sourcing this file, not which one is the login shell: `$SHELL`
+# is still `/bin/zsh` inside a bash subshell, where `bindkey` does not exist.
+if [ -n "${ZSH_VERSION:-}" ]; then
+  DOTFILES_SHELL=zsh
+else
+  DOTFILES_SHELL=bash
+fi
 
 # ls
 alias l="eza -lh"
@@ -48,16 +61,16 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # mise
 if command -v mise >/dev/null 2>&1; then
-  eval "$(mise activate zsh)"
+  eval "$(mise activate "$DOTFILES_SHELL")"
 fi
 
 # zoxide
 if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init --cmd cd zsh)"
+  eval "$(zoxide init --cmd cd "$DOTFILES_SHELL")"
 fi
 
 # git-prompt.zsh {{{
-if [ -f "$HOME/.zsh/git-prompt.zsh/git-prompt.zsh" ]; then
+if [ "$DOTFILES_SHELL" = "zsh" ] && [ -f "$HOME/.zsh/git-prompt.zsh/git-prompt.zsh" ]; then
   source $HOME/.zsh/git-prompt.zsh/git-prompt.zsh
 
   # ZSH_THEME_GIT_PROMPT_PREFIX="["
@@ -95,6 +108,6 @@ fi
 export TERM="xterm-256color"
 
 # zsh disable vi-mode, enforce emacs-mode
-if [[ "$SHELL" == *zsh ]]; then
+if [ "$DOTFILES_SHELL" = "zsh" ]; then
   bindkey -e
 fi

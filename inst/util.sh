@@ -20,40 +20,64 @@ skip_info() {
 # `inst/apt.sh`, for instance).
 DOTFILES_CURRENT_TARGET=""
 
-# ERR trap handler, installed once by `install`. Reports what broke, then exits
-# non-zero so the script stops either way.
+# Set by a function that has already explained its own failure, so the handler
+# below does not append a vague "a command failed" line after a specific
+# message. Both shells need it: bash's `BASH_COMMAND` and zsh's DEBUG trap each
+# name the `return` statement, which the handler clears as noise, leaving it
+# with nothing to report but that generic line.
+DOTFILES_FAILURE_REPORTED=0
+
+# zsh has no `BASH_COMMAND`, so a DEBUG trap records each command as it starts
+# and the handler reads the last one back. Without it, a failure that comes from
+# a bare command in `inst/apt.sh` would be reported as an anonymous "a command
+# failed", while bash names it. It also names the failing step inside a
+# multi-step `install` command rather than the whole command string.
+DOTFILES_LAST_COMMAND=""
+if [ -n "${ZSH_VERSION:-}" ]; then
+  trap 'DOTFILES_LAST_COMMAND=$ZSH_DEBUG_CMD' DEBUG
+fi
+
+# Failure handler, installed once by `install` as the `ERR` trap.
 #
 # Without this, `set -e` kills the script silently: the reader sees the last
 # line of output and has no idea which command failed, let alone which tool it
 # was installing.
+#
+# `$?` is read through the argument's default so it still holds the failing
+# status: the `local` keyword would otherwise reset it. The variable is called
+# `code` and not `status` because zsh treats `status` as a read-only special.
+#
+# `BASH_COMMAND` names the failing command under bash. Under zsh the DEBUG trap
+# above stands in for it.
 report_failure() {
-  local status=$?
-  # `exit 0` would turn a failure into success; `set -e` only fires on non-zero,
-  # but stay explicit in case this is ever called by hand.
-  if [ "$status" -eq 0 ]; then
-    status=1
-  fi
+  local code="${1:-$?}"
+  local failed="${BASH_COMMAND:-${DOTFILES_LAST_COMMAND:-}}"
 
   # A function that returns non-zero has already said what went wrong (see
   # `profile_configs`), so naming the `return` statement itself would only add
   # noise like "'return 1' failed (exit 1)". Still name the target when there is
   # one - `install "some_installer" "tool"` is exactly the case where the
   # installer's own message may not say which tool it was.
-  case "$BASH_COMMAND" in
-  return* | exit*)
-    if [ -n "$DOTFILES_CURRENT_TARGET" ]; then
-      info "install '$DOTFILES_CURRENT_TARGET' - failed (exit $status)"
-    fi
-    exit "$status"
-    ;;
+  case "$failed" in
+  return* | exit*) failed="" ;;
   esac
 
-  if [ -n "$DOTFILES_CURRENT_TARGET" ]; then
-    info "install '$DOTFILES_CURRENT_TARGET' with: '$BASH_COMMAND' - failed (exit $status)"
-  else
-    info "'$BASH_COMMAND' failed (exit $status)"
+  if [ "$DOTFILES_FAILURE_REPORTED" = "1" ]; then
+    exit "$code"
   fi
-  exit "$status"
+
+  if [ -n "$DOTFILES_CURRENT_TARGET" ]; then
+    if [ -n "$failed" ]; then
+      info "install '$DOTFILES_CURRENT_TARGET' with: '$failed' - failed (exit $code)"
+    else
+      info "install '$DOTFILES_CURRENT_TARGET' - failed (exit $code)"
+    fi
+  elif [ -n "$failed" ]; then
+    info "'$failed' failed (exit $code)"
+  else
+    info "a command failed (exit $code)"
+  fi
+  exit "$code"
 }
 
 install() {
