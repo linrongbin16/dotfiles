@@ -142,9 +142,23 @@ ghostty_configs() {
 }
 
 profile_configs() {
-  echo '' >>~/.zshrc
-  echo '# dotfiles ' >>~/.zshrc
-  echo '[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh' >>~/.zshrc
+  local zshrc="$HOME/.zshrc"
+  local line='[ -f ~/.dotfiles/dotfiles.zsh ] && source ~/.dotfiles/dotfiles.zsh'
+
+  # Re-running `install` used to append this block again every time, so the
+  # file grew by three lines per run and sourced `dotfiles.zsh` more than once.
+  # Check for the `source` line itself rather than the `# dotfiles` marker,
+  # because earlier versions wrote the marker with a trailing space.
+  if grep -qxF "$line" "$zshrc" 2>/dev/null; then
+    info "'$zshrc' already sources dotfiles.zsh, skip..."
+    return 0
+  fi
+
+  if ! printf '\n%s\n%s\n' '# dotfiles' "$line" >>"$zshrc"; then
+    info "failed to append to '$zshrc'"
+    return 1
+  fi
+
   info "done"
 }
 
