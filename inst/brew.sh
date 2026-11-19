@@ -12,7 +12,6 @@ install "brew install automake" "automake"
 install "brew install pkg-config" "pkg-config"
 install "brew install cmake" "cmake"
 install "brew install openssl" "$(brew --prefix openssl)/bin/openssl"
-install "brew install openssh" "$(brew --prefix openssh)/bin/ssh"
 
 install "brew install git" "git"
 install "brew install gh" "gh"
