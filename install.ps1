@@ -48,10 +48,10 @@ function InvokeChecked([string]$command, [string]$action)
 # Install a package when *any* provider of `$target` will do, i.e. when the requirement is
 # "this command must exist", not "this package must be installed by this manager".
 #
-# Only for the two cases where a foreign installation is the intended setup -- bob owns
-# `nvim`, a rustup.rs toolchain owns `rustc`/`cargo` -- because scoop installing its own copy
-# next to them puts a second `nvim.exe`/`rustc.exe` on PATH. Everything else probes the
-# package with `InstallScoop` / `InstallCargo` below.
+# Only for the one case where a foreign installation is the intended setup -- bob owns `nvim`
+# -- because scoop installing its own copy next to it puts a second `nvim.exe` on PATH.
+# Everything else probes the package with `InstallScoop` / `InstallCargo` below, and `rustup`
+# has `InstallRustup`, which installs the toolchain the Rust project's own way.
 function Install([string]$command, [string]$target)
 {
   if (Get-Command -Name $target -ErrorAction SilentlyContinue)
@@ -302,13 +302,73 @@ function GoDeps()
   InstallScoop "main/fzf"
 }
 
+# Install `rustup` and its default (stable) toolchain from the Rust project instead of scoop.
+#
+# `rustup-init.exe` is the official installer -- the unix `install` script reaches the same
+# thing through `sh.rustup.rs` -- and `static.rust-lang.org` serves one binary per host triple,
+# so the ARM64 and x64 images get their own. It downloads the stable toolchain and puts
+# `rustup.exe`/`cargo.exe`/`rustc.exe` proxies in `%USERPROFILE%\.cargo\bin`, the directory
+# `dotfiles.ps1` already appends to PATH, so nothing lands in a second location that could
+# shadow it later.
+#
+# Probing `rustup` rather than `rustc` is deliberate: a `rustc` from anywhere else (`scoop
+# install rust`, a stray copy) is exactly the state this function exists to replace, while a
+# `rustup` always owns its toolchain, i.e. it brings `rustc`/`cargo` with it.
+function InstallRustup()
+{
+  if (Get-Command -Name rustup -ErrorAction SilentlyContinue)
+  {
+    SkipInfo "rustup"
+    return
+  }
+
+  $triple = "x86_64-pc-windows-msvc"
+  if ($isArm)
+  {
+    $triple = "aarch64-pc-windows-msvc"
+  }
+  $url = "https://static.rust-lang.org/rustup/dist/${triple}/rustup-init.exe"
+  $installer = Join-Path $env:TEMP "rustup-init.exe"
+
+  Info "download '${url}'"
+  & curl.exe -fsSL -o $installer $url
+  if ($LASTEXITCODE -ne 0)
+  {
+    throw "failed to download ${url}"
+  }
+
+  # `-y` takes the answers the interactive prompt would ask for; `--default-toolchain stable`
+  # is explicit because it is the whole point of the step, and the default profile brings
+  # `rustc`, `cargo`, `rust-std`, `rust-docs`, `rustfmt` and `clippy`. The user PATH is left
+  # to the installer, which appends `%USERPROFILE%\.cargo\bin` itself.
+  InvokeChecked -command "& '${installer}' -y --default-toolchain stable" -action "install rustup with the stable toolchain"
+  # Cleanup only: a leftover installer in TEMP must not fail an otherwise finished install.
+  Remove-Item -Path $installer -Force -ErrorAction SilentlyContinue
+
+  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
+  # still be "not recognized" for the `cargo install` calls below on a fresh machine.
+  $cargoBin = Join-Path $HOME ".cargo\bin"
+  if (($env:PATH -split ';') -notcontains $cargoBin)
+  {
+    $env:PATH = "${cargoBin};$env:PATH"
+  }
+  # Fail here, with the reason, rather than in the first `cargo install` with a bare
+  # "not recognized as the name of a cmdlet".
+  if (-not (Get-Command -Name cargo -ErrorAction SilentlyContinue))
+  {
+    throw "rustup finished but 'cargo' is not on PATH (expected '${cargoBin}')"
+  }
+}
+
 function RustDeps()
 {
   Info "install rust deps for windows"
 
-  # A rustup.rs toolchain already provides `rustc`/`cargo` outside scoop, and scoop's `rustup`
-  # would add a second pair to PATH, so a working toolchain is reason enough to skip.
-  Install -command "scoop install rustup" -target "rustc"
+  # `rustup` plus the stable `rustc`/`cargo` come from the Rust project itself, not from scoop:
+  # that is the supported installer (the unix `install` script does the same through
+  # `sh.rustup.rs`) and it installs into `%USERPROFILE%\.cargo`, which `dotfiles.ps1` already
+  # puts on PATH.
+  InstallRustup
   InstallScoop "fd"
   InstallScoop "ripgrep"
   InstallScoop "bat"
