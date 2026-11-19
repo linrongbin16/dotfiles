@@ -5,7 +5,13 @@
 info "install deps with brew"
 
 install "xcode-select --install" "clang"
-install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
+# Download the installer to a file and run it from there. Wrapping it as
+# `bash -c "$(curl ...)"` breaks on quoting: the command substitution expands
+# *before* `install()` sees it, and `install()` then re-parses the string with
+# `eval`, so the payload is cut at its first double quote and the rest is
+# silently dropped while still exiting 0. `curl -f` plus `&&` also makes a
+# failed download abort instead of executing an empty script.
+install 'curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o /tmp/homebrew-install.sh && NONINTERACTIVE=1 /bin/bash /tmp/homebrew-install.sh' "brew"
 brew update
 
 brew install lld
