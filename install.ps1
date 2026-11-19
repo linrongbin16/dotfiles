@@ -268,16 +268,54 @@ function SetExecutionPolicyForWindowsPowerShell()
   Info "set windows powershell execution policy 'RemoteSigned' (was '${current}') - done"
 }
 
+# Detect the encoding a profile file is already stored in, by its byte order mark.
+#
+# Windows PowerShell 5.1's `>>` wrote UTF-16LE, so a profile created by an older installer is
+# still UTF-16LE while everything this script writes is BOM-less UTF-8. Appending UTF-8 bytes
+# to a UTF-16LE file corrupts it: the appended line is read back as CJK gibberish and every
+# shell start fails with `The term '...' is not recognized as the name of a cmdlet`.
+function GetProfileEncoding([string]$path)
+{
+  $head = New-Object byte[] 3
+  $read = 0
+  if (Test-Path -Path $path)
+  {
+    $stream = [System.IO.File]::OpenRead($path)
+    try
+    {
+      $read = $stream.Read($head, 0, $head.Length)
+    }
+    finally
+    {
+      $stream.Dispose()
+    }
+  }
+
+  if ($read -ge 2 -and $head[0] -eq 0xFF -and $head[1] -eq 0xFE)
+  {
+    return [System.Text.UnicodeEncoding]::new($false, $true) # UTF-16LE
+  }
+  if ($read -ge 3 -and $head[0] -eq 0xEF -and $head[1] -eq 0xBB -and $head[2] -eq 0xBF)
+  {
+    return [System.Text.UTF8Encoding]::new($true) # UTF-8 with BOM
+  }
+
+  # Missing file or no BOM: BOM-less UTF-8, which is what this script writes.
+  return [System.Text.UTF8Encoding]::new($false)
+}
+
 # Append the `# dotfiles` marker and the `dotfiles.ps1` source line to one profile file,
 # unless the source line is already in there.
 function AddProfileSource([string]$path, [string]$line)
 {
   New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
 
+  $encoding = GetProfileEncoding -path $path
+
   $content = ''
   if (Test-Path -Path $path)
   {
-    $content = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
+    $content = [System.IO.File]::ReadAllText($path, $encoding)
   }
 
   # Probe before appending: the block used to be written unconditionally, so every re-run
@@ -292,7 +330,7 @@ function AddProfileSource([string]$path, [string]$line)
     }
   }
 
-  # Append through `[System.IO.File]::AppendAllText` with an explicit BOM-less UTF-8 encoder.
+  # Append through `[System.IO.File]::AppendAllText` with an explicit encoder.
   # `>>` is not usable here: under Windows PowerShell 5.1 it appends UTF-16LE, which
   # corrupts a UTF-8 profile and makes it fail to parse. `Add-Content -Encoding utf8` is
   # closer but still writes a BOM when it has to create the file.
@@ -309,8 +347,10 @@ function AddProfileSource([string]$path, [string]$line)
     $prefix += "`r`n"
   }
 
+  # Write back in the encoding the file already uses, so an old UTF-16LE profile stays
+  # readable instead of turning into half UTF-8.
   $block = "${prefix}# dotfiles`r`n${line}`r`n"
-  [System.IO.File]::AppendAllText($path, $block, [System.Text.UTF8Encoding]::new($false))
+  [System.IO.File]::AppendAllText($path, $block, $encoding)
 
   Info "done"
 }
