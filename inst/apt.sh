@@ -103,9 +103,6 @@ install "sudo apt-get install -q -y curl" "curl"
 install "sudo apt-get install -q -y wget" "wget"
 
 install "sudo apt-get install -q -y gzip" "gzip"
-# `7zip` is the real package on Ubuntu 24.04+ (23.01+/26.00+), and it provides
-# `/usr/bin/7z`. `p7zip`/`p7zip-full` are only transitional (24.04) or virtual
-# (26.04) names there, so install the real one explicitly.
 install "sudo apt-get install -q -y 7zip" "7z"
 install "sudo apt-get install -q -y unzip" "unzip"
 

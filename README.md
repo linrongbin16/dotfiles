@@ -6,12 +6,10 @@ My dot files.
 
 ## Install
 
-### MacOS/Linux
+### macOS/Ubuntu
 
-#### Pre-Requirements
-
-- For both macOS and Linux (only support Debian/Ubuntu), please install [zsh](https://www.zsh.org/) and set it as default login shell.
-- For macOS, please install [xcode](https://developer.apple.com/support/xcode/) and use [homebrew](https://brew.sh/) as your package manager.
+- For macOS, install [xcode](https://developer.apple.com/support/xcode/) and use [homebrew](https://brew.sh/) as your package manager.
+- For Ubuntu Linux, 24 and later versions are supported, install [zsh](https://www.zsh.org/) and set it as default login shell.
 
 ```bash
 cd ~
