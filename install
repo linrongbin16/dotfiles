@@ -87,9 +87,9 @@ prompt_deps() {
   # atuin
   install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --non-interactive" "atuin"
   mkdir -p $HOME/.atuin
-  cp $HOME/.dotfiles/atuin.toml $HOME/.atuin/config.toml
-  mkdir -p $HOME/.config/atuin
-  cp $HOME/.dotfiles/atuin.toml $HOME/.config/atuin/config.toml
+  if [ ! -f "$HOME/.atuin/config.toml" ]; then
+    cp $HOME/.dotfiles/atuin.toml $HOME/.atuin/config.toml
+  fi
 }
 
 # alacritty_configs() {
