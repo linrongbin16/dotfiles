@@ -44,14 +44,11 @@ function DotGitCommit
 Set-Alias -name gco -value DotGitCommit
 
 # Add a directory to the PATH, exactly once, and in front of the other entries.
-#
-# Sourcing this file must not grow the PATH: `+=` appended another copy of every entry on every
-# source, so a shell that sourced the file N times ended up with N copies. The directory is
-# removed from the PATH first and then added in front, so the copies that are already there are
-# cleaned up as well, and `bob`'s nvim wins over the nvim that scoop installed.
 function AddPathEntry([string]$dir)
 {
-  if ([string]::IsNullOrEmpty($dir)) { return }
+  if ([string]::IsNullOrEmpty($dir))
+  { return 
+  }
   $entries = @($env:PATH -split ';' | Where-Object { $_ })
   $target = $dir.TrimEnd('\')
   $kept = @($entries | Where-Object { $_.TrimEnd('\') -ine $target })
