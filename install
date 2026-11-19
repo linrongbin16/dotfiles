@@ -72,20 +72,7 @@ js_deps() {
   install "curl -fsSL https://bun.com/install | bash" "bun"
 }
 
-install_fzf() {
-  # `git clone` refuses to write into a non-empty directory (exit 128), which
-  # under `set -e` would abort the whole re-run. Skipping an existing checkout
-  # also keeps a locally modified one from being clobbered.
-  if [ ! -d "$HOME/.fzf" ]; then
-    git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-  fi
-  "$HOME/.fzf/install" --bin
-  export PATH="$PATH:$HOME/.fzf/bin"
-  fzf --version
-}
-
 go_deps() {
-  install "install_fzf" "fzf"
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
   install "go install github.com/walles/moor/v2/cmd/moor@latest" "moor"
   install "go install github.com/umlx5h/gtrash@latest" "gtrash"
