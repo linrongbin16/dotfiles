@@ -25,10 +25,6 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      # Deliberately not wrapped in `sudo sh -c`: that resets `HOME` to `/root`,
-      # so the job would test `/root/.gitconfig` and `/root/.zshrc` instead of
-      # the files a real user gets. `install` already calls `sudo` for the apt
-      # steps itself.
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
