@@ -16,33 +16,6 @@ Set-Alias -name ll -value DotLs2
 # lazygit
 Set-Alias -name lg -value lazygit
 
-# git
-function DotGitStatus
-{
-  git status $args
-}
-Set-Alias -name gs -value DotGitStatus
-function DotGitPull
-{
-  git pull $args
-}
-# Set-Alias -name gpl -value DotGitPull
-function DotGitPush
-{
-  git push $args
-}
-# Set-Alias -name gps -value DotGitPush
-function DotGitAdd
-{
-  git add $args
-}
-Set-Alias -name ga -value DotGitAdd
-function DotGitCommit
-{
-  git commit $args
-}
-Set-Alias -name gco -value DotGitCommit
-
 # Add a directory to the PATH, exactly once, and in front of the other entries.
 function AddPathEntry([string]$dir)
 {
