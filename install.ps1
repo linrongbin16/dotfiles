@@ -35,9 +35,16 @@ function InvokeChecked([string]$command, [string]$action)
 }
 
 # Whether `$command` is on PATH *and* actually runs, e.g. `cargo --version` exiting 0.
-function TestCommand([string]$command)
+#
+# `-Arguments` defaults to `--version` because that is what every tool probed here answers, but it
+# is a parameter for `cargo-binstall`: its `--version` takes a *crate* version as the value, so a
+# bare `--version` exits 2 even on a healthy install. That call site passes `-V` instead.
+function TestCommand([string]$command, [string]$Arguments = "--version")
 {
-  $exe = Get-Command -Name $command -CommandType Application -ErrorAction SilentlyContinue
+  # `-First 1`: PATH can hold two copies of the same binary (say a scoop shim and the one in
+  # `~/.cargo\bin`), and `Get-Command` then answers with an array that `&` refuses to run.
+  $exe = Get-Command -Name $command -CommandType Application -ErrorAction SilentlyContinue |
+    Select-Object -First 1
   if (-not $exe)
   {
     return $false
@@ -46,7 +53,7 @@ function TestCommand([string]$command)
   $ErrorActionPreference = 'Continue'
   try
   {
-    & $exe --version 2>&1 | Out-Null
+    & $exe $Arguments 2>&1 | Out-Null
   } finally
   {
     $ErrorActionPreference = $previous
@@ -101,9 +108,10 @@ function InstallScoop([string]$app, [string]$target)
   InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
 }
 
-# The crates `cargo install` has put on this machine, e.g. `rmz`. `cargo install --list`
-# prints `<name> v<version>:` followed by the binaries it installed, so the version line is
-# the crate name. Cached for the same reason as `GetScoopApps`.
+# The crates installed into this `CARGO_HOME`, e.g. `rmz`. `cargo install --list` prints
+# `<name> v<version>:` followed by the binaries the crate installed, so the version line is the
+# crate name. `cargo binstall` writes the same records, which is why one probe covers both
+# installers. Cached for the same reason as `GetScoopApps`.
 function GetCargoCrates()
 {
   if ($null -eq $script:CargoCrates)
@@ -127,8 +135,18 @@ function GetCargoCrates()
   return $script:CargoCrates
 }
 
-# Install a crate unless `cargo install` already put it here. `tree-sitter-cli` is the reason
-# this cannot be `Get-Command`: the crate ships `tree-sitter.exe`, not `tree-sitter-cli.exe`.
+# Install a crate unless it is already in this `CARGO_HOME`. `tree-sitter-cli` is the reason this
+# cannot be `Get-Command`: the crate ships `tree-sitter.exe`, not `tree-sitter-cli.exe`.
+#
+# `cargo binstall` instead of `cargo install`: it downloads a prebuilt release when the crate
+# publishes one and only falls back to compiling. That turns the slowest part of this script
+# (`tree-sitter-cli` alone is minutes of C compilation) into a download. It records installs in
+# the same `.crates.toml` `cargo install` writes, so `GetCargoCrates` sees both.
+#
+# `--no-confirm` because binstall asks "do you wish to continue?" before every install and this
+# script runs unattended; `--disable-telemetry` because without it `--no-confirm` silently leaves
+# the QuickInstall install-statistics consent enabled (`consent_asked = false`), i.e. it would
+# report what this machine installs without ever having asked.
 function InstallCargo([string]$crate)
 {
   if ((GetCargoCrates) -contains $crate)
@@ -136,7 +154,8 @@ function InstallCargo([string]$crate)
     SkipInfo $crate
   } else
   {
-    InvokeChecked -command "cargo install --locked ${crate}" -action "install '${crate}' with command: 'cargo install --locked ${crate}'"
+    $command = "cargo binstall --locked --no-confirm --disable-telemetry ${crate}"
+    InvokeChecked -command $command -action "install '${crate}' with command: '${command}'"
   }
 }
 
@@ -340,11 +359,50 @@ function InstallRustup()
   }
 }
 
+# Install `cargo-binstall`, the `cargo install` replacement `InstallCargo` uses.
+#
+# Not `cargo install cargo-binstall`: the crate takes several minutes to compile, which is exactly
+# the cost binstall exists to avoid, so it is installed from its own prebuilt release instead.
+# The project's installer is the one its README points at, and it picks the release asset for this
+# architecture itself, honours `CARGO_HOME`, and falls back to `-y --force cargo-binstall` if its
+# `--self-install` step does not work out.
+#
+# The probe is `-V`, not the `--version` default of `TestCommand`: binstall's `--version` takes a
+# crate version as its value, so a bare `--version` exits 2 on a perfectly healthy install.
+function InstallCargoBinstall()
+{
+  if (TestCommand "cargo-binstall" "-V")
+  {
+    SkipInfo "cargo-binstall"
+    return
+  }
+
+  $url = "https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.ps1"
+  Info "download '${url}'"
+  # `-UseBasicParsing` because PowerShell 5.1 otherwise parses the body with the Internet Explorer
+  # engine, which fails on a machine where IE has never been started. (PowerShell 7 ignores it.)
+  $installer = (Invoke-WebRequest -Uri $url -UseBasicParsing).Content
+
+  # `iex` runs the body in *this* function's scope, so the variables it assigns (`$tmpdir`, `$zip`,
+  # `$cargo_bin`, ...) stay here instead of leaking into the rest of the script. `4>$null` drops the
+  # timing lines it writes with `Write-Verbose -Verbose`, which are not this script's log format.
+  Invoke-Expression $installer 4>$null
+
+  # Fail here, with the reason, rather than in the first `cargo binstall` with a bare
+  # "no such command: `binstall`".
+  if (-not (TestCommand "cargo-binstall" "-V"))
+  {
+    $cargoBin = Join-Path $HOME ".cargo\bin"
+    throw "ran the cargo-binstall installer but 'cargo-binstall' is not usable (expected '${cargoBin}')"
+  }
+}
+
 function RustDeps()
 {
   Info "install rust deps for windows"
 
   InstallRustup
+  InstallCargoBinstall
   InstallScoop "fd"
   InstallScoop "ripgrep"
   InstallScoop "bat"
