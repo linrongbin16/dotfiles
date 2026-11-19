@@ -66,8 +66,19 @@ AddPathEntry (Join-Path $env:GOPATH 'bin')
 AddPathEntry "$env:LOCALAPPDATA\bob\nvim-bin"
 
 # starship prompt
-$env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
-Invoke-Expression (&starship init powershell)
+#
+# `starship init powershell` is what writes the prompt of the shell, so it may run only when
+# starship is installed: without the guard every shell reports the missing command as a
+# non-terminating error. The config of starship belongs to starship, so it goes with the init.
+#
+# `Get-Command` reports a missing command as an error, and `-ErrorAction SilentlyContinue` still
+# writes that error into `$Error`. `-ErrorAction Ignore` writes it nowhere, so a shell without
+# starship starts with an empty `$Error`.
+if (Get-Command starship -ErrorAction Ignore)
+{
+  $env:STARSHIP_CONFIG = "$env:USERPROFILE\.dotfiles\starship.toml"
+  Invoke-Expression (&starship init powershell)
+}
 
 # mise
 #
@@ -81,7 +92,7 @@ Invoke-Expression (&starship init powershell)
 # `mise activate pwsh` writes the PATH, so it may run only once per shell: a second run puts the
 # shims of mise into the PATH a second time. `__MISE_ORIG_PATH` is the marker that mise itself
 # sets on the first activation, so it tells whether mise is already active.
-if (-not (Test-Path -Path Env:/__MISE_ORIG_PATH) -and (Get-Command mise -ErrorAction SilentlyContinue))
+if (-not (Test-Path -Path Env:/__MISE_ORIG_PATH) -and (Get-Command mise -ErrorAction Ignore))
 {
   (&mise activate pwsh) | Out-String | Invoke-Expression
 }
