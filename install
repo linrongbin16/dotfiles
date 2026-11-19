@@ -80,16 +80,27 @@ go_deps() {
 
 # rust
 rust_deps() {
-  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "cargo"
-  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustc"
   export PATH="$HOME/.cargo/bin:$PATH"
-  install "cargo install fd-find" "fd"
-  install "cargo install ripgrep" "rg"
-  install "cargo install --locked bat" "bat"
-  install "cargo install eza" "eza"
-  install "cargo install --locked rmz" "rmz"
-  install "cargo install --locked cpz" "cpz"
-  install "cargo install --locked tree-sitter-cli" "tree-sitter"
+
+  install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustup"
+
+  if ! rustc --version >/dev/null 2>&1 || ! cargo --version >/dev/null 2>&1; then
+    info "install 'rustc/cargo' with: 'rustup default stable'"
+    rustup default stable
+    info "install 'rustc/cargo' with: 'rustup default stable' - done"
+  else
+    skip_info "rustc/cargo"
+  fi
+
+  install "curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash" "cargo-binstall"
+
+  install "cargo binstall -y fd-find" "fd"
+  install "cargo binstall -y ripgrep" "rg"
+  install "cargo binstall -y --locked bat" "bat"
+  install "cargo binstall -y eza" "eza"
+  install "cargo binstall -y --locked rmz" "rmz"
+  install "cargo binstall -y --locked cpz" "cpz"
+  install "cargo binstall -y --locked tree-sitter-cli" "tree-sitter"
 }
 
 prompt_deps() {
