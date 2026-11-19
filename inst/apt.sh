@@ -2,17 +2,12 @@
 
 # set -x
 
-# debian/ubuntu package architecture name, i.e. amd64/arm64
-ARCH="$(uname -m)"
-case "$ARCH" in
-x86_64) ARCH="amd64" ;;
-aarch64 | arm64) ARCH="arm64" ;;
-esac
-
-IS_ARM=0
-if [[ "$ARCH" == arm* ]]; then
-  IS_ARM=1
-fi
+# Platform detection is done once by `install` (see the top of that file):
+# `OS_ARCH` is the `uname -m` name, `ARCH` the dpkg package architecture and
+# `IS_ARM` the 0/1 flag. Fail loudly instead of expanding to empty strings
+# when this file is sourced without `install`.
+: "${ARCH:?ARCH is not set - source this file from install}"
+: "${IS_ARM:?IS_ARM is not set - source this file from install}"
 
 install_nodejs() {
   # https://github.com/nodesource/distributions
