@@ -11,11 +11,6 @@ alias ll="eza -alh"
 # lazygit
 alias lg="lazygit"
 
-# fzf
-if [ -d "$HOME/.fzf/bin" ]; then
-  export PATH="$PATH:$HOME/.fzf/bin"
-fi
-
 # git
 alias gs="git status"
 alias gp="git pull"
