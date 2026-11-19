@@ -43,15 +43,27 @@ function DotGitCommit
 }
 Set-Alias -name gco -value DotGitCommit
 
+# Add a directory to the PATH, exactly once, and in front of the other entries.
+function AddPathEntry([string]$dir)
+{
+  if ([string]::IsNullOrEmpty($dir))
+  { return 
+  }
+  $entries = @($env:PATH -split ';' | Where-Object { $_ })
+  $target = $dir.TrimEnd('\')
+  $kept = @($entries | Where-Object { $_.TrimEnd('\') -ine $target })
+  $env:PATH = (@($dir) + $kept) -join ';'
+}
+
 # rust/cargo
-$env:PATH += ";$env:USERPROFILE\.cargo\bin"
+AddPathEntry "$env:USERPROFILE\.cargo\bin"
 
 # go
-$env:GOPATH="$env:USERPROFILE\go"
-$env:PATH += ";$env:GOPATH\bin"
+$env:GOPATH = "$env:USERPROFILE\go"
+AddPathEntry (Join-Path $env:GOPATH 'bin')
 
 # bob-nvim
-$env:PATH += ";$env:LOCALAPPDATA\bob\nvim-bin"
+AddPathEntry "$env:LOCALAPPDATA\bob\nvim-bin"
 
 # mise is disabled
 # mise activate pwsh | Out-String | Invoke-Expression

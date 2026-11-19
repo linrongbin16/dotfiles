@@ -335,7 +335,6 @@ function CoreDeps()
 
   RunCommand -command "scoop install mingw"
   RunCommand -command "scoop install coreutils"
-  RunCommand -command "scoop install file"
   RunCommand -command "scoop install extras/vcredist2022"
 
   InstallScoop "which"
