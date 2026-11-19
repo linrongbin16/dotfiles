@@ -11,8 +11,6 @@ install "brew install autoconf" "autoconf"
 install "brew install automake" "automake"
 install "brew install pkg-config" "pkg-config"
 install "brew install cmake" "cmake"
-# `openssl` also lives in /usr/bin, so probing the bare name would report
-# success before brew installed its own copy. Probe the keg path instead.
 install "brew install openssl" "$(brew --prefix openssl)/bin/openssl"
 
 install "brew install git" "git"
