@@ -83,31 +83,6 @@ function AddScoopBucket([string]$name)
   }
 }
 
-# Drop a scoop shim that shadows a build tool of the same name.
-#
-# `microsoft-coreutils` ships GNU `link`, which scoop exposes as `~\scoop\shims\link.exe`.
-# That shim sits on PATH ahead of MSVC, so rustc resolves `link.exe` to it and every
-# `cargo install` fails with `error: 2 values required for '<FILES> <FILES>' but 34 were
-# provided` -- the GNU tool takes two file arguments, the MSVC linker takes a linker
-# command line. `scoop shim rm` on an absent shim exits with 3, so probe the shim list
-# first, the same way `AddScoopBucket` probes the bucket list.
-function RemoveScoopShim([string]$name)
-{
-  $global:LASTEXITCODE = 0
-  $shims = & scoop shim list $name 6>&1 | Out-String
-  if ($LASTEXITCODE -ne 0)
-  {
-    throw "failed to list scoop shims (exit ${LASTEXITCODE})"
-  }
-  if ($shims -match "(?m)^${name}\s")
-  {
-    RunCommand -command "scoop shim rm ${name}"
-  } else
-  {
-    Info "scoop shim '${name}' is not there, skip..."
-  }
-}
-
 # utils }
 
 function InstallMo()
@@ -176,11 +151,12 @@ function CoreDeps()
   AddScoopBucket -name "extras"
 
   RunCommand -command "scoop install mingw"
-  RunCommand -command "scoop install microsoft-coreutils"
+  # Not `microsoft-coreutils`: it shims GNU `link` as `~\scoop\shims\link.exe`, and scoop
+  # puts its shims on PATH ahead of the MSVC toolchain, so rustc picks it up as the linker
+  # and every `cargo install` in `RustDeps` fails with `error: 2 values required for
+  # '<FILES> <FILES>' but 34 were provided`. `coreutils` provides the shell utilities this
+  # setup needs and ships no `link`.
   RunCommand -command "scoop install coreutils"
-  # `microsoft-coreutils` puts GNU `link` on PATH as `link.exe`, which shadows the MSVC
-  # linker and breaks every `cargo install` below. Must run after the coreutils installs.
-  RemoveScoopShim -name "link"
   RunCommand -command "scoop install file"
   # RunCommand -command "scoop install uutils-coreutils"
   RunCommand -command "scoop install extras/vcredist2022"
