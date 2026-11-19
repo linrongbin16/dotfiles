@@ -4,8 +4,6 @@
 
 info "install deps with brew"
 
-install "xcode-select --install" "clang"
-install "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"" "brew"
 brew update
 
 brew install lld
