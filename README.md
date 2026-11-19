@@ -9,7 +9,7 @@ My dot files.
 ### macOS/Ubuntu
 
 - For macOS, install [xcode](https://developer.apple.com/support/xcode/) and use [homebrew](https://brew.sh/) as your package manager.
-- For Ubuntu Linux, 24 and later versions are supported, install [zsh](https://www.zsh.org/) and set it as default login shell.
+- For Ubuntu Linux, 26 and later versions are supported, install [zsh](https://www.zsh.org/) and set it as default login shell.
 
 ```bash
 cd ~
