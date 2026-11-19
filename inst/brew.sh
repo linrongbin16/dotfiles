@@ -29,7 +29,9 @@ install "brew install deno" "deno"
 install "brew install oven-sh/bun/bun" "bun"
 
 install "brew install go" "go"
-install "brew install macos-trash" "/opt/homebrew/opt/macos-trash/bin/trash"
+# `macos-trash` is keg-only, so it is never linked into the brew prefix and
+# `command -v trash` cannot see it. Ask brew where the keg is instead.
+install "brew install macos-trash" "$(brew --prefix macos-trash)/bin/trash"
 install "brew install zoxide" "zoxide"
 install "brew install fzf" "fzf"
 install "brew install lazygit" "lazygit"
