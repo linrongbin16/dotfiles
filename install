@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# Fail fast: any command that fails aborts the whole installation with its own
+# exit code, instead of running to the end and reporting success because the
+# last step happened to work.
+#
+# `-u` catches typos in variable names (`$HOM` instead of `$HOME` would
+# otherwise expand to nothing and quietly install into the wrong place).
+#
+# `-E` propagates the ERR trap into functions and subshells. Without it the trap
+# set in `install()` never fires for the command it evaluates, so a failure
+# would kill the script with no hint about which tool was being installed.
+#
+# `pipefail` makes `curl ... | sh` report curl's failure rather than the exit
+# code of `sh`, which happily reads an empty script and exits 0.
+#
+# These only apply to commands run unprotected. Anything wrapped in `if`, `||`
+# or `&&` is exempt from errexit, so `install()` deliberately runs its command
+# bare.
+set -Eeuo pipefail
+
 # set -x
 
 OS="$(uname -s)"
@@ -20,6 +39,11 @@ esac
 export DOTFILES_HOME="$HOME/.dotfiles"
 
 . "$DOTFILES_HOME/inst/util.sh"
+
+# Installed once, after `util.sh` defines `report_failure`. Covers the bare
+# commands in `inst/apt.sh` and `inst/brew.sh` too, which are just as likely to
+# fail as anything wrapped in `install()`.
+trap 'report_failure' ERR
 
 core_deps() {
   case "$OS" in
@@ -48,15 +72,7 @@ js_deps() {
   install "curl -fsSL https://bun.com/install | bash" "bun"
 }
 
-install_fzf() {
-  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-  ~/.fzf/install --bin
-  export PATH="$PATH:$HOME/.fzf/bin"
-  fzf --version
-}
-
 go_deps() {
-  install "install_fzf" "fzf"
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
   install "go install github.com/walles/moor/v2/cmd/moor@latest" "moor"
   install "go install github.com/umlx5h/gtrash@latest" "gtrash"
@@ -158,8 +174,6 @@ profile_configs() {
     info "failed to append to '$zshrc'"
     return 1
   fi
-
-  info "done"
 }
 
 main() {
@@ -173,6 +187,7 @@ main() {
   # kitty_configs
   ghostty_configs
   profile_configs
+  info "done"
 }
 
 main

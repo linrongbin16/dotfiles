@@ -25,18 +25,14 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Get branch
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          set -x
-          echo '${{ steps.extract_branch.outputs.branch }}'
-          export BRANCH_NAME=${{ steps.extract_branch.outputs.branch }}
-          sudo sh -c "git clone --single-branch --branch $BRANCH_NAME --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles && cd ~/.dotfiles && sudo bash -euxo pipefail ./install"
+          git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
+          cd ~/.dotfiles
+          bash ./install
   macos_installer:
     name: MacOS Installer
     runs-on: macos-latest
@@ -45,19 +41,14 @@ jobs:
         with:
           xcode-version: latest-stable
       - uses: Homebrew/actions/setup-homebrew@1f8e202ffddf94def7f42f6fa3a482e821489f9c # 2026.07.10.1
-      - name: Get branch
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          set -x
-          echo '${{ steps.extract_branch.outputs.branch }}'
-          echo ${{ steps.extract_branch.outputs.branch }}
-          git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
+          git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
           cd ~/.dotfiles
-          bash -euxo pipefail ./install
+          bash ./install
   windows_installer:
     name: Windows Installer
     strategy:
