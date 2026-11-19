@@ -1,5 +1,13 @@
 # Set-PSDebug -Trace 1
 
+# Fail fast: a failing cmdlet (a bad path, a failed redirect, a missing command) aborts the
+# installation instead of being printed and then silently ignored.
+#
+# Native commands (`scoop`, `git`, `cargo`, ...) are unaffected by this preference: their
+# stderr still goes straight to the console, and their exit code is checked explicitly by
+# `InvokeChecked` below.
+$ErrorActionPreference = 'Stop'
+
 $isArm = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64
 
 # utils {
@@ -14,6 +22,27 @@ function SkipInfo([string]$content)
   Info "'$content' already exist, skip..."
 }
 
+# Run `$command` and abort the whole installation when it exits with a non-zero code.
+#
+# This is what keeps CI honest. On Windows CI only runs `pwsh .\install.ps1` (see
+# `.github/workflows/ci.yml`), so a bare `Invoke-Expression` would let a failed step pass
+# unnoticed and leave the job green, unlike the bash installers there that run under
+# `bash -e`. It mirrors `install()` in `inst/util.sh` for the unix side.
+function InvokeChecked([string]$command, [string]$action)
+{
+  # Cmdlets never touch $LASTEXITCODE, so a stale value from some earlier command would be
+  # mistaken for the result of this one: clear it before running.
+  $global:LASTEXITCODE = 0
+  Info $action
+  Invoke-Expression $command
+  $status = $LASTEXITCODE
+  if ($status -ne 0)
+  {
+    throw "command failed with exit code ${status}: '${command}'"
+  }
+  Info "${action} - done"
+}
+
 function Install([string]$command, [string]$target)
 {
   if (Get-Command -Name $target -ErrorAction SilentlyContinue)
@@ -21,8 +50,36 @@ function Install([string]$command, [string]$target)
     SkipInfo $target
   } else
   {
-    Info "install '${target}' with command: '${command}'"
-    Invoke-Expression $command
+    InvokeChecked -command $command -action "install '${target}' with command: '${command}'"
+  }
+}
+
+# Install a package that provides no command to probe with `Get-Command`, e.g. `mingw` only
+# appends its `bin` directory to PATH. Scoop's own install is idempotent: when the package
+# is already there it warns and exits 0, so no extra guard is needed here.
+function RunCommand([string]$command)
+{
+  InvokeChecked -command $command -action "run command: '${command}'"
+}
+
+function AddScoopBucket([string]$name)
+{
+  # `scoop bucket add` exits with 2 when the bucket exists (scoop's `lib/buckets.ps1:
+  # add_bucket`), so probe the bucket list instead of special-casing that code.
+  # scoop prints through `Write-Host`, i.e. the information stream, hence `6>&1` to read it
+  # back; both Windows PowerShell 5.1 and PowerShell 7 support that.
+  $global:LASTEXITCODE = 0
+  $buckets = & scoop bucket list 6>&1 | Out-String
+  if ($LASTEXITCODE -ne 0)
+  {
+    throw "failed to list scoop buckets (exit ${LASTEXITCODE})"
+  }
+  if ($buckets -match "(?m)^${name}\s")
+  {
+    SkipInfo "scoop bucket ${name}"
+  } else
+  {
+    RunCommand -command "scoop bucket add ${name}"
   }
 }
 
@@ -80,18 +137,23 @@ function CoreDeps()
   Info "install core deps for windows"
 
   # deps
-  Install -command "scoop install 7zip" -target "7z"
+  # `7zip` must be installed *through scoop*, not merely be present on PATH: scoop unpacks
+  # `.7z` / `.tar.xz` / `.tar.lzma` downloads with its own copy of `7z.exe`
+  # (`lib/decompress.ps1` -> `Get-HelperPath -Helper 7zip`, which only looks at scoop apps).
+  # Probing `7z` with `Get-Command` therefore skipped this install on the CI images, which
+  # ship a standalone 7-Zip that scoop cannot see, and the next `.7z` package (`mingw`)
+  # failed to extract. Every package below needs it, so keep it first.
+  RunCommand -command "scoop install 7zip"
   Install -command "scoop install gzip" -target "gzip"
   Install -command "scoop install unzip" -target "unzip"
 
+  # `extras` bucket is required by `extras/vcredist2022` below.
+  AddScoopBucket -name "extras"
 
-  scoop bucket add extras
-  scoop install mingw
-  scoop install microsoft-coreutils
-  scoop install coreutils
-  scoop install file
-  # scoop install uutils-coreutils
-  scoop install extras/vcredist2022
+  RunCommand -command "scoop install mingw"
+  RunCommand -command "scoop install coreutils"
+  RunCommand -command "scoop install file"
+  RunCommand -command "scoop install extras/vcredist2022"
 
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
@@ -125,10 +187,10 @@ function GitConfigs()
 {
   Info "install git configs for windows"
 
-  git config --global user.email "linrongbin16@outlook.com"
-  git config --global user.name "linrongbin16"
-  git config --global pull.rebase false
-  git config --global init.defaultBranch main
+  RunCommand -command 'git config --global user.email "linrongbin16@outlook.com"'
+  RunCommand -command 'git config --global user.name "linrongbin16"'
+  RunCommand -command 'git config --global pull.rebase false'
+  RunCommand -command 'git config --global init.defaultBranch main'
 }
 
 function GoDeps()
@@ -159,7 +221,8 @@ function RustDeps()
 function NeovimDeps()
 {
   Info "install neovim deps for windows"
-  Install "scoop install nvim" "nvim"
+  # the scoop package is named `neovim`, it installs the `nvim` binary.
+  Install -command "scoop install neovim" -target "nvim"
 }
 
 function PromptDeps()
@@ -198,4 +261,14 @@ function Main()
   ProfileConfigs
 }
 
-Main
+try
+{
+  Main
+  Info "all done"
+}
+catch
+{
+  # Report the reason, then exit non-zero so CI (and the caller) sees the failure.
+  Info "install failed: $($_.Exception.Message)"
+  exit 1
+}
