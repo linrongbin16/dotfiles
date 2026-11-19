@@ -55,7 +55,7 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # zoxide
-if [ -x "zoxide" ]; then
+if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init --cmd cd zsh)"
 fi
 
