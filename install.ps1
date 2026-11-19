@@ -451,8 +451,6 @@ function AddProfileSource([string]$path, [string]$line)
   # readable instead of turning into half UTF-8.
   $block = "${prefix}# dotfiles`r`n${line}`r`n"
   [System.IO.File]::AppendAllText($path, $block, $encoding)
-
-  Info "done"
 }
 
 function ProfileConfigs()
@@ -501,7 +499,7 @@ function Main()
 try
 {
   Main
-  Info "all done"
+  Info "done"
 } catch
 {
   # Report the reason, then exit non-zero so CI (and the caller) sees the failure.
