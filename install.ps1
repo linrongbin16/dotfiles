@@ -2,12 +2,6 @@
 
 # Fail fast: a failing cmdlet (a bad path, a failed redirect, a missing command) aborts the
 # installation instead of being printed and then silently ignored.
-#
-# Native commands (`scoop`, `git`, `cargo`, ...) are unaffected by this preference as long as
-# their streams are not redirected: their stderr goes straight to the console, and their exit
-# code is checked explicitly by `InvokeChecked` below. Redirecting it (`2>$null`) would change
-# that under PowerShell 5.1, where each redirected line becomes an error record -- see
-# `GetCargoCrates`.
 $ErrorActionPreference = 'Stop'
 
 $isArm = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::Arm64
@@ -25,11 +19,6 @@ function SkipInfo([string]$content)
 }
 
 # Run `$command` and abort the whole installation when it exits with a non-zero code.
-#
-# This is what keeps CI honest. On Windows CI only runs `pwsh .\install.ps1` (see
-# `.github/workflows/ci.yml`), so a bare `Invoke-Expression` would let a failed step pass
-# unnoticed and leave the job green, unlike the bash installers there that run under
-# `bash -e`. It mirrors `install()` in `inst/util.sh` for the unix side.
 function InvokeChecked([string]$command, [string]$action)
 {
   # Cmdlets never touch $LASTEXITCODE, so a stale value from some earlier command would be
@@ -45,14 +34,28 @@ function InvokeChecked([string]$command, [string]$action)
   Info "${action} - done"
 }
 
+# Whether `$command` is on PATH *and* actually runs, e.g. `cargo --version` exiting 0.
+function TestCommand([string]$command)
+{
+  $exe = Get-Command -Name $command -CommandType Application -ErrorAction SilentlyContinue
+  if (-not $exe)
+  {
+    return $false
+  }
+  $previous = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try
+  {
+    & $exe --version 2>&1 | Out-Null
+  } finally
+  {
+    $ErrorActionPreference = $previous
+  }
+  return $LASTEXITCODE -eq 0
+}
+
 # The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes
 # two dozen packages and one `scoop list` costs ~0.3s.
-#
-# `Get-Command` cannot answer "is this scoop package installed". Under PowerShell 5.1 it
-# resolves `curl` and `wget` to the `Invoke-WebRequest` alias, and unrelated tools earlier
-# on PATH answer for packages scoop never installed (`niubash`'s `winuxcmd` provides
-# `which`/`awk`/`sed`/`fd`/`rg`). Probing the package name is the only way to see what
-# scoop itself sees.
 function GetScoopApps()
 {
   if ($null -eq $script:ScoopApps)
@@ -101,17 +104,6 @@ function InstallScoop([string]$app, [string]$target)
 # The crates `cargo install` has put on this machine, e.g. `rmz`. `cargo install --list`
 # prints `<name> v<version>:` followed by the binaries it installed, so the version line is
 # the crate name. Cached for the same reason as `GetScoopApps`.
-#
-# The exit code is ignored on purpose: a broken or absent `--list` yields no names, i.e.
-# "nothing is installed", and the `cargo install` that follows fails loudly with the real
-# error instead of the installer quietly skipping a dependency.
-#
-# Its stderr is left alone rather than redirected to `$null`: under PowerShell 5.1 every
-# redirected stderr line from a native command becomes an error record, and the
-# `$ErrorActionPreference = 'Stop'` above turns the first one into a terminating error. `cargo`
-# writes its diagnostics there (any warning, any failing `--list`), so discarding them would make
-# the probe throw instead of returning "nothing installed" and letting the real `cargo install`
-# report the error.
 function GetCargoCrates()
 {
   if ($null -eq $script:CargoCrates)
@@ -299,22 +291,25 @@ function GoDeps()
 }
 
 # Install `rustup` and its default (stable) toolchain from the Rust project instead of scoop.
-#
-# `rustup-init.exe` is the official installer -- the unix `install` script reaches the same
-# thing through `sh.rustup.rs` -- and `static.rust-lang.org` serves one binary per host triple,
-# so the ARM64 and x64 images get their own. It downloads the stable toolchain and puts
-# `rustup.exe`/`cargo.exe`/`rustc.exe` proxies in `%USERPROFILE%\.cargo\bin`, the directory
-# `dotfiles.ps1` already appends to PATH, so nothing lands in a second location that could
-# shadow it later.
-#
-# Probing `rustup` rather than `rustc` is deliberate: a `rustc` from anywhere else (`scoop
-# install rust`, a stray copy) is exactly the state this function exists to replace, while a
-# `rustup` always owns its toolchain, i.e. it brings `rustc`/`cargo` with it.
 function InstallRustup()
 {
-  if (Get-Command -Name rustup -ErrorAction SilentlyContinue)
+  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
+  # still be "not recognized" for the `cargo install` calls below on a fresh machine. Done
+  # first: the probes should look at the directory the install puts its proxies in.
+  $cargoBin = Join-Path $HOME ".cargo\bin"
+  if (($env:PATH -split ';') -notcontains $cargoBin)
+  {
+    $env:PATH = "${cargoBin};$env:PATH"
+  }
+
+  if (TestCommand "rustup")
   {
     SkipInfo "rustup"
+    if ((TestCommand "rustc") -and (TestCommand "cargo"))
+    {
+      return
+    }
+    InvokeChecked -command "rustup default stable" -action "install the default rust toolchain"
     return
   }
 
@@ -333,26 +328,15 @@ function InstallRustup()
     throw "failed to download ${url}"
   }
 
-  # `-y` takes the answers the interactive prompt would ask for; `--default-toolchain stable`
-  # is explicit because it is the whole point of the step, and the default profile brings
-  # `rustc`, `cargo`, `rust-std`, `rust-docs`, `rustfmt` and `clippy`. The user PATH is left
-  # to the installer, which appends `%USERPROFILE%\.cargo\bin` itself.
   InvokeChecked -command "& '${installer}' -y --default-toolchain stable" -action "install rustup with the stable toolchain"
   # Cleanup only: a leftover installer in TEMP must not fail an otherwise finished install.
   Remove-Item -Path $installer -Force -ErrorAction SilentlyContinue
 
-  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
-  # still be "not recognized" for the `cargo install` calls below on a fresh machine.
-  $cargoBin = Join-Path $HOME ".cargo\bin"
-  if (($env:PATH -split ';') -notcontains $cargoBin)
-  {
-    $env:PATH = "${cargoBin};$env:PATH"
-  }
   # Fail here, with the reason, rather than in the first `cargo install` with a bare
   # "not recognized as the name of a cmdlet".
-  if (-not (Get-Command -Name cargo -ErrorAction SilentlyContinue))
+  if (-not (TestCommand "cargo"))
   {
-    throw "rustup finished but 'cargo' is not on PATH (expected '${cargoBin}')"
+    throw "rustup finished but 'cargo' is not usable (expected '${cargoBin}')"
   }
 }
 
@@ -360,10 +344,6 @@ function RustDeps()
 {
   Info "install rust deps for windows"
 
-  # `rustup` plus the stable `rustc`/`cargo` come from the Rust project itself, not from scoop:
-  # that is the supported installer (the unix `install` script does the same through
-  # `sh.rustup.rs`) and it installs into `%USERPROFILE%\.cargo`, which `dotfiles.ps1` already
-  # puts on PATH.
   InstallRustup
   InstallScoop "fd"
   InstallScoop "ripgrep"
@@ -388,16 +368,6 @@ function PromptDeps()
 }
 
 # Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
-#
-# `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` (README.md) is not enough: run under
-# pwsh 7 it writes `Documents\PowerShell\powershell.config.json`, a file `powershell.exe`
-# never reads. 5.1 reads `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell`
-# and, left at the Windows default `Restricted`, refuses to source any profile -- every launch
-# then prints `running scripts is disabled on this system` and `dotfiles.ps1` never runs.
-#
-# The value is written straight to the registry instead of shelling out to
-# `powershell.exe -Command Set-ExecutionPolicy`: no child process, and the result is the same
-# no matter which host ran the installer. Policies that already allow local scripts are kept.
 function SetExecutionPolicyForWindowsPowerShell()
 {
   $key = 'HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
