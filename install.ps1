@@ -312,7 +312,7 @@ function AddProfileSource([string]$path, [string]$line)
   $block = "${prefix}# dotfiles`r`n${line}`r`n"
   [System.IO.File]::AppendAllText($path, $block, [System.Text.UTF8Encoding]::new($false))
 
-  Info "append '${line}' to '${path}' - done"
+  Info "done"
 }
 
 function ProfileConfigs()
