@@ -119,5 +119,6 @@ install "install_bat" "bat"
 install "install_fd" "fd"
 install "install_eza" "eza"
 install "install_mo" "mo"
+install "curl -fsSL https://mise.run | MISE_INSTALL_HELP=0 sh" "mise"
 
 install "install_neovim" "nvim"

@@ -40,5 +40,6 @@ install "brew install fd" "fd"
 install "brew install eza" "eza"
 install "brew install tree-sitter-cli" "tree-sitter"
 install "brew install k1LoW/tap/mo" "mo"
+install "brew install mise" "mise"
 
 install "brew install neovim" "nvim"
