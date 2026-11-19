@@ -158,9 +158,11 @@ function CoreDeps()
   Install -command "scoop install which" -target "which"
   Install -command "scoop install gawk" -target "awk"
   Install -command "scoop install sed" -target "sed"
-  if ($isArm) {
+  if ($isArm)
+  {
     Install -command "scoop install llvm-arm64" -target "clang"
-  } else {
+  } else
+  {
     Install -command "scoop install llvm" -target "clang"
   }
   Install -command "scoop install make" -target "make"
@@ -279,7 +281,7 @@ function ProfileConfigs()
   $block = "${prefix}# dotfiles`r`n${line}`r`n"
   [System.IO.File]::AppendAllText($PROFILE, $block, [System.Text.UTF8Encoding]::new($false))
 
-  Info "append '${line}' to '${PROFILE}' - done"
+  Info "done"
 }
 
 function Main()
@@ -298,8 +300,7 @@ try
 {
   Main
   Info "all done"
-}
-catch
+} catch
 {
   # Report the reason, then exit non-zero so CI (and the caller) sees the failure.
   Info "install failed: $($_.Exception.Message)"
