@@ -45,6 +45,38 @@ function InvokeChecked([string]$command, [string]$action)
   Info "${action} - done"
 }
 
+# Whether `$command` is on PATH *and* actually runs, e.g. `cargo --version` exiting 0.
+#
+# Both halves are needed. Being on PATH proves nothing for the rustup proxies: they stay there
+# as files after the toolchain they dispatch to is gone, so a bare `Get-Command cargo` answers
+# happily while every `cargo` call fails. `-CommandType Application` is not decoration either:
+# under PowerShell 5.1 a bare `Get-Command curl` resolves to the `Invoke-WebRequest` alias, and
+# calling that with `--version` throws instead of returning an exit code.
+#
+# The probe's output is dropped because the exit code already says everything the caller needs.
+# Doing that takes the local `Continue`: under 5.1 every redirected stderr line becomes an error
+# record, and `$ErrorActionPreference = 'Stop'` would turn the first `info:` line of a healthy
+# `rustup --version` into a terminating error before `$LASTEXITCODE` could be read.
+function TestCommand([string]$command)
+{
+  $exe = Get-Command -Name $command -CommandType Application -ErrorAction SilentlyContinue
+  if (-not $exe)
+  {
+    return $false
+  }
+  $previous = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try
+  {
+    & $exe --version 2>&1 | Out-Null
+  }
+  finally
+  {
+    $ErrorActionPreference = $previous
+  }
+  return $LASTEXITCODE -eq 0
+}
+
 # The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes
 # two dozen packages and one `scoop list` costs ~0.3s.
 #
@@ -307,14 +339,33 @@ function GoDeps()
 # `dotfiles.ps1` already appends to PATH, so nothing lands in a second location that could
 # shadow it later.
 #
-# Probing `rustup` rather than `rustc` is deliberate: a `rustc` from anywhere else (`scoop
-# install rust`, a stray copy) is exactly the state this function exists to replace, while a
-# `rustup` always owns its toolchain, i.e. it brings `rustc`/`cargo` with it.
+# Two probes, two questions. `rustup` itself decides whether the installer has to run at all:
+# when it is present, `rustup-init.exe` would only re-download what is already there. `rustc`
+# and `cargo` decide whether that rustup is *usable*: they are the proxies it dispatches
+# through, so `rustup toolchain uninstall stable`, `rustup-init --default-toolchain none` or a
+# fresh `RUSTUP_HOME` all leave `rustup --version` answering happily while `cargo --version`
+# fails with "rustup could not choose a version of cargo to run" -- which is what used to break
+# the `cargo install` calls below. `rustup default stable` repairs that without touching any
+# toolchain that is already installed, and it is the only network work a healthy machine skips.
 function InstallRustup()
 {
-  if (Get-Command -Name rustup -ErrorAction SilentlyContinue)
+  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
+  # still be "not recognized" for the `cargo install` calls below on a fresh machine. Done
+  # first: the probes should look at the directory the install puts its proxies in.
+  $cargoBin = Join-Path $HOME ".cargo\bin"
+  if (($env:PATH -split ';') -notcontains $cargoBin)
+  {
+    $env:PATH = "${cargoBin};$env:PATH"
+  }
+
+  if (TestCommand "rustup")
   {
     SkipInfo "rustup"
+    if ((TestCommand "rustc") -and (TestCommand "cargo"))
+    {
+      return
+    }
+    InvokeChecked -command "rustup default stable" -action "install the default rust toolchain"
     return
   }
 
@@ -341,18 +392,11 @@ function InstallRustup()
   # Cleanup only: a leftover installer in TEMP must not fail an otherwise finished install.
   Remove-Item -Path $installer -Force -ErrorAction SilentlyContinue
 
-  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
-  # still be "not recognized" for the `cargo install` calls below on a fresh machine.
-  $cargoBin = Join-Path $HOME ".cargo\bin"
-  if (($env:PATH -split ';') -notcontains $cargoBin)
-  {
-    $env:PATH = "${cargoBin};$env:PATH"
-  }
   # Fail here, with the reason, rather than in the first `cargo install` with a bare
   # "not recognized as the name of a cmdlet".
-  if (-not (Get-Command -Name cargo -ErrorAction SilentlyContinue))
+  if (-not (TestCommand "cargo"))
   {
-    throw "rustup finished but 'cargo' is not on PATH (expected '${cargoBin}')"
+    throw "rustup finished but 'cargo' is not usable (expected '${cargoBin}')"
   }
 }
 
