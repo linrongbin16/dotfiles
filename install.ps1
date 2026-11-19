@@ -235,18 +235,49 @@ function PromptDeps()
   # Install -command "scoop install mise" -target "mise"
 }
 
-function ProfileConfigs()
+# Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
+#
+# `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` (README.md) is not enough: run under
+# pwsh 7 it writes `Documents\PowerShell\powershell.config.json`, a file `powershell.exe`
+# never reads. 5.1 reads `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell`
+# and, left at the Windows default `Restricted`, refuses to source any profile -- every launch
+# then prints `running scripts is disabled on this system` and `dotfiles.ps1` never runs.
+#
+# The value is written straight to the registry instead of shelling out to
+# `powershell.exe -Command Set-ExecutionPolicy`: no child process, and the result is the same
+# no matter which host ran the installer. Policies that already allow local scripts are kept.
+function SetExecutionPolicyForWindowsPowerShell()
 {
-  Info "install PROFILE configs for windows"
+  $key = 'HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
 
-  $line = '. $env:USERPROFILE\.dotfiles\dotfiles.ps1'
+  $current = $null
+  if (Test-Path -Path $key)
+  {
+    $current = (Get-ItemProperty -Path $key).ExecutionPolicy
+  }
 
-  New-Item -ItemType Directory -Path (Split-Path $PROFILE) -Force | Out-Null
+  # `AllSigned` is deliberately not in this list: it would still refuse the unsigned profile.
+  if (@('RemoteSigned', 'Unrestricted', 'Bypass') -contains $current)
+  {
+    Info "windows powershell execution policy is '${current}', skip..."
+    return
+  }
+
+  New-Item -Path $key -Force | Out-Null
+  Set-ItemProperty -Path $key -Name 'ExecutionPolicy' -Value 'RemoteSigned'
+  Info "set windows powershell execution policy 'RemoteSigned' (was '${current}') - done"
+}
+
+# Append the `# dotfiles` marker and the `dotfiles.ps1` source line to one profile file,
+# unless the source line is already in there.
+function AddProfileSource([string]$path, [string]$line)
+{
+  New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
 
   $content = ''
-  if (Test-Path -Path $PROFILE)
+  if (Test-Path -Path $path)
   {
-    $content = [System.IO.File]::ReadAllText($PROFILE, [System.Text.Encoding]::UTF8)
+    $content = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
   }
 
   # Probe before appending: the block used to be written unconditionally, so every re-run
@@ -256,7 +287,7 @@ function ProfileConfigs()
   {
     if ($existing.Trim() -eq $line)
     {
-      Info "source '${line}' is already in '${PROFILE}', skip..."
+      Info "source '${line}' is already in '${path}', skip..."
       return
     }
   }
@@ -279,9 +310,40 @@ function ProfileConfigs()
   }
 
   $block = "${prefix}# dotfiles`r`n${line}`r`n"
-  [System.IO.File]::AppendAllText($PROFILE, $block, [System.Text.UTF8Encoding]::new($false))
+  [System.IO.File]::AppendAllText($path, $block, [System.Text.UTF8Encoding]::new($false))
 
   Info "done"
+}
+
+function ProfileConfigs()
+{
+  Info "install PROFILE configs for windows"
+
+  $line = '. $env:USERPROFILE\.dotfiles\dotfiles.ps1'
+
+  # `$PROFILE` only names the running host's own profile, so writing that one left the other
+  # host unconfigured: `.\install.ps1` under `powershell.exe` 5.1 wrote
+  # `Documents\WindowsPowerShell\...`, and pwsh 7 then loaded nothing. Configure both, using
+  # `MyDocuments` rather than `$HOME\Documents` so a relocated (OneDrive) Documents folder
+  # still resolves to where PowerShell actually looks.
+  #
+  # The 5.1 side also needs its execution policy opened: `Set-ExecutionPolicy RemoteSigned
+  # -Scope CurrentUser` in README.md writes `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\
+  # Microsoft.PowerShell`, which `powershell.exe` reads and pwsh 7 ignores (7 is pinned to
+  # RemoteSigned by `$PSHOME\powershell.config.json`). Skipping it leaves 5.1 at `Restricted`,
+  # where sourcing the profile fails and every launch prints a `running scripts is disabled`
+  # error -- the very failure this dual-profile support is meant to avoid.
+  SetExecutionPolicyForWindowsPowerShell
+
+  $documents = [Environment]::GetFolderPath('MyDocuments')
+  $profiles = @(
+    (Join-Path $documents "PowerShell\Microsoft.PowerShell_profile.ps1"),
+    (Join-Path $documents "WindowsPowerShell\Microsoft.PowerShell_profile.ps1")
+  )
+  foreach ($path in $profiles)
+  {
+    AddProfileSource -path $path -line $line
+  }
 }
 
 function Main()
