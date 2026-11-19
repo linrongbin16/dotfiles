@@ -45,24 +45,6 @@ function InvokeChecked([string]$command, [string]$action)
   Info "${action} - done"
 }
 
-# Install a package when *any* provider of `$target` will do, i.e. when the requirement is
-# "this command must exist", not "this package must be installed by this manager".
-#
-# Only for the one case where a foreign installation is the intended setup -- bob owns `nvim`
-# -- because scoop installing its own copy next to it puts a second `nvim.exe` on PATH.
-# Everything else probes the package with `InstallScoop` / `InstallCargo` below, and `rustup`
-# has `InstallRustup`, which installs the toolchain the Rust project's own way.
-function Install([string]$command, [string]$target)
-{
-  if (Get-Command -Name $target -ErrorAction SilentlyContinue)
-  {
-    SkipInfo $target
-  } else
-  {
-    InvokeChecked -command $command -action "install '${target}' with command: '${command}'"
-  }
-}
-
 # The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes
 # two dozen packages and one `scoop list` costs ~0.3s.
 #
@@ -90,16 +72,30 @@ function GetScoopApps()
 # `neovim` provides `nvim`, `trashy` provides `trash`. A bucket prefix is allowed
 # (`extras/lazygit`) because `scoop install` accepts it, but `scoop list` reports the bare
 # name, hence the split.
-function InstallScoop([string]$app)
+#
+# `$target` is optional and names the *command* the package provides, for the cases where
+# another tool is the intended owner of it: bob manages `nvim`, so a `neovim` from scoop would
+# put a second `nvim.exe` on PATH. When given and `Get-Command` finds it, the package is
+# skipped even though scoop does not have it -- that is the one question `scoop list` cannot
+# answer, because a command from elsewhere says nothing about what scoop installed.
+function InstallScoop([string]$app, [string]$target)
 {
   $name = $app.Split('/')[-1]
   if ((GetScoopApps) -contains $name)
   {
     SkipInfo $name
-  } else
-  {
-    InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
+    return
   }
+
+  # The one question `scoop list` cannot answer: a command from somewhere else says nothing
+  # about what scoop installed, but it does mean scoop's copy would only shadow it.
+  if (-not [string]::IsNullOrEmpty($target) -and (Get-Command -Name $target -ErrorAction SilentlyContinue))
+  {
+    SkipInfo $target
+    return
+  }
+
+  InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
 }
 
 # The crates `cargo install` has put on this machine, e.g. `rmz`. `cargo install --list`
@@ -384,7 +380,7 @@ function NeovimDeps()
   Info "install neovim deps for windows"
   # bob manages `nvim` in this setup; scoop's `neovim` would shadow it on PATH, so an `nvim`
   # from anywhere is enough. The scoop package is named `neovim`, it ships the `nvim` binary.
-  Install -command "scoop install neovim" -target "nvim"
+  InstallScoop "neovim" "nvim"
 }
 
 function PromptDeps()
