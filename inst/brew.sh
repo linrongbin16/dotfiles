@@ -4,14 +4,22 @@
 
 info "install deps with brew"
 
+# Deliberately not an `install()` call: there is no formula to probe for, and
+# passing `brew` as the target would skip forever because `type brew` always
+# succeeds. A failure here is still reported by the ERR trap, as
+# `'brew update' failed (exit N)`.
 brew update
 
-brew install lld
+install "brew install lld" "lld"
 install "brew install autoconf" "autoconf"
 install "brew install automake" "automake"
 install "brew install pkg-config" "pkg-config"
 install "brew install cmake" "cmake"
-brew install openssl openssh
+# `openssl` and `ssh` also live in /usr/bin, so probing the bare names would
+# report success before brew installed its own copy - and the two formulas have
+# to be separate `install()` calls anyway. Probe the keg path instead.
+install "brew install openssl" "$(brew --prefix openssl)/bin/openssl"
+install "brew install openssh" "$(brew --prefix openssh)/bin/ssh"
 
 install "brew install git" "git"
 install "brew install gh" "gh"
