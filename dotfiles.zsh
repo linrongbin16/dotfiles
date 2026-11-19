@@ -1,9 +1,6 @@
 #!/bin/zsh
 
 # performance
-# Stay within the defaults of every platform this file runs on: macOS caps
-# `kern.maxfilesperproc` at 10240 and `kern.maxprocperuid` at 2660, so asking
-# for more fails and leaves the shell at its defaults.
 ulimit -n 10240
 ulimit -u 2660
 
