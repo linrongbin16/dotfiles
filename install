@@ -187,8 +187,6 @@ profile_configs() {
     info "failed to append to '$zshrc'"
     return 1
   fi
-
-  info "done"
 }
 
 main() {
@@ -202,7 +200,7 @@ main() {
   # kitty_configs
   ghostty_configs
   profile_configs
-  info "all done"
+  info "done"
 }
 
 main
