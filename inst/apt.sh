@@ -24,7 +24,7 @@ install_nodejs() {
 }
 
 install_git() {
-  sudo apt-add-repository ppa:git-core/ppa
+  sudo apt-add-repository -y ppa:git-core/ppa
   sudo apt-get -q -q -y update
   sudo apt-get install -q -y git
 }
