@@ -80,18 +80,10 @@ go_deps() {
 
 # rust
 rust_deps() {
-  # The rustup installer edits the *user* PATH, which this shell never re-reads, so
-  # `cargo` would stay "not found" for the `cargo binstall` calls below on a fresh
-  # machine. Done first: every probe here should look where the install puts its shims.
   export PATH="$HOME/.cargo/bin:$PATH"
 
   install "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "rustup"
 
-  # `rustup` ships `rustc`/`cargo` as shims that are on PATH as soon as the installer
-  # finishes, even when no toolchain is downloaded yet - so `type rustc` says yes on a
-  # machine that has rustup but no toolchain, and then every `cargo binstall` below fails
-  # with "no default toolchain configured". Running them is the only probe that tells
-  # those two states apart.
   if ! rustc --version >/dev/null 2>&1 || ! cargo --version >/dev/null 2>&1; then
     info "install 'rustc/cargo' with: 'rustup default stable'"
     rustup default stable
@@ -100,10 +92,6 @@ rust_deps() {
     skip_info "rustc/cargo"
   fi
 
-  # Every crate below is built from source by `cargo install`, which is minutes of
-  # compilation each. `cargo binstall` downloads a prebuilt binary when the crate
-  # publishes one and only falls back to `cargo install` when it does not, so it is a
-  # drop-in replacement. The `--locked` flags still matter for that fallback path.
   install "curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash" "cargo-binstall"
 
   install "cargo binstall -y fd-find" "fd"
