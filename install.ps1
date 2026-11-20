@@ -471,6 +471,20 @@ function InstallPython3()
   $scriptsDir = Join-Path $pythonDir "Scripts"
   New-Item -ItemType Directory -Force -Path $scriptsDir | Out-Null
 
+  # The ZIP ships `pip` only as a module (`python -m pip`): `Scripts` stays empty until something
+  # is installed, and there is no `pip.exe`/`pip3.exe` at all. Reinstall the bundled wheel to let
+  # it write the console scripts -- `--no-index` keeps it offline, and the version does not
+  # change. It has to run *after* the directory stops moving, because `pip.exe` hard-codes the
+  # interpreter path it was generated for.
+  $pip3 = Join-Path $scriptsDir "pip3.exe"
+  if (Test-Path -Path $pip3)
+  {
+    SkipInfo "the pip console scripts"
+  } else
+  {
+    InvokeChecked -command "& '${python}' -m pip install --no-index --force-reinstall --find-links '${pythonDir}\Lib\ensurepip\_bundled' pip" -action "install the pip console scripts"
+  }
+
   AddUserPathEntry -dir $pythonDir
   AddProcessPathEntry -dir $pythonDir
   AddUserPathEntry -dir $scriptsDir
