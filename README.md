@@ -36,12 +36,13 @@ Install with below components:
 #### Run PowerShell Command
 
 ```powershell
-# Scoop/git for Windows
+# scoop for Windows
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
+
+# Git for Windows
 scoop install git
 
-# Dotfiles
 git clone https://github.com/linrongbin16/dotfiles.git $env:USERPROFILE\.dotfiles
 cd $env:USERPROFILE\.dotfiles
 .\install.ps1
