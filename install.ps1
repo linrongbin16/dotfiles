@@ -131,8 +131,8 @@ function InvokeInstaller([string]$pwsh)
 
 try
 {
-  $env:DOTFILES_HOME="$env:USERPROFILE\.dotfiles"
-  cd $env:DOTFILES_HOME
+  cd "$env:USERPROFILE\.dotfiles"
+
   $pwsh = FindPwsh
   if ($pwsh)
   {
