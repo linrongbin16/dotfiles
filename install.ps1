@@ -63,27 +63,13 @@ function GetScoopApps()
 {
   if ($null -eq $script:ScoopApps)
   {
-    # `scoop list` prints its header through `Write-Host`, i.e. the information stream, and
-    # the rows as objects with a `Name` property. The exit code only reports "nothing is
-    # installed at all" (1) -- a filter that matches nothing still exits 0 -- so the names
-    # are the only usable signal. Empty means "assume nothing is installed" and install.
+    # `scoop list` prints its header through `Write-Host`
     $script:ScoopApps = @(& scoop list 6>$null | ForEach-Object { $_.Name } | Where-Object { $_ })
   }
   return $script:ScoopApps
 }
 
 # Install a scoop package unless scoop already has it.
-#
-# `$app` is the name scoop knows, not the binary the package ships: `gawk` provides `awk`,
-# `neovim` provides `nvim`, `trashy` provides `trash`. A bucket prefix is allowed
-# (`extras/lazygit`) because `scoop install` accepts it, but `scoop list` reports the bare
-# name, hence the split.
-#
-# `$target` is optional and names the *command* the package provides, for the cases where
-# another tool is the intended owner of it: bob manages `nvim`, so a `neovim` from scoop would
-# put a second `nvim.exe` on PATH. When given and `Get-Command` finds it, the package is
-# skipped even though scoop does not have it -- that is the one question `scoop list` cannot
-# answer, because a command from elsewhere says nothing about what scoop installed.
 function InstallScoop([string]$app, [string]$target)
 {
   $name = $app.Split('/')[-1]
@@ -224,8 +210,12 @@ function InstallMo()
   # current working directory, which left a `mo_<tag>_windows_amd64.tar.gz` behind in the
   # repository root -- hidden only by the `mo*.tar.gz` rule in `.gitignore`.
   $tempBase = $env:TEMP
-  if (-not $tempBase) { $tempBase = $env:TMP }
-  if (-not $tempBase) { $tempBase = [System.IO.Path]::GetTempPath() }
+  if (-not $tempBase)
+  { $tempBase = $env:TMP 
+  }
+  if (-not $tempBase)
+  { $tempBase = [System.IO.Path]::GetTempPath() 
+  }
   $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
   $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("mo-install-" + [guid]::NewGuid().ToString("N"))))
 
