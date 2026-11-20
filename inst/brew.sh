@@ -34,5 +34,5 @@ brew install macos-trash
 # develop tools
 brew install zoxide fzf lazygit ripgrep bat fd eza tree-sitter-cli k1LoW/tap/mo mise
 
-# neovim
-install "brew install neovim" "nvim"
+# neovim is installed by `bob` in `rust_deps`, not by brew: a brew `nvim` would
+# win the `$PATH` lookup and silently shadow the bob-managed one.
