@@ -493,6 +493,149 @@ function InstallPython3()
   DisableWindowsAppsPythonAlias
 }
 
+# The newest Node.js LTS that publishes a Windows archive for `$arch`, e.g. `v26.13.1`.
+#
+# `dist/index.json` lists every release down to the nightlies; the `lts` field is the LTS
+# codename (`"Lithium"`) or `false`, so it is the field that separates the two channels. The
+# list is already ordered newest first, and the first LTS entry is the latest one -- Node.js
+# keeps a single "active LTS" line, the older lines only receive maintenance patches.
+function GetLatestNodejsVersion([string]$arch)
+{
+  $api = "https://nodejs.org/dist/index.json"
+  $json = & curl.exe -fsSL $api
+  if ($LASTEXITCODE -ne 0 -or -not $json)
+  {
+    throw "failed to download the Node.js release list from ${api}"
+  }
+
+  # Bound to a variable first for the same reason as in `GetLatestPythonVersion`: Windows
+  # PowerShell 5.1 hands the whole array to the filter when it is piped straight out of
+  # `ConvertFrom-Json`.
+  $releases = $json | ConvertFrom-Json
+  $versions = @(
+    # `lts` is falsy for the current line and for every nightly (`v27.0.0-nightly...`), and the
+    # version pattern drops the pre-releases of an LTS line as well.
+    $releases | Where-Object { $_.lts -and $_.version -match '^v\d+\.\d+\.\d+$' } |
+      ForEach-Object { $_.version }
+  )
+  if ($versions.Count -eq 0)
+  {
+    throw "the Node.js release list at ${api} holds no LTS release"
+  }
+
+  foreach ($version in $versions)
+  {
+    $url = "https://nodejs.org/dist/${version}/node-${version}-win-${arch}.zip"
+    # A `HEAD` request only: the archive is ~40 MB, and this answer decides which one to fetch.
+    & curl.exe -fsSI -o NUL $url
+    if ($LASTEXITCODE -eq 0)
+    {
+      return $version
+    }
+  }
+
+  throw "no Node.js LTS publishes a windows-${arch} archive"
+}
+
+# Install the latest Node.js LTS from nodejs.org into `~/.local\nodejs`.
+#
+# The ZIP build is used rather than the `.msi` installer for the same reasons as Python: the
+# installer writes its own registry entries and shortcuts and picks the install location
+# itself, while the ZIP is a plain directory that can live where the rest of `~/.local` lives.
+# `node.exe` looks for nothing outside its own directory, and `npm.cmd` resolves the interpreter
+# next to itself, so a relocated copy keeps working.
+function InstallNodejs()
+{
+  $arch = "x64"
+  if ($isArm)
+  {
+    $arch = "arm64"
+  }
+  $version = GetLatestNodejsVersion -arch $arch
+
+  $nodejsDir = Join-Path $HOME ".local\nodejs"
+  $nodejs = Join-Path $nodejsDir "node.exe"
+
+  $installed = ""
+  if (Test-Path -Path $nodejs)
+  {
+    $installed = @(& $nodejs -v 2>$null) | Select-Object -Last 1
+    $installed = "$installed".Trim()
+  }
+
+  if ($installed -eq $version)
+  {
+    SkipInfo "nodejs ${version}"
+  } else
+  {
+    $url = "https://nodejs.org/dist/${version}/node-${version}-win-${arch}.zip"
+    $tempBase = $env:TEMP
+    if (-not $tempBase)
+    {
+      $tempBase = $env:TMP
+    }
+    if (-not $tempBase)
+    {
+      $tempBase = [System.IO.Path]::GetTempPath()
+    }
+    $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
+    $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("nodejs-install-" + [guid]::NewGuid().ToString("N"))))
+
+    try
+    {
+      New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+      $archive = Join-Path $workDir "nodejs.zip"
+      Info "download '${url}'"
+      & curl.exe -fsSL -o $archive $url
+      if ($LASTEXITCODE -ne 0)
+      {
+        throw "failed to download ${url}"
+      }
+
+      # The archive holds a single `node-<version>-win-<arch>` directory: unpack it into the
+      # work directory and rename that one, instead of moving the whole work directory around.
+      tar -xf $archive -C $workDir
+      if ($LASTEXITCODE -ne 0)
+      {
+        throw "failed to extract ${url}"
+      }
+      $extractDir = Join-Path $workDir "node-${version}-win-${arch}"
+      if (-not (Test-Path -Path (Join-Path $extractDir "node.exe")))
+      {
+        throw "the archive ${url} does not contain node.exe"
+      }
+
+      # An upgrade replaces the directory: the global packages under `node_modules` belong to
+      # the Node.js version that installed them.
+      Remove-Item -Path $nodejsDir -Recurse -Force -ErrorAction SilentlyContinue
+      # `Move-Item` into an existing directory would nest it instead of replacing it, which
+      # would leave the old Node.js in place: fail rather than pretend the install worked.
+      if (Test-Path -Path $nodejsDir)
+      {
+        throw "failed to remove the previous nodejs installation in ${nodejsDir}"
+      }
+      # `Move-Item` also refuses to create the missing parents, i.e. `~/.local` on a machine
+      # where nothing else has been installed into it yet.
+      New-Item -ItemType Directory -Force -Path (Split-Path -Path $nodejsDir -Parent) | Out-Null
+      Move-Item -Path $extractDir -Destination $nodejsDir
+      Info "installed nodejs ${version} into ${nodejsDir}"
+    } finally
+    {
+      # Remove only the directory this function created, and only when it really is a child of
+      # the temporary directory. A leftover must not fail an otherwise finished installation.
+      if ((Split-Path -Path $workDir -Parent) -eq $tempRoot)
+      {
+        Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
+      }
+    }
+  }
+
+  # `npm` and `npx` are the `npm.cmd`/`npx.cmd` shims that sit next to `node.exe`, so the one
+  # directory also carries them onto PATH.
+  AddUserPathEntry -dir $nodejsDir
+  AddProcessPathEntry -dir $nodejsDir
+}
+
 function Deps()
 {
   Info "install core deps for windows"
@@ -537,6 +680,7 @@ function Deps()
   InstallPython3
 
   # node/deno/bun
+  InstallNodejs
   InstallScoop "deno"
   InstallScoop "bun"
 
