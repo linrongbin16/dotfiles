@@ -103,6 +103,17 @@ rust_deps() {
   install "cargo binstall -y --locked rmz" "rmz"
   install "cargo binstall -y --locked cpz" "cpz"
   install "cargo binstall -y --locked tree-sitter-cli" "tree-sitter"
+  install "cargo binstall -y --locked bob-nvim" "bob"
+
+  # `bob use` asks whether to add its `nvim-bin` to `$PATH`, and it waits 120
+  # seconds for an answer. Closing stdin is not enough to skip that: bob only
+  # asks when *both* stdout and stderr are terminals, so redirecting stdin still
+  # hangs the install on a real terminal. Piping stdout through `cat` turns it
+  # into a pipe and takes bob down its non-interactive branch, which records the
+  # answer in its config and returns without touching any rc file. `pipefail` is
+  # set, so a failed download still fails the install. `dotfiles.sh` already
+  # puts `nvim-bin` on `$PATH`, so nothing is lost by not letting bob do it.
+  install "bob use stable </dev/null | cat" "nvim"
 }
 
 prompt_deps() {

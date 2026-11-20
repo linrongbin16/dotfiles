@@ -54,11 +54,6 @@ install_fd() {
   sudo ln -sfn /usr/bin/fdfind /usr/bin/fd
 }
 
-install_neovim() {
-  sudo apt install -y snapd
-  sudo snap install nvim --classic
-}
-
 install_mo() {
   # https://github.com/k1LoW/mo
   local tag version
@@ -106,6 +101,3 @@ install "install_fd" "fd"
 install "install_eza" "eza"
 install "install_mo" "mo"
 install "curl -fsSL https://mise.run | MISE_INSTALL_HELP=0 sh" "mise"
-
-# neovim
-install "install_neovim" "nvim"

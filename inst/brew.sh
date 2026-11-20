@@ -33,6 +33,3 @@ brew install macos-trash
 
 # develop tools
 brew install zoxide fzf lazygit ripgrep bat fd eza tree-sitter-cli k1LoW/tap/mo mise
-
-# neovim
-install "brew install neovim" "nvim"
