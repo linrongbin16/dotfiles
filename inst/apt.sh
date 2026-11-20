@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Platform detection is done once by `install` (see the top of that file):
-# `ARCH` is the `uname -m` name, `DOTFILES_ARCH` the dpkg package architecture
-# and `IS_ARM` the 0/1 flag. Fail loudly instead of expanding to empty strings
+# Sourced from `install`, fail loudly instead of expanding to empty strings
 # when this file is sourced without `install`.
 : "${DOTFILES_ARCH:?DOTFILES_ARCH is not set - source this file from install}"
 : "${IS_ARM:?IS_ARM is not set - source this file from install}"
