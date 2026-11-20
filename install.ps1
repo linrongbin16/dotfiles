@@ -335,6 +335,16 @@ function CoreDeps()
 
   InstallMo
 
+  # Niubash (`niu`): a bash-compatible shell for Windows, no WSL and no MSYS. Its README installs
+  # from the in-repo scoop manifest, because the Extras-bucket submission
+  # (ScoopInstaller/Extras#19334) has not merged yet -- switch this to `InstallScoop "niubash"`
+  # once `scoop search niubash` finds it. `InstallScoop` cannot guard the URL form: it derives
+  # the name from the last URL segment, i.e. `niubash.json`, which never matches the installed
+  # app `niubash` in `scoop list`. Going through it would re-run the install on every run, so
+  # the plain `RunCommand` relies on scoop's own idempotence (it warns "'niubash' (1.5.0) is
+  # already installed" and exits 0).
+  RunCommand -command "scoop install https://raw.githubusercontent.com/unixwin/niubash/master/installer/scoop/niubash.json"
+
   # InstallScoop "extras/alacritty"
 }
 
