@@ -390,7 +390,8 @@ function Deps()
   InstallScoop "make"
   InstallScoop "cmake"
 
-  # gh
+  # git
+  InstallScoop "git"
   InstallScoop "gh"
 
   # cli tools
