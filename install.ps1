@@ -90,10 +90,7 @@ function InstallScoop([string]$app, [string]$target)
   InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
 }
 
-# The crates installed into this `CARGO_HOME`, e.g. `rmz`. `cargo install --list` prints
-# `<name> v<version>:` followed by the binaries the crate installed, so the version line is the
-# crate name. `cargo binstall` writes the same records, which is why one probe covers both
-# installers. Cached for the same reason as `GetScoopApps`.
+# The crates installed into this `CARGO_HOME`, e.g. `rmz`.
 function GetCargoCrates()
 {
   if ($null -eq $script:CargoCrates)
@@ -140,10 +137,6 @@ function RunCommand([string]$command)
 }
 
 # Add `$dir` to the PATH of the current process, when it is not there yet.
-#
-# The entry is appended at the end, the same way `dotfiles.ps1` appends the directories it
-# manages, and it is never added twice: a duplicated entry makes every command in that
-# directory go through two PATH lookups.
 function AddProcessPathEntry([string]$dir)
 {
   if (($env:Path -split ";") -notcontains $dir)
@@ -152,11 +145,7 @@ function AddProcessPathEntry([string]$dir)
   }
 }
 
-# Add `$dir` to the PATH of the current user, when it is not there yet.
-#
-# The persisted PATH is a different list from the one of the running process: changing only
-# the former would not make the directory usable until the next login, changing only the
-# latter would be lost at the next start. Both are updated, in the same order.
+# Add `$dir` to the persisted PATH of the current user, when it is not there yet.
 function AddUserPathEntry([string]$dir)
 {
   $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
