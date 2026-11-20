@@ -294,31 +294,24 @@ function InstallMo()
   AddProcessPathEntry -dir $localBin
 }
 
-function CoreDeps()
+function Deps()
 {
   Info "install core deps for windows"
 
-  # deps
-  # `7zip` must be installed *through scoop*, not merely be present on PATH: scoop unpacks
-  # `.7z` / `.tar.xz` / `.tar.lzma` downloads with its own copy of `7z.exe`
-  # (`lib/decompress.ps1` -> `Get-HelperPath -Helper 7zip`, which only looks at scoop apps).
-  # Probing `7z` with `Get-Command` therefore skipped this install on the CI images, which
-  # ship a standalone 7-Zip that scoop cannot see, and the next `.7z` package (`mingw`)
-  # failed to extract. Every package below needs it, so keep it first.
+  # `7zip` must be installed *through scoop* and must stay first,
+  # all following scoop installations need it.
   RunCommand -command "scoop install 7zip"
-  InstallScoop "gzip"
-  InstallScoop "unzip"
 
-  # `extras` bucket is required by `extras/vcredist2022` below.
+  # `extras` bucket
   AddScoopBucket -name "extras"
 
+  # shell environment
   RunCommand -command "scoop install mingw"
   RunCommand -command "scoop install coreutils"
   RunCommand -command "scoop install extras/vcredist2022"
+  RunCommand -command "scoop install https://raw.githubusercontent.com/unixwin/niubash/master/installer/scoop/niubash.json"
 
-  InstallScoop "which"
-  InstallScoop "gawk"
-  InstallScoop "sed"
+  # c/c++ toolchain
   if ($isArm)
   {
     InstallScoop "llvm-arm64"
@@ -329,22 +322,39 @@ function CoreDeps()
   InstallScoop "make"
   InstallScoop "cmake"
 
+  # gh
   InstallScoop "gh"
+
+  # cli tools
+  InstallScoop "gzip"
+  InstallScoop "unzip"
   InstallScoop "curl"
   InstallScoop "wget"
+  InstallScoop "which"
+  InstallScoop "gawk"
+  InstallScoop "sed"
 
-  InstallMo
-
-  # Niubash (`niu`): https://github.com/unixwin/niubash
-  RunCommand -command "scoop install https://raw.githubusercontent.com/unixwin/niubash/master/installer/scoop/niubash.json"
-}
-
-function JsDeps()
-{
-  Info "install deno/bun for windows"
-
+  # node/deno/bun
   InstallScoop "deno"
   InstallScoop "bun"
+
+  # go
+  InstallScoop "go"
+
+  # develop tools
+  InstallScoop "extras/lazygit"
+  InstallScoop "main/fzf"
+  InstallScoop "fd"
+  InstallScoop "ripgrep"
+  InstallScoop "bat"
+  InstallScoop "eza"
+  InstallScoop "trashy"
+  InstallMo
+  InstallScoop "mise"
+  InstallScoop "starship"
+
+  # neovim
+  InstallScoop "neovim" "nvim"
 }
 
 # Run `$file` with `$arguments` and return its exit code, for the one call that has to pass an
@@ -422,15 +432,6 @@ function GitConfigs()
   RunCommand -command 'git config --global --replace-all safe.directory "*"'
 
   SetGitHubCredentialHelper
-}
-
-function GoDeps()
-{
-  Info "install go deps for windows"
-
-  InstallScoop "go"
-  InstallScoop "extras/lazygit"
-  InstallScoop "main/fzf"
 }
 
 # Install `rustup` and its default (stable) toolchain from the Rust project instead of scoop.
@@ -518,26 +519,9 @@ function RustDeps()
 
   InstallRustup
   InstallCargoBinstall
-  InstallScoop "fd"
-  InstallScoop "ripgrep"
-  InstallScoop "bat"
-  InstallScoop "eza"
-  InstallScoop "trashy"
   InstallCargo "rmz"
   InstallCargo "cpz"
   InstallCargo "tree-sitter-cli"
-}
-
-function NeovimDeps()
-{
-  Info "install neovim deps for windows"
-  InstallScoop "neovim" "nvim"
-}
-
-function PromptDeps()
-{
-  InstallScoop "starship"
-  InstallScoop "mise"
 }
 
 # Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
@@ -702,12 +686,8 @@ function ProfileConfigs()
 
 function Main()
 {
-  CoreDeps
-  JsDeps
-  GoDeps
+  Deps
   RustDeps
-  NeovimDeps
-  PromptDeps
   GitConfigs
   ProfileConfigs
 }
