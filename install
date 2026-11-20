@@ -66,11 +66,45 @@ core_deps() {
   esac
 }
 
+# Point the git credential helper at `gh`, so `git pull` / `git push` over
+# HTTPS authenticate with the token `gh` already stores (its login, or the
+# system keyring) instead of asking for a password.
+#
+# `gh auth setup-git` writes the absolute path of the `gh` binary that ran it.
+# That path moves on an upgrade (`/opt/homebrew/Cellar/gh/<version>/...`, a
+# different install prefix), and the stale copy in `.gitconfig` then makes
+# every HTTPS fetch fail with "could not read Password". The bare `gh` below is
+# resolved through PATH on each call instead.
+#
+# The empty helper resets the list first: git tries the helpers in order, and
+# one left behind by an older setup would otherwise shadow the `gh` one.
+#
+# `github.user` is deliberately not set here: `git config --global` appends to
+# the end of `~/.gitconfig`, so a global value would override the per-directory
+# `includeIf` sections that the `gh` wrapper in dotfiles.sh reads.
+set_github_credential_helper() {
+  # Fail here, with the reason, rather than writing a helper that no `git`
+  # invocation can run.
+  if ! command -v gh >/dev/null 2>&1; then
+    info "'gh' is not on PATH, cannot configure the git credential helper"
+    return 1
+  fi
+
+  local gh_host key
+  for gh_host in github.com gist.github.com; do
+    key="credential.https://${gh_host}.helper"
+    git config --global --replace-all "$key" ''
+    git config --global --add "$key" '!gh auth git-credential'
+  done
+}
+
 git_configs() {
   git config --global user.email "linrongbin16@outlook.com"
   git config --global user.name "linrongbin16"
   git config --global pull.rebase false
   git config --global init.defaultBranch main
+
+  set_github_credential_helper
 }
 
 js_deps() {

@@ -31,6 +31,35 @@ alias gP="git push"
 alias ga="git add"
 alias gco="git commit"
 
+# gh
+#
+# Use the `gh` account that belongs to the repository. `github.user` is read
+# from the git config, so an `includeIf` section can override it per directory
+# the same way `user.name` / `user.email` are switched:
+#
+#   [includeIf "gitdir:~/work/"]
+#     path = ~/.gitconfig-work
+#
+# The wrapper fetches that account's token and hands it to `gh` through
+# `GH_TOKEN` for this invocation only, leaving the shell's active account
+# untouched. `command gh` is deliberate: a bare `gh` here would call this
+# function again.
+#
+# `printf ... >&2` rather than zsh's `print -u2`: this file is sourced by bash
+# too, where `print` does not exist.
+gh() {
+  local u token
+  u=$(command git config github.user 2>/dev/null)
+  if [ -n "$u" ]; then
+    if token=$(command gh auth token --user "$u" 2>/dev/null) && [ -n "$token" ]; then
+      GH_TOKEN="$token" command gh "$@"
+      return
+    fi
+    printf '%s\n' "gh: no stored login for '$u' (github.user), using active account; run: gh auth login" >&2
+  fi
+  command gh "$@"
+}
+
 # cargo
 export PATH="$HOME/.cargo/bin:$PATH"
 
