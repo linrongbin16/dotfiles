@@ -11,8 +11,33 @@
 
 set -Eeuo pipefail
 
+# What this machine is. Computed once, here, and exported: the `exec` at the
+# bottom starts a fresh `zsh` with this environment, so `inst/install.sh` reads
+# the values back instead of repeating the same `uname` calls and the same
+# architecture mapping.
 DOTFILES_HOME="$HOME/.dotfiles"
 OS="$(uname -s)"
+ARCH="$(uname -m)"
+
+# The names the release assets use, which are neither `uname -m`'s nor each
+# other's.
+DOTFILES_ARCH="$ARCH"
+case "$ARCH" in
+x86_64) DOTFILES_ARCH="amd64" ;;
+aarch64 | arm64) DOTFILES_ARCH="arm64" ;;
+esac
+
+IS_ARM=0
+case "$ARCH" in
+aarch64 | arm*) IS_ARM=1 ;;
+esac
+
+IS_MAC=0
+case "$OS" in
+Darwin) IS_MAC=1 ;;
+esac
+
+export DOTFILES_HOME OS DOTFILES_ARCH IS_ARM IS_MAC
 
 . "$DOTFILES_HOME/inst/util.sh"
 

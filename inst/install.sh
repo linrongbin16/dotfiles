@@ -25,32 +25,23 @@
 # These only apply to commands run unprotected. Anything wrapped in `if`, `||`
 # or `&&` is exempt from errexit, so `install()` deliberately runs its command
 # bare.
+#
+# `./install` sets the same options, but `exec` replaces the process with a
+# fresh `zsh` that starts from its own defaults - shell options are not part of
+# the environment it inherits - so they have to be set again here.
 set -Eeuo pipefail
 
 # set -x
 
-OS="$(uname -s)"
-ARCH="$(uname -m)"
-
-DOTFILES_ARCH="$ARCH"
-case "$ARCH" in
-x86_64) DOTFILES_ARCH="amd64" ;;
-aarch64 | arm64) DOTFILES_ARCH="arm64" ;;
-esac
-
-IS_ARM=0
-case "$ARCH" in
-aarch64 | arm*) IS_ARM=1 ;;
-esac
-
-IS_MAC=0
-case "$OS" in
-Darwin)
-  IS_MAC=1
-  ;;
-esac
-
-export DOTFILES_HOME="$HOME/.dotfiles"
+# `./install` computed what this machine is and exported it, so it survives the
+# `exec` into this shell. Check rather than re-derive: a missing one means this
+# file was started some other way, and the install would otherwise run against
+# an empty architecture.
+: "${DOTFILES_HOME:?DOTFILES_HOME is not set - start the installation with ./install}"
+: "${OS:?OS is not set - start the installation with ./install}"
+: "${DOTFILES_ARCH:?DOTFILES_ARCH is not set - start the installation with ./install}"
+: "${IS_ARM:?IS_ARM is not set - start the installation with ./install}"
+: "${IS_MAC:?IS_MAC is not set - start the installation with ./install}"
 
 . "$DOTFILES_HOME/inst/util.sh"
 
