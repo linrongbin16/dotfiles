@@ -126,8 +126,6 @@ ghostty_configs() {
   if [ -d "$HOME/.config/ghostty" ]; then
     rm -rf $HOME/.config/ghostty
   fi
-  # `=` rather than `==`: zsh reads `==` as a glob and fails with
-  # "= not found", so the double form only works under bash.
   if [ "$IS_MAC" = "1" ]; then
     ln -s $HOME/.dotfiles/ghostty_mac $HOME/.config/ghostty
   else
