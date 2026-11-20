@@ -70,10 +70,7 @@ jobs:
         shell: [pwsh.exe, powershell.exe]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: ilammy/msvc-dev-cmd@v1
       - uses: MinoruSekine/setup-scoop@v5.0.1
-        with:
-          buckets: extras
       - name: Get branch
         run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
         shell: bash
@@ -83,8 +80,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo '${{ steps.extract_branch.outputs.branch }}'
-          echo ${{ steps.extract_branch.outputs.branch }}
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles
           cd $env:USERPROFILE\.dotfiles
           & '${{ matrix.shell }}' -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
