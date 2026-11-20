@@ -63,27 +63,13 @@ function GetScoopApps()
 {
   if ($null -eq $script:ScoopApps)
   {
-    # `scoop list` prints its header through `Write-Host`, i.e. the information stream, and
-    # the rows as objects with a `Name` property. The exit code only reports "nothing is
-    # installed at all" (1) -- a filter that matches nothing still exits 0 -- so the names
-    # are the only usable signal. Empty means "assume nothing is installed" and install.
+    # `scoop list` prints its header through `Write-Host`
     $script:ScoopApps = @(& scoop list 6>$null | ForEach-Object { $_.Name } | Where-Object { $_ })
   }
   return $script:ScoopApps
 }
 
 # Install a scoop package unless scoop already has it.
-#
-# `$app` is the name scoop knows, not the binary the package ships: `gawk` provides `awk`,
-# `neovim` provides `nvim`, `trashy` provides `trash`. A bucket prefix is allowed
-# (`extras/lazygit`) because `scoop install` accepts it, but `scoop list` reports the bare
-# name, hence the split.
-#
-# `$target` is optional and names the *command* the package provides, for the cases where
-# another tool is the intended owner of it: bob manages `nvim`, so a `neovim` from scoop would
-# put a second `nvim.exe` on PATH. When given and `Get-Command` finds it, the package is
-# skipped even though scoop does not have it -- that is the one question `scoop list` cannot
-# answer, because a command from elsewhere says nothing about what scoop installed.
 function InstallScoop([string]$app, [string]$target)
 {
   $name = $app.Split('/')[-1]
@@ -104,10 +90,7 @@ function InstallScoop([string]$app, [string]$target)
   InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
 }
 
-# The crates installed into this `CARGO_HOME`, e.g. `rmz`. `cargo install --list` prints
-# `<name> v<version>:` followed by the binaries the crate installed, so the version line is the
-# crate name. `cargo binstall` writes the same records, which is why one probe covers both
-# installers. Cached for the same reason as `GetScoopApps`.
+# The crates installed into this `CARGO_HOME`, e.g. `rmz`.
 function GetCargoCrates()
 {
   if ($null -eq $script:CargoCrates)
@@ -154,10 +137,6 @@ function RunCommand([string]$command)
 }
 
 # Add `$dir` to the PATH of the current process, when it is not there yet.
-#
-# The entry is appended at the end, the same way `dotfiles.ps1` appends the directories it
-# manages, and it is never added twice: a duplicated entry makes every command in that
-# directory go through two PATH lookups.
 function AddProcessPathEntry([string]$dir)
 {
   if (($env:Path -split ";") -notcontains $dir)
@@ -166,11 +145,7 @@ function AddProcessPathEntry([string]$dir)
   }
 }
 
-# Add `$dir` to the PATH of the current user, when it is not there yet.
-#
-# The persisted PATH is a different list from the one of the running process: changing only
-# the former would not make the directory usable until the next login, changing only the
-# latter would be lost at the next start. Both are updated, in the same order.
+# Add `$dir` to the persisted PATH of the current user, when it is not there yet.
 function AddUserPathEntry([string]$dir)
 {
   $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
@@ -224,8 +199,12 @@ function InstallMo()
   # current working directory, which left a `mo_<tag>_windows_amd64.tar.gz` behind in the
   # repository root -- hidden only by the `mo*.tar.gz` rule in `.gitignore`.
   $tempBase = $env:TEMP
-  if (-not $tempBase) { $tempBase = $env:TMP }
-  if (-not $tempBase) { $tempBase = [System.IO.Path]::GetTempPath() }
+  if (-not $tempBase)
+  { $tempBase = $env:TMP 
+  }
+  if (-not $tempBase)
+  { $tempBase = [System.IO.Path]::GetTempPath() 
+  }
   $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
   $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("mo-install-" + [guid]::NewGuid().ToString("N"))))
 
@@ -367,14 +346,47 @@ function JsDeps()
   InstallScoop "bun"
 }
 
+# Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
+# with the token `gh` already stored (the keyring) instead of asking for a password.
+#
+# This is what `gh auth setup-git` writes, spelled out here because that command stores the
+# absolute path of the `gh.exe` it ran from -- `C:\users\<user>\scoop\apps\gh\current\...` is a
+# symlink that moves on every scoop upgrade, and a stale copy of the path in `.gitconfig` makes
+# every HTTPS fetch fail with "could not read Password". The bare `gh` below is resolved through
+# PATH on each call instead.
+function SetGitHubCredentialHelper()
+{
+  # Fail here, with the reason, rather than writing a helper that no `git` invocation can run.
+  if (-not (Get-Command -Name gh -ErrorAction SilentlyContinue))
+  {
+    throw "gh is not on PATH, cannot configure the git credential helper"
+  }
+
+  foreach ($ghHost in @('github.com', 'gist.github.com'))
+  {
+    $key = "credential.https://${ghHost}.helper"
+    RunCommand -command "git config --global --replace-all ${key} ''"
+    RunCommand -command "git config --global --add ${key} '!gh auth git-credential'"
+  }
+}
+
 function GitConfigs()
 {
   Info "install git configs for windows"
 
+  # [user]
   RunCommand -command 'git config --global user.email "linrongbin16@outlook.com"'
   RunCommand -command 'git config --global user.name "linrongbin16"'
+  # [github]
+  RunCommand -command 'git config --global github.user "linrongbin16"'
+
   RunCommand -command 'git config --global pull.rebase false'
   RunCommand -command 'git config --global init.defaultBranch main'
+
+  # [safe] *
+  RunCommand -command 'git config --global --replace-all safe.directory "*"'
+
+  SetGitHubCredentialHelper
 }
 
 function GoDeps()

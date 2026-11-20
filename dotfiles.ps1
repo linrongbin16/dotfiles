@@ -45,6 +45,47 @@ if (Get-Command starship -ErrorAction Ignore)
   Invoke-Expression (&starship init powershell)
 }
 
+# gh
+#
+# Use the `gh` account that matches the directory: the wrapper reads `github.user` from the
+# git config of the current repository (set globally by `install.ps1`, overridden per directory
+# by an `includeIf` section), fetches that account's token and hands it to `gh` through
+# `GH_TOKEN` for the duration of the call. Without this, `gh` always acts as the *active*
+# account, which is wrong in a checkout whose `user.name` / `user.email` belong to another one.
+#
+# `gh` is called as `gh.exe` on purpose: inside a function named `gh`, a plain `gh` would call
+# the function again. The variable is restored - or removed, when it was not set - in a
+# `finally`, so one call cannot leak an identity into the next.
+function gh
+{
+  $u = git config github.user 2>$null
+  if ($u)
+  {
+    $tok = gh.exe auth token --user $u 2>$null
+    if ($tok)
+    {
+      $old = $env:GH_TOKEN
+      try
+      {
+        $env:GH_TOKEN = $tok
+        gh.exe @args
+      } finally
+      {
+        if ($null -eq $old)
+        {
+          Remove-Item Env:GH_TOKEN -ErrorAction SilentlyContinue
+        } else
+        {
+          $env:GH_TOKEN = $old
+        }
+      }
+      return
+    }
+    [Console]::Error.WriteLine("gh: no stored login for '$u' (github.user), using active account; run: gh auth login")
+  }
+  gh.exe @args
+}
+
 # mise
 #
 # `install.ps1` installs mise on windows, so the shell activates it here: the shims of mise have
