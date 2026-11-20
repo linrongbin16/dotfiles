@@ -1,3 +1,8 @@
+#Requires -Version 7.0
+# The installation itself, and PowerShell 7 only: `install.ps1` in the repository root is the entry
+# point, it installs `pwsh.exe` when it is missing and re-launches this file with it. The `#Requires`
+# above is what keeps a `powershell.exe` (5.1) call from getting this far.
+
 # Set-PSDebug -Trace 1
 
 # Fail fast: a failing cmdlet (a bad path, a failed redirect, a missing command) aborts the
@@ -183,8 +188,7 @@ function AddScoopBucket([string]$name)
 {
   # `scoop bucket add` exits with 2 when the bucket exists (scoop's `lib/buckets.ps1:
   # add_bucket`), so probe the bucket list instead of special-casing that code.
-  # scoop prints through `Write-Host`, i.e. the information stream, hence `6>&1` to read it
-  # back; both Windows PowerShell 5.1 and PowerShell 7 support that.
+  # scoop prints through `Write-Host`, i.e. the information stream, hence `6>&1` to read it back.
   $global:LASTEXITCODE = 0
   $buckets = & scoop bucket list 6>&1 | Out-String
   if ($LASTEXITCODE -ne 0)
@@ -441,31 +445,6 @@ function Deps()
   InstallScoop "neovim" "nvim"
 }
 
-# Run `$file` with `$arguments` and return its exit code, for the one call that has to pass an
-# *empty* argument to a native command.
-#
-# A PowerShell command line cannot express that: Windows PowerShell 5.1 drops an empty argument
-# entirely, so `git config --replace-all <key> ""` reached git as `--replace-all <key>` and died
-# with `wrong number of arguments, should be from 2 to 3`. PowerShell 7 passes `""` through, but
-# as the two characters `\"\"`, which lands in `.gitconfig` as a literal `\"\"` value.
-# `ProcessStartInfo` hands the argument string to `CreateProcess` verbatim, and both hosts keep
-# the empty argument.
-function InvokeProcess([string]$file, [string]$arguments)
-{
-  $info = New-Object System.Diagnostics.ProcessStartInfo
-  $info.FileName = $file
-  $info.Arguments = $arguments
-  $info.UseShellExecute = $false
-  $info.RedirectStandardError = $true
-  $process = [System.Diagnostics.Process]::Start($info)
-  $stderr = $process.StandardError.ReadToEnd()
-  $process.WaitForExit()
-  if ($process.ExitCode -ne 0)
-  {
-    throw "command failed with exit code $($process.ExitCode): '${file} ${arguments}': ${stderr}"
-  }
-}
-
 # Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
 # with the token `gh` already stored (the keyring) instead of asking for a password.
 #
@@ -493,7 +472,12 @@ function SetGitHubCredentialHelper()
     #
     # `--replace-all` rather than `--add`: a re-run then rewrites the pair instead of stacking a
     # second copy of the same shell command, which makes `git` call the keyring twice.
-    InvokeProcess -file 'git' -arguments ('config --global --replace-all "{0}" ""' -f $key)
+    #
+    # The `""` is a real empty argument: PowerShell 7 on Windows quotes native arguments itself
+    # (`$PSNativeCommandArgumentPassing = 'Windows'`, the default since 7.4), so `git` receives an
+    # empty value. 5.1 dropped the argument instead, and `git` died with
+    # `wrong number of arguments, should be from 2 to 3`.
+    RunCommand -command ('git config --global --replace-all "{0}" ""' -f $key)
 
     RunCommand -command "git config --global --add ${key} '!gh auth git-credential'"
   }
@@ -579,9 +563,7 @@ function InstallCargoBinstall()
 
   $url = "https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.ps1"
   Info "download '${url}'"
-  # `-UseBasicParsing` because PowerShell 5.1 otherwise parses the body with the Internet Explorer
-  # engine, which fails on a machine where IE has never been started. (PowerShell 7 ignores it.)
-  $installer = (Invoke-WebRequest -Uri $url -UseBasicParsing).Content
+  $installer = (Invoke-WebRequest -Uri $url).Content
 
   # `iex` runs the body in *this* function's scope, so the variables it assigns (`$tmpdir`, `$zip`,
   # `$cargo_bin`, ...) stay here instead of leaking into the rest of the script. `4>$null` drops the
@@ -706,10 +688,10 @@ function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n
     }
   }
 
-  # Append through `[System.IO.File]::AppendAllText` with an explicit encoder.
-  # `>>` is not usable here: under Windows PowerShell 5.1 it appends UTF-16LE, which
-  # corrupts a UTF-8 profile and makes it fail to parse. `Add-Content -Encoding utf8` is
-  # closer but still writes a BOM when it has to create the file.
+  # Append through `[System.IO.File]::AppendAllText` with an explicit encoder, rather than
+  # `>>` or `Add-Content`, because the target file's encoding has to be preserved: `>>` would
+  # append UTF-8 to a legacy UTF-16LE profile and corrupt it, and `Add-Content -Encoding utf8`
+  # writes a BOM when it has to create the file.
   #
   # `AppendAllText` does not terminate the previous line, so close it first when the file
   # does not end with a newline; keep the blank separator line the old version wrote.
@@ -735,11 +717,11 @@ function ProfileConfigs()
 
   $line = '. $env:USERPROFILE\.dotfiles\dotfiles.ps1'
 
-  # `$PROFILE` only names the running host's own profile, so writing that one left the other
-  # host unconfigured: `.\install.ps1` under `powershell.exe` 5.1 wrote
-  # `Documents\WindowsPowerShell\...`, and pwsh 7 then loaded nothing. Configure both, using
-  # `MyDocuments` rather than `$HOME\Documents` so a relocated (OneDrive) Documents folder
-  # still resolves to where PowerShell actually looks.
+  # `$PROFILE` only names the running host's own profile, so writing that one would leave
+  # `powershell.exe` 5.1 unconfigured: this script runs under pwsh 7, which writes
+  # `Documents\PowerShell\...`, and 5.1 -- still the `powershell` most tools spawn -- then loads
+  # nothing. Configure both, using `MyDocuments` rather than `$HOME\Documents` so a relocated
+  # (OneDrive) Documents folder still resolves to where PowerShell actually looks.
   #
   # The 5.1 side also needs its execution policy opened: `Set-ExecutionPolicy RemoteSigned
   # -Scope CurrentUser` in README.md writes `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\
