@@ -38,7 +38,7 @@ jobs:
           SHELL: /usr/bin/${{ matrix.shell }}
         run: |
           git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
-          $SHELL ./.dotfiles/install
+          $SHELL ~/.dotfiles/install
           $SHELL ~/.dotfiles/dotfiles.sh
   macos:
     name: MacOS
@@ -54,7 +54,7 @@ jobs:
           SHELL: /bin/${{ matrix.shell }}
         run: |
           git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
-          $SHELL ./.dotfiles/install
+          $SHELL ~/.dotfiles/install
           $SHELL ~/.dotfiles/dotfiles.sh
   windows:
     name: Windows (${{ matrix.os }}, ${{ matrix.shell }})
