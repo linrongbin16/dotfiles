@@ -367,6 +367,36 @@ function JsDeps()
   InstallScoop "bun"
 }
 
+# Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
+# with the token `gh` already stored (the keyring) instead of asking for a password.
+#
+# This is what `gh auth setup-git` writes, spelled out here because that command stores the
+# absolute path of the `gh.exe` it ran from -- `C:\users\<user>\scoop\apps\gh\current\...` is a
+# symlink that moves on every scoop upgrade, and a stale copy of the path in `.gitconfig` makes
+# every HTTPS fetch fail with "could not read Password". The bare `gh` below is resolved through
+# PATH on each call instead.
+function SetGitHubCredentialHelper()
+{
+  # Fail here, with the reason, rather than writing a helper that no `git` invocation can run.
+  if (-not (Get-Command -Name gh -ErrorAction SilentlyContinue))
+  {
+    throw "gh is not on PATH, cannot configure the git credential helper"
+  }
+
+  foreach ($ghHost in @('github.com', 'gist.github.com'))
+  {
+    # git *appends* to the helper list, built from the system scope down to the repository one,
+    # so setting the helper alone would leave whatever was configured before (a `manager-core`
+    # from an old install, say) *ahead* of it, and `gh` would never be asked. An empty value
+    # resets the list to that point; the pair of entries below is the documented way to both
+    # reset and install one helper, and `--replace-all` keeps a re-run from appending a second
+    # copy of it.
+    $key = "credential.https://${ghHost}.helper"
+    RunCommand -command "git config --global --replace-all ${key} ''"
+    RunCommand -command "git config --global --add ${key} '!gh auth git-credential'"
+  }
+}
+
 function GitConfigs()
 {
   Info "install git configs for windows"
@@ -375,6 +405,14 @@ function GitConfigs()
   RunCommand -command 'git config --global user.name "linrongbin16"'
   RunCommand -command 'git config --global pull.rebase false'
   RunCommand -command 'git config --global init.defaultBranch main'
+
+  # `github.user` is what the `gh` wrapper in `dotfiles.ps1` reads to pick the account of the
+  # current directory. It is set globally to the account of the settings above, so `gh` works
+  # outside of a checkout; an `includeIf` section for another account overrides it per
+  # directory, the same way `user.name` / `user.email` are overridden.
+  RunCommand -command 'git config --global github.user "linrongbin16"'
+
+  SetGitHubCredentialHelper
 }
 
 function GoDeps()
