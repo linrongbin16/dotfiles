@@ -423,6 +423,11 @@ function Deps()
   # all following scoop installations need it.
   RunCommand -command "scoop install 7zip"
 
+  # `git` must come before the buckets: `scoop bucket add` shells out to git and refuses to work
+  # without one (`lib/buckets.ps1: add_bucket`), so on a fresh machine `extras` below could not be
+  # added at all.
+  InstallScoop "git"
+
   # `extras` bucket
   AddScoopBucket -name "extras"
 
@@ -443,8 +448,7 @@ function Deps()
   InstallScoop "make"
   InstallScoop "cmake"
 
-  # git
-  InstallScoop "git"
+  # github cli
   InstallScoop "gh"
 
   # cli tools
