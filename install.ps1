@@ -115,11 +115,11 @@ function ResolvePwsh()
 #
 # `-NoProfile`: the profile of a fresh machine is not configured yet (this very script writes it),
 # and one left over from an earlier installation would source `dotfiles.ps1` into the installer.
-# Extra arguments are passed through, so `.\install.ps1 -Foo` reaches the real script.
+# Extra arguments are passed through, so `install.ps1 -Foo` reaches the real script.
 function InvokeInstaller([string]$pwsh)
 {
   $installer = Join-Path $PSScriptRoot "inst\install.ps1"
-  if (-not (Test-Path -Path $installer))
+  if (-not (Test-Path -LiteralPath $installer))
   {
     throw "cannot find '${installer}'"
   }
@@ -131,21 +131,35 @@ function InvokeInstaller([string]$pwsh)
 
 try
 {
-  $pwsh = FindPwsh
-  if ($pwsh)
+  # Everything below (and in `inst/install.ps1`) resolves paths relative to the repository, so it
+  # must not depend on where the caller happened to be.
+  #
+  # `Push-Location` rather than `Set-Location`: this script exits from `InvokeInstaller`, and a
+  # `Set-Location` would take effect in the *caller's* session too -- someone who starts it from an
+  # open shell would be left standing in the checkout afterwards.
+  # `-LiteralPath`: a checkout whose path contains `[` would otherwise be read as a wildcard.
+  Push-Location -LiteralPath $PSScriptRoot
+  try
   {
-    Info "'pwsh.exe' is already installed ('${pwsh}'), skip..."
-  } else
-  {
-    InstallPwsh
-    $pwsh = ResolvePwsh
-    if (-not $pwsh)
+    $pwsh = FindPwsh
+    if ($pwsh)
     {
-      throw "installed PowerShell 7 but 'pwsh.exe' is not usable - open a new shell and run this script again"
+      Info "'pwsh.exe' is already installed ('${pwsh}'), skip..."
+    } else
+    {
+      InstallPwsh
+      $pwsh = ResolvePwsh
+      if (-not $pwsh)
+      {
+        throw "installed PowerShell 7 but 'pwsh.exe' is not usable - open a new shell and run this script again"
+      }
     }
-  }
 
-  InvokeInstaller -pwsh $pwsh
+    InvokeInstaller -pwsh $pwsh
+  } finally
+  {
+    Pop-Location
+  }
 } catch
 {
   # Report the reason, then exit non-zero so CI (and the caller) sees the failure.
