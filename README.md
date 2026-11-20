@@ -9,6 +9,10 @@ My dot files.
 ### macOS/Ubuntu
 
 ```bash
+sudo apt-add-repository -y ppa:git-core/ppa
+sudo apt-get -q -q -y update
+sudo apt-get install -q -y git
+
 git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles \
         && cd ~/.dotfiles \
         && ./install
