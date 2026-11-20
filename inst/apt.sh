@@ -1,12 +1,8 @@
 #!/bin/bash
 
-# set -x
-
-# Platform detection is done once by `install` (see the top of that file):
-# `OS_ARCH` is the `uname -m` name, `ARCH` the dpkg package architecture and
-# `IS_ARM` the 0/1 flag. Fail loudly instead of expanding to empty strings
+# Sourced from `install`, fail loudly instead of expanding to empty strings
 # when this file is sourced without `install`.
-: "${ARCH:?ARCH is not set - source this file from install}"
+: "${DOTFILES_ARCH:?DOTFILES_ARCH is not set - source this file from install}"
 : "${IS_ARM:?IS_ARM is not set - source this file from install}"
 
 install_nodejs() {
@@ -74,51 +70,49 @@ install_mo() {
   local tag version
   tag="$(basename "$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/k1LoW/mo/releases/latest)")"
   version="${tag#v}"
-  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/mo_${version}-1_${ARCH}.deb"
-  sudo apt-get install -q -y "./mo_${version}-1_${ARCH}.deb"
+  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/mo_${version}-1_${DOTFILES_ARCH}.deb"
+  sudo apt-get install -q -y "./mo_${version}-1_${DOTFILES_ARCH}.deb"
 }
 
 info "install deps with apt"
-info "arch: $ARCH, arm: $IS_ARM"
+info "arch: $DOTFILES_ARCH, arm: $IS_ARM"
 
 sudo apt-get -q -y update
 
-sudo apt-get install -q -y build-essential
-sudo apt-get install -q -y llvm llvm-dev clang lld mold
-install "sudo apt-get install -q -y autoconf" "autoconf"
-install "sudo apt-get install -q -y automake" "automake"
-install "sudo apt-get install -q -y pkg-config" "pkg-config"
-install "sudo apt-get install -q -y cmake" "cmake"
-sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
-sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
+# c/c++ toolchain
+sudo apt-get install -q -y build-essential llvm llvm-dev clang \
+  lld mold autoconf automake pkg-config cmake \
+  libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev
 
+# ssh/ssl
+sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
+
+# git
 install "install_git" "git"
 install "install_gh" "gh"
-install "sudo apt-get install -q -y curl" "curl"
-install "sudo apt-get install -q -y wget" "wget"
 
-install "sudo apt-get install -q -y gzip" "gzip"
-install "sudo apt-get install -q -y 7zip" "7z"
-install "sudo apt-get install -q -y unzip" "unzip"
+# cli tools
+sudo apt-get install -q -y curl wget gzip 7zip unzip xsel xclip
 
-install "sudo apt-get install -q -y xsel" "xsel"
-install "sudo apt-get install -q -y xclip" "xclip"
-install "sudo apt-get install -q -y zoxide" "zoxide"
+# python
+sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils
 
-install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
-install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
-
+# node/deno/bun
 install "install_nodejs" "node"
 install "install_nodejs" "npm"
+install "curl -fsSL https://deno.land/install.sh | sh -s -- -y" "deno"
+install "curl -fsSL https://bun.com/install | bash" "bun"
 
+# go
 install "install_go" "go"
 
-install "sudo apt-get install -q -y fzf" "fzf"
-install "sudo apt-get install -q -y ripgrep" "rg"
+# develop tools
+sudo apt-get install -q -y lazygit fzf ripgrep zoxide
 install "install_bat" "bat"
 install "install_fd" "fd"
 install "install_eza" "eza"
 install "install_mo" "mo"
 install "curl -fsSL https://mise.run | MISE_INSTALL_HELP=0 sh" "mise"
 
+# neovim
 install "install_neovim" "nvim"
