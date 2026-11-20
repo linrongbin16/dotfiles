@@ -9,7 +9,9 @@ My dot files.
 ### macOS/Ubuntu
 
 ```bash
-git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles && cd ~/.dotfiles && ./install
+git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles \
+        && cd ~/.dotfiles \
+        && ./install
 ```
 
 ### Windows
@@ -41,15 +43,10 @@ irm get.scoop.sh | iex
 scoop install git
 ```
 
-PowerShell 7 is not on this list: `install.ps1` installs it with `winget` when `pwsh.exe` is missing, then runs the rest of the installation under it. Nothing else has to be run under `powershell.exe` 5.1.
-
 #### Run PowerShell Command
 
 ```powershell
-cd $env:USERPROFILE
-git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
-cd .dotfiles
+git clone https://github.com/linrongbin16/dotfiles.git $env:USERPROFILE\.dotfiles
+cd $env:USERPROFILE\.dotfiles
 .\install.ps1
 ```
-
-The same command works from either `powershell.exe` (5.1) or `pwsh.exe` (7): the entry point always re-launches `inst/install.ps1` under `pwsh.exe`, which is where the installation itself lives.
