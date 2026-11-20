@@ -136,19 +136,8 @@ ghostty_configs() {
 }
 
 profile_configs() {
-  local line="[ -f \"$DOTFILES_HOME/dotfiles.sh\" ] && source \"$DOTFILES_HOME/dotfiles.sh\""
-  local old_line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
+  local line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
   local zshrc="$HOME/.zshrc"
-
-  # Earlier installs wrote a line with a hardcoded `~/.dotfiles`; rewrite it in
-  # place so re-running the installer doesn't source dotfiles.sh twice.
-  if grep -qxF "$old_line" "$zshrc" 2>/dev/null; then
-    local tmp
-    tmp="$(mktemp)"
-    awk -v old="$old_line" -v new="$line" '$0 == old { print new; next } { print }' "$zshrc" >"$tmp"
-    cat "$tmp" >"$zshrc"
-    rm -f "$tmp"
-  fi
 
   # search if the `line` already exists and avoid duplication.
   if grep -qxF "$line" "$zshrc" 2>/dev/null; then
