@@ -461,9 +461,6 @@ function Deps()
   InstallMo
   InstallScoop "mise"
   InstallScoop "starship"
-
-  # neovim
-  InstallScoop "neovim" "nvim"
 }
 
 # Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
@@ -600,6 +597,24 @@ function InstallCargoBinstall()
   }
 }
 
+# Install the latest stable neovim through `bob`, instead of a scoop package that pins one build.
+function InstallNeovim()
+{
+  if (-not (TestCommand "bob"))
+  {
+    $cargoBin = Join-Path $HOME ".cargo\bin"
+    throw "installed 'bob-nvim' but 'bob' is not usable (expected '${cargoBin}')"
+  }
+
+  # Put `nvim-bin` in the process PATH first, so `bob use` takes its "already in PATH" early return
+  # instead of blocking on an interactive "add bob-managed Neovim binary to your $PATH?" prompt.
+  # Answering that prompt rewrites the whole user Path in lowercase; skipping it never writes the
+  # registry at all. `dotfiles.ps1` prepends the same directory in every shell it starts.
+  AddProcessPathEntry (Join-Path $env:LOCALAPPDATA "bob\nvim-bin")
+
+  RunCommand -command "bob use stable"
+}
+
 function RustDeps()
 {
   Info "install rust deps for windows"
@@ -609,6 +624,8 @@ function RustDeps()
   InstallCargo "rmz"
   InstallCargo "cpz"
   InstallCargo "tree-sitter-cli"
+  InstallCargo "bob-nvim"
+  InstallNeovim
 }
 
 # Detect the encoding an existing startup file is stored in, by its byte order mark.
