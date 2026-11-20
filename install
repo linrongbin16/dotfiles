@@ -1,14 +1,26 @@
 #!/bin/bash
 
-# Everything the installation needs before it can install anything else: a
-# `zsh` to run under, and on macOS the toolchain (`xcode` / `homebrew`) that
-# provides the packages every later step asks for.
+# Fail fast: any command that fails aborts the whole installation with its own
+# exit code, instead of running to the end and reporting success because the
+# last step happened to work.
 #
-# This is the entry point - `./install` - and it hands over to
-# `inst/install.sh` under `zsh`, so from there on everything runs with the same
-# shell a new terminal will start, instead of being written for one shell and
-# tested in another.
-
+# `-u` catches typos in variable names (`$HOM` instead of `$HOME` would
+# otherwise expand to nothing and quietly install into the wrong place).
+#
+# `-E` propagates the ERR trap into functions and subshells. Without it the trap
+# set in `install()` never fires for the command it evaluates, so a failure
+# would kill the script with no hint about which tool was being installed.
+#
+# `pipefail` makes `curl ... | sh` report curl's failure rather than the exit
+# code of `sh`, which happily reads an empty script and exits 0.
+#
+# These only apply to commands run unprotected. Anything wrapped in `if`, `||`
+# or `&&` is exempt from errexit, so `install()` deliberately runs its command
+# bare.
+#
+# `./install` sets the same options, but `exec` replaces the process with a
+# fresh `zsh` that starts from its own defaults - shell options are not part of
+# the environment it inherits - so they have to be set again here.
 set -Eeuo pipefail
 
 # What this machine is. Computed once, here, and exported: the `exec` at the

@@ -1,37 +1,6 @@
 #!/usr/bin/env zsh
 
-# The installation itself, run by `./install` under `zsh` once that shell is
-# installed and set as the login shell. Everything below - this file,
-# `inst/apt.sh`, `inst/brew.sh`, `inst/util.sh` - runs under `zsh`, so the
-# interpreter that checks this code is the one the user's terminal will start.
-#
-# The bootstrap is `./install` and not this file: it is what installs `zsh` in
-# the first place, so a machine without one could not start here.
-#
-# Fail fast: any command that fails aborts the whole installation with its own
-# exit code, instead of running to the end and reporting success because the
-# last step happened to work.
-#
-# `-u` catches typos in variable names (`$HOM` instead of `$HOME` would
-# otherwise expand to nothing and quietly install into the wrong place).
-#
-# `-E` propagates the ERR trap into functions and subshells. Without it the trap
-# set in `install()` never fires for the command it evaluates, so a failure
-# would kill the script with no hint about which tool was being installed.
-#
-# `pipefail` makes `curl ... | sh` report curl's failure rather than the exit
-# code of `sh`, which happily reads an empty script and exits 0.
-#
-# These only apply to commands run unprotected. Anything wrapped in `if`, `||`
-# or `&&` is exempt from errexit, so `install()` deliberately runs its command
-# bare.
-#
-# `./install` sets the same options, but `exec` replaces the process with a
-# fresh `zsh` that starts from its own defaults - shell options are not part of
-# the environment it inherits - so they have to be set again here.
 set -Eeuo pipefail
-
-# set -x
 
 # `./install` computed what this machine is and exported it, so it survives the
 # `exec` into this shell. Check rather than re-derive: a missing one means this
