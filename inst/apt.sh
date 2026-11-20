@@ -79,42 +79,40 @@ info "arch: $DOTFILES_ARCH, arm: $IS_ARM"
 
 sudo apt-get -q -y update
 
-sudo apt-get install -q -y build-essential
-sudo apt-get install -q -y llvm llvm-dev clang lld mold
-install "sudo apt-get install -q -y autoconf" "autoconf"
-install "sudo apt-get install -q -y automake" "automake"
-install "sudo apt-get install -q -y pkg-config" "pkg-config"
-install "sudo apt-get install -q -y cmake" "cmake"
-sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
-sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
+# c/c++ toolchain
+sudo apt-get install -q -y build-essential llvm llvm-dev clang \
+  lld mold autoconf automake pkg-config cmake \
+  libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev
 
+# ssh/ssl
+sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
+
+# git
 install "install_git" "git"
 install "install_gh" "gh"
-install "sudo apt-get install -q -y curl" "curl"
-install "sudo apt-get install -q -y wget" "wget"
 
-install "sudo apt-get install -q -y gzip" "gzip"
-install "sudo apt-get install -q -y 7zip" "7z"
-install "sudo apt-get install -q -y unzip" "unzip"
+# cli tools
+sudo apt-get install -q -y curl wget gzip 7zip unzip xsel xclip
 
-install "sudo apt-get install -q -y xsel" "xsel"
-install "sudo apt-get install -q -y xclip" "xclip"
-install "sudo apt-get install -q -y zoxide" "zoxide"
+# python
+sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils
 
-install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
-install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
-
+# node/deno/bun
 install "install_nodejs" "node"
 install "install_nodejs" "npm"
+install "curl -fsSL https://deno.land/install.sh | sh -s -- -y" "deno"
+install "curl -fsSL https://bun.com/install | bash" "bun"
 
+# go
 install "install_go" "go"
 
-install "sudo apt-get install -q -y fzf" "fzf"
-install "sudo apt-get install -q -y ripgrep" "rg"
+# develop tools
+sudo apt-get install -q -y lazygit fzf ripgrep zoxide
 install "install_bat" "bat"
 install "install_fd" "fd"
 install "install_eza" "eza"
 install "install_mo" "mo"
 install "curl -fsSL https://mise.run | MISE_INSTALL_HELP=0 sh" "mise"
 
+# neovim
 install "install_neovim" "nvim"

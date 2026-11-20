@@ -107,11 +107,6 @@ git_configs() {
   set_github_credential_helper
 }
 
-js_deps() {
-  install "curl -fsSL https://deno.land/install.sh | sh -s -- -y" "deno"
-  install "curl -fsSL https://bun.com/install | bash" "bun"
-}
-
 go_deps() {
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
   install "go install github.com/walles/moor/v2/cmd/moor@latest" "moor"
@@ -235,7 +230,6 @@ profile_configs() {
 
 main() {
   core_deps
-  js_deps
   go_deps
   rust_deps
   prompt_deps
