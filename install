@@ -180,16 +180,9 @@ profile_configs() {
   local line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
   local rc
 
-  # `dotfiles.sh` is written for both shells, so configure both: zsh reads
-  # `~/.zshrc` and bash reads `~/.bashrc` for interactive non-login shells, and
-  # writing only the one belonging to the shell that ran `install` leaves the
-  # other one without the aliases, PATH entries and prompt. Neither file is
-  # required to exist yet; the append creates it.
+  # `dotfiles.sh` is written for both `~/.zshrc` and `~/.bashrc`.
   for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
-    # Re-running `install` used to append this block again every time, so the
-    # file grew by three lines per run and sourced `dotfiles.sh` more than once.
-    # Check for the `source` line itself rather than the `# dotfiles` marker,
-    # because earlier versions wrote the marker with a trailing space.
+    # search if the `line` already exists and avoid duplication.
     if grep -qxF "$line" "$rc" 2>/dev/null; then
       info "'$rc' already sources dotfiles.sh, skip..."
       continue
