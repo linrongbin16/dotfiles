@@ -177,26 +177,33 @@ ghostty_configs() {
 }
 
 profile_configs() {
-  local zshrc="$HOME/.zshrc"
   local line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
+  local rc
 
-  # Re-running `install` used to append this block again every time, so the
-  # file grew by three lines per run and sourced `dotfiles.sh` more than once.
-  # Check for the `source` line itself rather than the `# dotfiles` marker,
-  # because earlier versions wrote the marker with a trailing space.
-  if grep -qxF "$line" "$zshrc" 2>/dev/null; then
-    info "'$zshrc' already sources dotfiles.sh, skip..."
-    return 0
-  fi
+  # `dotfiles.sh` is written for both shells, so configure both: zsh reads
+  # `~/.zshrc` and bash reads `~/.bashrc` for interactive non-login shells, and
+  # writing only the one belonging to the shell that ran `install` leaves the
+  # other one without the aliases, PATH entries and prompt. Neither file is
+  # required to exist yet; the append creates it.
+  for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
+    # Re-running `install` used to append this block again every time, so the
+    # file grew by three lines per run and sourced `dotfiles.sh` more than once.
+    # Check for the `source` line itself rather than the `# dotfiles` marker,
+    # because earlier versions wrote the marker with a trailing space.
+    if grep -qxF "$line" "$rc" 2>/dev/null; then
+      info "'$rc' already sources dotfiles.sh, skip..."
+      continue
+    fi
 
-  if ! printf '\n%s\n%s\n' '# dotfiles' "$line" >>"$zshrc"; then
-    info "failed to append to '$zshrc'"
-    # `report_failure` clears the `return` statement as noise (both shells see
-    # it), which would leave it printing a pointless "a command failed" after
-    # this message.
-    DOTFILES_FAILURE_REPORTED=1
-    return 1
-  fi
+    if ! printf '\n%s\n%s\n' '# dotfiles' "$line" >>"$rc"; then
+      info "failed to append to '$rc'"
+      # `report_failure` clears the `return` statement as noise (both shells see
+      # it), which would leave it printing a pointless "a command failed" after
+      # this message.
+      DOTFILES_FAILURE_REPORTED=1
+      return 1
+    fi
+  done
 }
 
 main() {
