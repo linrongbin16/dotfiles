@@ -294,6 +294,191 @@ function InstallMo()
   AddProcessPathEntry -dir $localBin
 }
 
+# The newest stable Python 3 that publishes a Windows archive for `$arch`, e.g. `3.15.2`.
+#
+# The FTP index cannot answer this: python.org creates the directory of an upcoming release
+# before it publishes the Windows builds, so the newest entry (say `3.16.0`) holds only the
+# `python-3.16.0a1-*` alpha archives. Ask the release API for every stable release instead,
+# newest first, and keep the first one whose archive really exists.
+function GetLatestPythonVersion([string]$arch)
+{
+  $api = 'https://www.python.org/api/v2/downloads/release/?is_published=true'
+  $json = & curl.exe -fsSL $api
+  if ($LASTEXITCODE -ne 0 -or -not $json)
+  {
+    throw "failed to download the Python release list from ${api}"
+  }
+
+  # The two statements are separate for Windows PowerShell 5.1: piping straight from
+  # `ConvertFrom-Json` into `Where-Object` there hands the filter the whole array as one object
+  # (`$_.pre_release` is then an array, so the filter drops every record), while PowerShell 7
+  # unrolls it. Binding the result first makes both hosts enumerate the releases.
+  $releases = $json | ConvertFrom-Json
+  $versions = @(
+    # `pre_release` filters out the alphas and betas, the name pattern the installers and the
+    # `Python install manager` entries; `[version]` sorts `3.15.2` above `3.9.1`.
+    $releases | Where-Object { -not $_.pre_release } | ForEach-Object {
+      if ($_.name -match '^Python (3\.\d+\.\d+)$')
+      {
+        [version]$Matches[1]
+      }
+    } | Sort-Object -Descending -Unique
+  )
+
+  foreach ($version in $versions)
+  {
+    $url = "https://www.python.org/ftp/python/${version}/python-${version}-${arch}.zip"
+    # A `HEAD` request only: the archive is ~37 MB, and this answer decides which one to fetch.
+    & curl.exe -fsSI -o NUL $url
+    if ($LASTEXITCODE -eq 0)
+    {
+      return "${version}"
+    }
+  }
+
+  throw "no stable Python 3 publishes a windows-${arch} archive"
+}
+
+# Turn off the `python.exe` / `python3.exe` *app execution aliases* in
+# `%LOCALAPPDATA%\Microsoft\WindowsApps`. They are untargeted redirectors to the Microsoft
+# Store, and while they are on PATH `python` opens the Store instead of the interpreter
+# installed below. They are NTFS reparse points owned by the App Installer package (which
+# Windows marks non-removable), and deleting the entry is what the "App execution aliases"
+# toggle in Settings does.
+function DisableWindowsAppsPythonAlias()
+{
+  $windowsApps = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
+  foreach ($alias in @("python.exe", "python3.exe"))
+  {
+    $path = Join-Path $windowsApps $alias
+    # `Get-Item` rather than `Test-Path`: the entry is a reparse point, so `Test-Path` answers
+    # `$false` for one whose target is gone -- exactly the state the Store leaves behind, and
+    # not something to report as "already disabled" without removing anything.
+    $entry = Get-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
+    if (-not $entry)
+    {
+      Info "the '${alias}' app execution alias is already disabled, skip..."
+      continue
+    }
+    Remove-Item -LiteralPath $path -Force
+    Info "disabled the '${alias}' app execution alias in ${windowsApps}"
+  }
+}
+
+# Install the latest stable Python 3 from python.org into `~/.local\python3`.
+#
+# The python.org ZIP build is used rather than the `.exe` installer on purpose: the installer
+# writes its own registry entries and shortcuts, picks the install location itself, and has no
+# way to put `pip`'s scripts on PATH. The ZIP is a plain directory -- `python.exe` finds its
+# `Lib` and `DLLs` next to itself -- so it can live where the rest of `~/.local` lives, and
+# `pip` works out of it (`Lib\site-packages` ships pip already).
+function InstallPython3()
+{
+  $arch = "amd64"
+  if ($isArm)
+  {
+    $arch = "arm64"
+  }
+  $version = GetLatestPythonVersion -arch $arch
+
+  $pythonDir = Join-Path $HOME ".local\python3"
+  $python = Join-Path $pythonDir "python.exe"
+
+  $installed = ""
+  if (Test-Path -Path $python)
+  {
+    # `python --version` writes to stderr on 5.1-era builds; ask the interpreter for the triple
+    # it is running, which also proves the copy still starts.
+    $installed = @(& $python -c "import sys; print('%d.%d.%d' % sys.version_info[:3])" 2>$null) | Select-Object -Last 1
+    $installed = "$installed".Trim()
+  }
+
+  if ($installed -eq $version)
+  {
+    SkipInfo "python ${version}"
+  } else
+  {
+    $url = "https://www.python.org/ftp/python/${version}/python-${version}-${arch}.zip"
+    $tempBase = $env:TEMP
+    if (-not $tempBase)
+    {
+      $tempBase = $env:TMP
+    }
+    if (-not $tempBase)
+    {
+      $tempBase = [System.IO.Path]::GetTempPath()
+    }
+    $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
+    $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("python3-install-" + [guid]::NewGuid().ToString("N"))))
+
+    try
+    {
+      New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+      $archive = Join-Path $workDir "python.zip"
+      Info "download '${url}'"
+      & curl.exe -fsSL -o $archive $url
+      if ($LASTEXITCODE -ne 0)
+      {
+        throw "failed to download ${url}"
+      }
+
+      # Unpack next to the archive first and only then swap it in, so a broken download cannot
+      # leave a half-written `~/.local\python3` behind. `tar` reads the zip and takes ~1.5s,
+      # against ~7s for `Expand-Archive`.
+      $extractDir = Join-Path $workDir "python"
+      New-Item -ItemType Directory -Force -Path $extractDir | Out-Null
+      tar -xf $archive -C $extractDir
+      if ($LASTEXITCODE -ne 0)
+      {
+        throw "failed to extract ${url}"
+      }
+      if (-not (Test-Path -Path (Join-Path $extractDir "python.exe")))
+      {
+        throw "the archive ${url} does not contain python.exe"
+      }
+
+      # An upgrade replaces the directory, `Lib\site-packages` included: the packages installed
+      # with `pip` belong to the interpreter version that was there.
+      Remove-Item -Path $pythonDir -Recurse -Force -ErrorAction SilentlyContinue
+      # `Move-Item` into an existing directory would nest it instead of replacing it, which
+      # would leave the old interpreter in place: fail rather than pretend the install worked.
+      if (Test-Path -Path $pythonDir)
+      {
+        throw "failed to remove the previous python installation in ${pythonDir}"
+      }
+      # `Move-Item` also refuses to create the missing parents, i.e. `~/.local` on a machine
+      # where nothing else has been installed into it yet.
+      New-Item -ItemType Directory -Force -Path (Split-Path -Path $pythonDir -Parent) | Out-Null
+      Move-Item -Path $extractDir -Destination $pythonDir
+      Info "installed python ${version} into ${pythonDir}"
+    } finally
+    {
+      # Remove only the directory this function created, and only when it really is a child of
+      # the temporary directory. A leftover must not fail an otherwise finished installation.
+      if ((Split-Path -Path $workDir -Parent) -eq $tempRoot)
+      {
+        Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
+      }
+    }
+  }
+
+  # The Windows build ships `python.exe` only, while the Linux and macOS dotfiles call `python3`:
+  # copy the interpreter instead of symlinking it, which would need developer mode.
+  Copy-Item -Path $python -Destination (Join-Path $pythonDir "python3.exe") -Force
+
+  # `pip` puts the console scripts of a package here, and warns on every install when the
+  # directory is not on PATH.
+  $scriptsDir = Join-Path $pythonDir "Scripts"
+  New-Item -ItemType Directory -Force -Path $scriptsDir | Out-Null
+
+  AddUserPathEntry -dir $pythonDir
+  AddProcessPathEntry -dir $pythonDir
+  AddUserPathEntry -dir $scriptsDir
+  AddProcessPathEntry -dir $scriptsDir
+
+  DisableWindowsAppsPythonAlias
+}
+
 function Deps()
 {
   Info "install core deps for windows"
@@ -333,6 +518,9 @@ function Deps()
   InstallScoop "which"
   InstallScoop "gawk"
   InstallScoop "sed"
+
+  # python3
+  InstallPython3
 
   # node/deno/bun
   InstallScoop "deno"
