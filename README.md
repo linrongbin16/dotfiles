@@ -33,23 +33,16 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install Third-Party Pre-Requirements
-
-```powershell
-# 7zip
-winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
-
-# scoop
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.sh | iex
-
-# git
-scoop install git
-```
-
 #### Run PowerShell Command
 
 ```powershell
+# scoop for Windows
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+# Git for Windows
+scoop install git
+
 git clone https://github.com/linrongbin16/dotfiles.git $env:USERPROFILE\.dotfiles
 cd $env:USERPROFILE\.dotfiles
 .\install.ps1
