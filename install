@@ -154,23 +154,6 @@ prompt_deps() {
   fi
 }
 
-# alacritty_configs() {
-#   mkdir -p "$HOME/.config"
-#   if [ -d "$HOME/.config/alacritty" ]; then
-#     rm -rf $HOME/.config/alacritty
-#   fi
-#
-#   if [ "$IS_MAC" == "1" ]; then
-#     ln -s $HOME/.dotfiles/alacritty_mac $HOME/.config/alacritty
-#   else
-#     ln -s $HOME/.dotfiles/alacritty_unix $HOME/.config/alacritty
-#   fi
-#
-#   if [ ! -d "$HOME/.config/alacritty/alacritty-theme" ]; then
-#     git clone --depth=1 https://github.com/alacritty/alacritty-theme $HOME/.config/alacritty/alacritty-theme
-#   fi
-# }
-
 # kitty_configs() {
 #   mkdir -p "$HOME/.config"
 #   if [ -d "$HOME/.config/kitty" ]; then
@@ -234,7 +217,6 @@ main() {
   rust_deps
   prompt_deps
   git_configs
-  # alacritty_configs
   # kitty_configs
   ghostty_configs
   profile_configs
