@@ -42,9 +42,6 @@ winget install --no-upgrade --disable-interactivity Microsoft.PowerShell
 # 7zip
 winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 
-# node.js
-winget install --no-upgrade --disable-interactivity OpenJS.NodeJS.LTS --scope user -l $env:USERPROFILE\.local\bin\node OpenJS.NodeJS.LTS
-
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
