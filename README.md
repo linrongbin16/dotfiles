@@ -9,7 +9,9 @@ My dot files.
 ### macOS/Ubuntu
 
 ```bash
-git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles && cd ~/.dotfiles && ./install
+git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles \
+        && cd ~/.dotfiles \
+        && ./install
 ```
 
 ### Windows
@@ -30,9 +32,6 @@ Install with below components:
 #### Install Third-Party Pre-Requirements
 
 ```powershell
-# pwsh
-winget install --no-upgrade --disable-interactivity Microsoft.PowerShell
-
 # 7zip
 winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 
@@ -47,8 +46,7 @@ scoop install git
 #### Run PowerShell Command
 
 ```powershell
-cd $env:USERPROFILE
-git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
-cd .dotfiles
+git clone https://github.com/linrongbin16/dotfiles.git $env:USERPROFILE\.dotfiles
+cd $env:USERPROFILE\.dotfiles
 .\install.ps1
 ```

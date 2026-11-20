@@ -48,7 +48,7 @@ if (Get-Command starship -ErrorAction Ignore)
 # gh
 #
 # Use the `gh` account that matches the directory: the wrapper reads `github.user` from the
-# git config of the current repository (set globally by `install.ps1`, overridden per directory
+# git config of the current repository (set globally by `inst/install.ps1`, overridden per directory
 # by an `includeIf` section), fetches that account's token and hands it to `gh` through
 # `GH_TOKEN` for the duration of the call. Without this, `gh` always acts as the *active*
 # account, which is wrong in a checkout whose `user.name` / `user.email` belong to another one.
@@ -88,7 +88,7 @@ function gh
 
 # mise
 #
-# `install.ps1` installs mise on windows, so the shell activates it here: the shims of mise have
+# `inst/install.ps1` installs mise on windows, so the shell activates it here: the shims of mise have
 # to be in front of the PATH, otherwise the tool that wins is the one of scoop or of cargo.
 #
 # `mise activate pwsh` writes the PATH, so it may run only once per shell: a second run puts the

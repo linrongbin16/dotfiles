@@ -60,6 +60,9 @@ jobs:
           $SHELL ~/.dotfiles/dotfiles.sh
   windows:
     name: Windows (${{ matrix.os }}, ${{ matrix.shell }})
+    # Both hosts run the same entry point: `install.ps1` only bootstraps PowerShell 7 and hands over
+    # to `inst/install.ps1`, so the `powershell.exe` leg is what proves that 5.1 can still start the
+    # installation (and that the installer itself refuses to run under it).
     strategy:
       matrix:
         os: [windows-latest, windows-11-arm]
