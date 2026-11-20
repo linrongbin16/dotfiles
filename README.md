@@ -35,9 +35,6 @@ Install with below components:
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
-
-# git
-scoop install git
 ```
 
 #### Run PowerShell Command
