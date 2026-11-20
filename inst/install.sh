@@ -143,24 +143,21 @@ ghostty_configs() {
 
 profile_configs() {
   local line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
-  local rc
+  local zshrc="$HOME/.zshrc"
 
-  # `dotfiles.sh` is written for both `~/.zshrc` and `~/.bashrc`.
-  for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
-    # search if the `line` already exists and avoid duplication.
-    if grep -qxF "$line" "$rc" 2>/dev/null; then
-      info "'$rc' already sources dotfiles.sh, skip..."
-      continue
-    fi
+  # search if the `line` already exists and avoid duplication.
+  if grep -qxF "$line" "$zshrc" 2>/dev/null; then
+    info "'$zshrc' already sources dotfiles.sh, skip..."
+    return 0
+  fi
 
-    if ! printf '\n%s\n%s\n' '# dotfiles' "$line" >>"$rc"; then
-      info "failed to append to '$rc'"
-      # `report_failure` clears the `return` statement as noise, which would
-      # leave it printing a pointless "a command failed" after this message.
-      DOTFILES_FAILURE_REPORTED=1
-      return 1
-    fi
-  done
+  if ! printf '\n%s\n%s\n' '# dotfiles' "$line" >>"$zshrc"; then
+    info "failed to append to '$zshrc'"
+    # `report_failure` clears the `return` statement as noise, which would leave
+    # it printing a pointless "a command failed" after this message.
+    DOTFILES_FAILURE_REPORTED=1
+    return 1
+  fi
 }
 
 main() {
