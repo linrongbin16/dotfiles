@@ -1,11 +1,5 @@
 #!/usr/bin/env zsh
 
-# Runs under `zsh` only: `./install` installs it, makes it the login shell and
-# `exec`s this file with it. There is no other entry point, so the code below is
-# free to use `zsh` syntax (`[[ ]]`, `==`) without a `bash` fallback.
-#
-# `inst/util.sh` is shared with `./install`, which is still `bash` - that one
-# keeps both dialects.
 set -Eeuo pipefail
 
 # `./install` computed what this machine is and exported it, so it survives the
@@ -115,24 +109,26 @@ prompt_deps() {
   # git-prompt
   mkdir -p "$HOME/.config"
   mkdir -p "$HOME/.zsh"
-  if [[ ! -d "$HOME/.zsh/git-prompt.zsh" ]]; then
+  if [ ! -d "$HOME/.zsh/git-prompt.zsh" ]; then
     git clone --depth=1 https://github.com/woefe/git-prompt.zsh $HOME/.zsh/git-prompt.zsh
   fi
 
   # atuin
   install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --non-interactive" "atuin"
   mkdir -p $HOME/.atuin
-  if [[ ! -f "$HOME/.atuin/config.toml" ]]; then
+  if [ ! -f "$HOME/.atuin/config.toml" ]; then
     cp $HOME/.dotfiles/atuin.toml $HOME/.atuin/config.toml
   fi
 }
 
 ghostty_configs() {
   mkdir -p "$HOME/.config"
-  if [[ -d "$HOME/.config/ghostty" ]]; then
+  if [ -d "$HOME/.config/ghostty" ]; then
     rm -rf $HOME/.config/ghostty
   fi
-  if [[ "$IS_MAC" == "1" ]]; then
+  # `=` rather than `==`: zsh reads `==` as a glob and fails with
+  # "= not found", so the double form only works under bash.
+  if [ "$IS_MAC" = "1" ]; then
     ln -s $HOME/.dotfiles/ghostty_mac $HOME/.config/ghostty
   else
     ln -s $HOME/.dotfiles/ghostty_unix $HOME/.config/ghostty
