@@ -7,6 +7,4 @@ python-installer.exe
 mo*.deb
 mo*.rpm
 
-kitty-themes
-kitty-custom.conf
 ghostty-custom

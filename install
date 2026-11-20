@@ -109,7 +109,6 @@ git_configs() {
 
 go_deps() {
   install "go install github.com/jesseduffield/lazygit@latest" "lazygit"
-  install "go install github.com/walles/moor/v2/cmd/moor@latest" "moor"
   install "go install github.com/umlx5h/gtrash@latest" "gtrash"
 }
 
@@ -153,24 +152,6 @@ prompt_deps() {
     cp $HOME/.dotfiles/atuin.toml $HOME/.atuin/config.toml
   fi
 }
-
-# kitty_configs() {
-#   mkdir -p "$HOME/.config"
-#   if [ -d "$HOME/.config/kitty" ]; then
-#     rm -rf $HOME/.config/kitty
-#   fi
-#   if [ "$IS_MAC" == "1" ]; then
-#     ln -s $HOME/.dotfiles/kitty_mac $HOME/.config/kitty
-#   else
-#     ln -s $HOME/.dotfiles/kitty_unix $HOME/.config/kitty
-#   fi
-#
-#   touch "$HOME/.config/kitty/kitty-custom.conf"
-#
-#   if [ ! -d "$HOME/.config/kitty/kitty-themes" ]; then
-#     git clone --depth=1 https://github.com/kovidgoyal/kitty-themes $HOME/.config/kitty/kitty-themes
-#   fi
-# }
 
 ghostty_configs() {
   mkdir -p "$HOME/.config"
@@ -217,7 +198,6 @@ main() {
   rust_deps
   prompt_deps
   git_configs
-  # kitty_configs
   ghostty_configs
   profile_configs
   info "done"
