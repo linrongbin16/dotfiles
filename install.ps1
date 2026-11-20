@@ -573,9 +573,17 @@ function GetProfileEncoding([string]$path)
   return [System.Text.UTF8Encoding]::new($false)
 }
 
-# Append the `# dotfiles` marker and the `dotfiles.ps1` source line to one profile file,
-# unless the source line is already in there.
-function AddProfileSource([string]$path, [string]$line)
+# Append the `# dotfiles` marker and one source line to a shell startup file, unless the
+# source line is already in there.
+#
+# `-newLine` defaults to CRLF, which is what the PowerShell profiles take; a bash rc gets
+# LF instead, so writing into `~/.niubashrc` does not mix line endings in one file.
+#
+# `-probe` is an optional regex that also counts as "already there", for an rc that was
+# hand-configured before this script had a line for it: `~/.niubashrc` may already carry a
+# bare `. ~/.dotfiles/dotfiles.sh`, which is not this exact line but would source the file
+# a second time -- and `dotfiles.sh` prepends PATH entries, so they would stack.
+function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n", [string]$probe = '')
 {
   New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
 
@@ -592,9 +600,15 @@ function AddProfileSource([string]$path, [string]$line)
   # entries it appends.
   foreach ($existing in $content -split "\r?\n")
   {
-    if ($existing.Trim() -eq $line)
+    $trimmed = $existing.Trim()
+    if ($trimmed -eq $line)
     {
       Info "source '${line}' is already in '${path}', skip..."
+      return
+    }
+    if ($probe -and $trimmed -match $probe)
+    {
+      Info "'${path}' already sources dotfiles ('${trimmed}'), skip..."
       return
     }
   }
@@ -611,14 +625,14 @@ function AddProfileSource([string]$path, [string]$line)
   {
     if (-not $content.EndsWith("`n"))
     {
-      $prefix += "`r`n"
+      $prefix += $newLine
     }
-    $prefix += "`r`n"
+    $prefix += $newLine
   }
 
   # Write back in the encoding the file already uses, so an old UTF-16LE profile stays
   # readable instead of turning into half UTF-8.
-  $block = "${prefix}# dotfiles`r`n${line}`r`n"
+  $block = "${prefix}# dotfiles${newLine}${line}${newLine}"
   [System.IO.File]::AppendAllText($path, $block, $encoding)
 }
 
@@ -651,6 +665,25 @@ function ProfileConfigs()
   {
     AddProfileSource -path $path -line $line
   }
+
+  # Niubash reads exactly one startup file on Windows, `~/.niubashrc`, in plain bash syntax
+  # (`~/.bashrc` is never sourced there), so the bash half of the dotfiles gets its own line.
+  # Same guard as `profile_configs` in the `install` script: the line only sources
+  # `dotfiles.sh` when the checkout is there, instead of erroring on a machine without it.
+  #
+  # Force LF: `niu setup` writes this file with LF, and `AppendAllText` would otherwise inject
+  # CRLF into a bash script. niu tolerates CRLF, but a mixed-ending rc trips `git diff` and any
+  # editor that normalizes on save.
+  #
+  # `-probe` covers an rc that was already wired by hand with a bare `. ~/.dotfiles/dotfiles.sh`:
+  # appending the guarded line next to it would source `dotfiles.sh` twice and stack the PATH
+  # entries it prepends.
+  $niubashrc = Join-Path $env:USERPROFILE ".niubashrc"
+  AddProfileSource `
+    -path $niubashrc `
+    -line '[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh' `
+    -newLine "`n" `
+    -probe '^(?:\.|source)\s+\S*dotfiles\.sh$'
 }
 
 function Main()
