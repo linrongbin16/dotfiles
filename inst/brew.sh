@@ -13,8 +13,8 @@ brew install lld autoconf automake pkg-config cmake
 # ssh/ssl
 brew install openssl
 
-# git
-brew install git gh
+# gh
+brew install gh
 
 # cli tools
 brew install curl wget gzip p7zip unzip

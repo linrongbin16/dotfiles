@@ -14,12 +14,6 @@ install_nodejs() {
   sudo apt-get -q -y install nodejs
 }
 
-install_git() {
-  sudo apt-add-repository -y ppa:git-core/ppa
-  sudo apt-get -q -q -y update
-  sudo apt-get install -q -y git
-}
-
 install_gh() {
   (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y) ) &&
     sudo mkdir -p -m 755 /etc/apt/keyrings &&
@@ -88,7 +82,6 @@ sudo apt-get install -q -y build-essential llvm llvm-dev clang \
 sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
 
 # git
-install "install_git" "git"
 install "install_gh" "gh"
 
 # cli tools
