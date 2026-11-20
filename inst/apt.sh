@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Sourced from `install`, fail loudly instead of expanding to empty strings
-# when this file is sourced without `install`.
-: "${DOTFILES_ARCH:?DOTFILES_ARCH is not set - source this file from install}"
-: "${IS_ARM:?IS_ARM is not set - source this file from install}"
+# Sourced from `inst/install.sh`, fail loudly instead of expanding to empty
+# strings when this file is sourced on its own.
+: "${DOTFILES_ARCH:?DOTFILES_ARCH is not set - source this file from inst/install.sh}"
+: "${IS_ARM:?IS_ARM is not set - source this file from inst/install.sh}"
 
 install_nodejs() {
   # https://github.com/nodesource/distributions

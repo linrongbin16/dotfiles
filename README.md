@@ -8,14 +8,8 @@ My dot files.
 
 ### macOS/Ubuntu
 
-- For macOS, install [xcode](https://developer.apple.com/support/xcode/) and use [homebrew](https://brew.sh/) as your package manager.
-- For Ubuntu Linux, 26 and later versions are supported, install [zsh](https://www.zsh.org/) and set it as default login shell.
-
 ```bash
-cd ~
-git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
-cd .dotfiles
-./install
+git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles && cd ~/.dotfiles && ./install
 ```
 
 ### Windows
