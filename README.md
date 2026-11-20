@@ -8,8 +8,6 @@ My dot files.
 
 ### macOS/Ubuntu
 
-- [zsh](https://www.zsh.org/) is installed and set as the login shell for you, the installation then continues under it.
-
 ```bash
 git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles && cd ~/.dotfiles && ./install
 ```
