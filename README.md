@@ -8,27 +8,9 @@ My dot files.
 
 ### macOS/Ubuntu
 
-A fresh machine has neither `git` nor the repository, and `git` is one of the
-things this project installs (see `inst/apt.sh` and `inst/brew.sh`), so it
-cannot be used to fetch it. `bootstrap` is the one file that is fetched
-directly: it downloads the repository tarball with `curl` and unpacks it with
-`tar`, both of which macOS and Ubuntu ship, then runs `install` from the
-checkout.
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/linrongbin16/dotfiles/main/bootstrap | bash
 ```
-
-The repository is unpacked into `~/.dotfiles`. A branch other than `main`, or a
-fork, can be picked with environment variables:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/linrongbin16/dotfiles/main/bootstrap |
-  DOTFILES_REPO=my-name/dotfiles DOTFILES_BRANCH=my-branch bash
-```
-
-An existing `~/.dotfiles` checkout is used as-is, so `cd ~/.dotfiles && ./install`
-still works and skips the download.
 
 ### Windows
 
