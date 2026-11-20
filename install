@@ -51,7 +51,7 @@ esac
 
 export DOTFILES_HOME OS DOTFILES_ARCH IS_ARM IS_MAC
 
-cd $DOTFILES_HOME
+cd -- "$DOTFILES_HOME"
 
 . "$DOTFILES_HOME/inst/util.sh"
 

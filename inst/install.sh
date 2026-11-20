@@ -117,7 +117,7 @@ prompt_deps() {
   install "curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --non-interactive" "atuin"
   mkdir -p $HOME/.atuin
   if [ ! -f "$HOME/.atuin/config.toml" ]; then
-    cp $HOME/.dotfiles/atuin.toml $HOME/.atuin/config.toml
+    cp "$DOTFILES_HOME/atuin.toml" "$HOME/.atuin/config.toml"
   fi
 }
 
@@ -127,17 +127,28 @@ ghostty_configs() {
     rm -rf $HOME/.config/ghostty
   fi
   if [ "$IS_MAC" = "1" ]; then
-    ln -s $HOME/.dotfiles/ghostty_mac $HOME/.config/ghostty
+    ln -s "$DOTFILES_HOME/ghostty_mac" "$HOME/.config/ghostty"
   else
-    ln -s $HOME/.dotfiles/ghostty_unix $HOME/.config/ghostty
+    ln -s "$DOTFILES_HOME/ghostty_unix" "$HOME/.config/ghostty"
   fi
 
   touch "$HOME/.config/ghostty/ghostty-custom"
 }
 
 profile_configs() {
-  local line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
+  local line="[ -f \"$DOTFILES_HOME/dotfiles.sh\" ] && source \"$DOTFILES_HOME/dotfiles.sh\""
+  local old_line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
   local zshrc="$HOME/.zshrc"
+
+  # Earlier installs wrote a line with a hardcoded `~/.dotfiles`; rewrite it in
+  # place so re-running the installer doesn't source dotfiles.sh twice.
+  if grep -qxF "$old_line" "$zshrc" 2>/dev/null; then
+    local tmp
+    tmp="$(mktemp)"
+    awk -v old="$old_line" -v new="$line" '$0 == old { print new; next } { print }' "$zshrc" >"$tmp"
+    cat "$tmp" >"$zshrc"
+    rm -f "$tmp"
+  fi
 
   # search if the `line` already exists and avoid duplication.
   if grep -qxF "$line" "$zshrc" 2>/dev/null; then
