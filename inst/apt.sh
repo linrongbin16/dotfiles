@@ -70,7 +70,7 @@ sudo apt-get -q -y update
 
 # c/c++ toolchain
 sudo apt-get install -q -y build-essential llvm llvm-dev clang \
-  lld mold autoconf automake pkg-config cmake \
+  autoconf automake pkg-config cmake \
   libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev
 
 # ssh/ssl
