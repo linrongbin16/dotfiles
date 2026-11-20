@@ -8,7 +8,7 @@ info "install deps with brew"
 brew update
 
 # c/c++ toolchain
-brew install lld autoconf automake pkg-config cmake
+brew install autoconf automake pkg-config cmake
 
 # ssh/ssl
 brew install openssl
