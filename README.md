@@ -9,16 +9,20 @@ My dot files.
 ### macOS/Ubuntu
 
 ```bash
+# Git for Ubuntu
+sudo apt-add-repository -y ppa:git-core/ppa \
+         && sudo apt-get -q -q -y update \
+         && sudo apt-get install -q -y git
+
+# Git for macOS
+brew install git
+
 git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles \
         && cd ~/.dotfiles \
         && ./install
 ```
 
 ### Windows
-
-#### Enable developer mode
-
-Please see: [active developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development#activate-developer-mode).
 
 #### Install [Visual Studio](https://www.visualstudio.com/)
 
