@@ -75,18 +75,6 @@ function GetScoopApps()
 }
 
 # Install a scoop package and pin it with `scoop hold`, so `scoop update` leaves it alone.
-#
-# `scoop install` skips an app that is already there, so a re-run of this script does not chase
-# the bucket either: the version that was installed the first time is the version that stays --
-# which is the whole point of holding it. Moving it forward is a deliberate
-# `scoop unhold <app> && scoop update <app>`, not something a routine re-run does silently.
-#
-# A held app is skipped by `scoop update -a` and by `scoop update '*'`, and an explicit
-# `scoop update <app> --force` does not get past it either: `libexec/scoop-update.ps1` resolves
-# the upgrade inside `if ($force -or $status.outdated)` and takes the
-# `warn "'<app>' is held to version ..."` branch when `$status.hold` is set. `scoop status`
-# still lists it as behind ("Held package"), it just never upgrades it. Holding an app that is
-# already held only prints `INFO '<app>' is already held.` and exits 0, so no probe is needed.
 function InstallScoopHeld([string]$app)
 {
   # No `-target` argument on purpose: owning the version is what is being asked for, so a
@@ -322,11 +310,7 @@ function InstallMo()
 }
 
 # Turn off the `python.exe` / `python3.exe` *app execution aliases* in
-# `%LOCALAPPDATA%\Microsoft\WindowsApps`. They are untargeted redirectors to the Microsoft
-# Store, and while they are on PATH `python` opens the Store instead of the interpreter that
-# scoop installed. They are NTFS reparse points owned by the App Installer package (which
-# Windows marks non-removable), and deleting the entry is what the "App execution aliases"
-# toggle in Settings does.
+# `%LOCALAPPDATA%\Microsoft\WindowsApps`.
 function DisableWindowsAppsPythonAlias()
 {
   $windowsApps = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
