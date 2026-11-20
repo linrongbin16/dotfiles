@@ -362,9 +362,62 @@ function InstallNodejs()
   InstallScoopHeld "nodejs-lts"
 }
 
+# Install scoop itself, the one prerequisite every following package needs.
+function BootstrapScoop()
+{
+  $scoopDir = if ([string]::IsNullOrEmpty($env:SCOOP)) { Join-Path $env:USERPROFILE "scoop" } else { $env:SCOOP }
+  $shims = Join-Path $scoopDir "shims"
+
+  # The scoop installer only appends `shims` to the *persisted* PATH of the current user, which a
+  # process that was started before that write does not see, so a scoop installed by an earlier
+  # session shows up in `$shims` but not in `Get-Command`. Probe both, otherwise the installer
+  # below would refuse to install on top of its own non-empty directory.
+  if (-not (Get-Command -Name "scoop" -ErrorAction SilentlyContinue | Select-Object -First 1) -and
+    (Test-Path (Join-Path $shims "scoop.ps1")))
+  {
+    AddProcessPathEntry $shims
+  }
+  if (Get-Command -Name "scoop" -ErrorAction SilentlyContinue | Select-Object -First 1)
+  {
+    SkipInfo "scoop"
+    return
+  }
+
+  # What <https://scoop.sh> tells you to run, minus the `Set-ExecutionPolicy`: that one writes
+  # `HKCU:\...\PowerShell\1\ShellIds\Microsoft.PowerShell`, i.e. the 5.1 knob, while pwsh 7 is
+  # already pinned to `RemoteSigned` by `$PSHOME\powershell.config.json`. The installer rejects
+  # only `AllSigned` and `Restricted`, and a child started with `-ExecutionPolicy Bypass` reports
+  # `Bypass` to its own `Get-ExecutionPolicy`.
+  # The child process is also what keeps the installer's `Exit-Install` contained: run through
+  # `Invoke-Expression` it calls `break` instead of `exit`, and that `break` escapes every scope
+  # and ends this script silently.
+  $installer = Join-Path ([System.IO.Path]::GetTempPath()) "scoop-installer.ps1"
+  Info "download the scoop installer to '${installer}'"
+  try
+  {
+    Invoke-WebRequest -Uri "https://get.scoop.sh" -OutFile $installer
+    & (Join-Path $PSHOME "pwsh.exe") -NoLogo -NoProfile -ExecutionPolicy Bypass -File $installer
+    if ($LASTEXITCODE -ne 0)
+    {
+      throw "the scoop installer failed (exit ${LASTEXITCODE})"
+    }
+  } finally
+  {
+    Remove-Item -Path $installer -Force -ErrorAction SilentlyContinue
+  }
+
+  AddProcessPathEntry $shims
+  if (-not (Get-Command -Name "scoop" -ErrorAction SilentlyContinue | Select-Object -First 1))
+  {
+    throw "the scoop installer reported success but 'scoop' is still not on PATH under '${shims}'"
+  }
+}
+
 function Deps()
 {
   Info "install core deps for windows"
+
+  BootstrapScoop
 
   # `7zip` must be installed *through scoop* and must stay first,
   # all following scoop installations need it.
@@ -685,10 +738,10 @@ function ProfileConfigs()
   # relocated (OneDrive), where `$HOME\Documents` is not the answer.
   AddProfileSource -path $PROFILE -line $line
 
-  # `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` (README.md) covers 5.1 only: it writes
-  # `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell`, which pwsh 7 does not
-  # read. 7 has its own policies under `...\PowerShell\7\...` and is pinned to `RemoteSigned` by
-  # `$PSHOME\powershell.config.json`, so there is nothing to set up here.
+  # No execution policy to set up here: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
+  # would write `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell`, which pwsh 7
+  # does not read. 7 keeps its own policy under `...\PowerShell\7\...` and is already pinned to
+  # `RemoteSigned` by `$PSHOME\powershell.config.json`.
 
   # Add source `dotfiles.sh` for `~/.niubashrc`.
   $niubashrc = Join-Path $env:USERPROFILE ".niubashrc"
