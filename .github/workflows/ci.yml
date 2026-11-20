@@ -28,9 +28,6 @@ jobs:
     steps:
       - name: Install zsh
         if: matrix.shell == 'zsh'
-        # Only so that `$SHELL ./install` has a `zsh` to start with: the
-        # installation installs it on a machine that has none, which is the
-        # `bash` variant below.
         run: |
           sudo apt-get install -y zsh ||
             { sudo apt-get update && sudo apt-get install -y zsh; }
@@ -42,8 +39,6 @@ jobs:
         run: |
           git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
           cd ~/.dotfiles
-          # Both variants must end up under `zsh`: `./install` switches to it
-          # after installing it, whichever shell started it.
           $SHELL ./install
           $SHELL ~/.dotfiles/dotfiles.sh
   macos:
