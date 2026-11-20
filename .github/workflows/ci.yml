@@ -26,8 +26,6 @@ jobs:
         shell: [bash, zsh]
     runs-on: ${{ matrix.os }}
     steps:
-      # The runner images do not ship zsh, and the README already lists it as an
-      # Ubuntu prerequisite, so the zsh jobs install it before using `$SHELL`.
       - name: Install zsh
         if: matrix.shell == 'zsh'
         run: |
