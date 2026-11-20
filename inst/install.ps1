@@ -362,9 +362,46 @@ function InstallNodejs()
   InstallScoopHeld "nodejs-lts"
 }
 
+# Turn on Windows *developer mode*, so this machine can sideload and debug apps without the
+# interactive trip through the Settings app that README.md used to ask for.
+#
+# `AllowDevelopmentWithoutDevLicense` is the value behind the "Developer Mode" toggle (Microsoft's
+# documented alternative to the Settings page). The Settings page also installs the Developer Mode
+# package of optional features, which only remote deployment needs; for local development the value
+# is what decides, and it is set in HKLM, i.e. an elevated process is required -- the account of a
+# developer is an administrator, and the CI runner has the same rights.
+function EnableDeveloperMode()
+{
+  $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock'
+  $name = 'AllowDevelopmentWithoutDevLicense'
+
+  if ((Get-ItemProperty -Path $key -Name $name -ErrorAction SilentlyContinue).$name -eq 1)
+  {
+    SkipInfo "developer mode"
+    return
+  }
+
+  # Report the reason instead of dying in `New-Item` with a bare "Access to the registry key ...
+  # is denied": the fix is known, and it is not something this script can do on its own.
+  $principal = [System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())
+  if (-not $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))
+  {
+    throw "enabling developer mode writes '${key}\${name}' and needs an elevated PowerShell - run this script as administrator"
+  }
+
+  Info "enable developer mode"
+  New-Item -Path $key -Force | Out-Null
+  New-ItemProperty -Path $key -Name $name -PropertyType DWord -Value 1 -Force | Out-Null
+  Info "enable developer mode - done"
+}
+
 function Deps()
 {
   Info "install core deps for windows"
+
+  # First: several packages below (and the toolchains that trust their binaries) assume a machine
+  # that is allowed to run code that did not come from the Store.
+  EnableDeveloperMode
 
   # `7zip` must be installed *through scoop* and must stay first,
   # all following scoop installations need it.
