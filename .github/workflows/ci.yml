@@ -45,6 +45,9 @@ jobs:
           $SHELL ~/.dotfiles/dotfiles.sh
   macos:
     name: MacOS
+    strategy:
+      matrix:
+        shell: [bash, zsh]
     runs-on: macos-latest
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
@@ -55,10 +58,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          SHELL: /bin/${{ matrix.shell }}
         run: |
           git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
           cd ~/.dotfiles
-          bash ./install
+          $SHELL ./install
+          $SHELL ~/.dotfiles/dotfiles.sh
   windows:
     name: Windows
     strategy:
