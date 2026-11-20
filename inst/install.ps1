@@ -590,35 +590,13 @@ function RustDeps()
   InstallCargo "tree-sitter-cli"
 }
 
-# Open the execution policy of `powershell.exe` 5.1, so the profile written below can load.
-function SetExecutionPolicyForWindowsPowerShell()
-{
-  $key = 'HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell'
-
-  $current = $null
-  if (Test-Path -Path $key)
-  {
-    $current = (Get-ItemProperty -Path $key).ExecutionPolicy
-  }
-
-  # `AllSigned` is deliberately not in this list: it would still refuse the unsigned profile.
-  if (@('RemoteSigned', 'Unrestricted', 'Bypass') -contains $current)
-  {
-    Info "windows powershell execution policy is '${current}', skip..."
-    return
-  }
-
-  New-Item -Path $key -Force | Out-Null
-  Set-ItemProperty -Path $key -Name 'ExecutionPolicy' -Value 'RemoteSigned'
-  Info "set windows powershell execution policy 'RemoteSigned' (was '${current}') - done"
-}
-
-# Detect the encoding a profile file is already stored in, by its byte order mark.
+# Detect the encoding an existing startup file is stored in, by its byte order mark.
 #
-# Windows PowerShell 5.1's `>>` wrote UTF-16LE, so a profile created by an older installer is
-# still UTF-16LE while everything this script writes is BOM-less UTF-8. Appending UTF-8 bytes
-# to a UTF-16LE file corrupts it: the appended line is read back as CJK gibberish and every
-# shell start fails with `The term '...' is not recognized as the name of a cmdlet`.
+# This script writes BOM-less UTF-8, but the file it appends to is not necessarily its own: a
+# `~/.niubashrc` (or a profile) created from an older Windows PowerShell is still UTF-16LE, its
+# `>>` wrote that. Appending UTF-8 bytes to a UTF-16LE file corrupts it: the appended line is
+# read back as CJK gibberish and every shell start fails with `The term '...' is not recognized
+# as the name of a cmdlet`.
 function GetProfileEncoding([string]$path)
 {
   $head = New-Object byte[] 3
@@ -689,9 +667,8 @@ function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n
   }
 
   # Append through `[System.IO.File]::AppendAllText` with an explicit encoder, rather than
-  # `>>` or `Add-Content`, because the target file's encoding has to be preserved: `>>` would
-  # append UTF-8 to a legacy UTF-16LE profile and corrupt it, and `Add-Content -Encoding utf8`
-  # writes a BOM when it has to create the file.
+  # `Add-Content`, because the target file's encoding has to be preserved: `Add-Content -Encoding
+  # utf8` writes a BOM when it has to create the file.
   #
   # `AppendAllText` does not terminate the previous line, so close it first when the file
   # does not end with a newline; keep the blank separator line the old version wrote.
@@ -717,29 +694,16 @@ function ProfileConfigs()
 
   $line = '. $env:USERPROFILE\.dotfiles\dotfiles.ps1'
 
-  # `$PROFILE` only names the running host's own profile, so writing that one would leave
-  # `powershell.exe` 5.1 unconfigured: this script runs under pwsh 7, which writes
-  # `Documents\PowerShell\...`, and 5.1 -- still the `powershell` most tools spawn -- then loads
-  # nothing. Configure both, using `MyDocuments` rather than `$HOME\Documents` so a relocated
-  # (OneDrive) Documents folder still resolves to where PowerShell actually looks.
-  #
-  # The 5.1 side also needs its execution policy opened: `Set-ExecutionPolicy RemoteSigned
-  # -Scope CurrentUser` in README.md writes `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\
-  # Microsoft.PowerShell`, which `powershell.exe` reads and pwsh 7 ignores (7 is pinned to
-  # RemoteSigned by `$PSHOME\powershell.config.json`). Skipping it leaves 5.1 at `Restricted`,
-  # where sourcing the profile fails and every launch prints a `running scripts is disabled`
-  # error -- the very failure this dual-profile support is meant to avoid.
-  SetExecutionPolicyForWindowsPowerShell
+  # Only the PowerShell 7 profile: this script runs under pwsh 7 (`install.ps1` in the repository
+  # root starts it there and never under `powershell.exe` 5.1), so `$PROFILE` names exactly the
+  # file that `pwsh` reads on startup -- including on a machine whose Documents folder was
+  # relocated (OneDrive), where `$HOME\Documents` is not the answer.
+  AddProfileSource -path $PROFILE -line $line
 
-  $documents = [Environment]::GetFolderPath('MyDocuments')
-  $profiles = @(
-    (Join-Path $documents "PowerShell\Microsoft.PowerShell_profile.ps1"),
-    (Join-Path $documents "WindowsPowerShell\Microsoft.PowerShell_profile.ps1")
-  )
-  foreach ($path in $profiles)
-  {
-    AddProfileSource -path $path -line $line
-  }
+  # `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` (README.md) covers 5.1 only: it writes
+  # `HKCU:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell`, which pwsh 7 does not
+  # read. 7 has its own policies under `...\PowerShell\7\...` and is pinned to `RemoteSigned` by
+  # `$PSHOME\powershell.config.json`, so there is nothing to set up here.
 
   # Add source `dotfiles.sh` for `~/.niubashrc`.
   $niubashrc = Join-Path $env:USERPROFILE ".niubashrc"
