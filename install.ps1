@@ -406,6 +406,12 @@ function GitConfigs()
   RunCommand -command 'git config --global pull.rebase false'
   RunCommand -command 'git config --global init.defaultBranch main'
 
+  # Repositories checked out through WSL or another user carry an owner `git` does not expect,
+  # and it then refuses every command in them with "detected dubious ownership". Trusting all
+  # directories gives up that guard on purpose: these checkouts are the ones this section is
+  # run for, so the alternative is a `safe.directory` entry per path, edited by hand.
+  RunCommand -command 'git config --global --replace-all safe.directory "*"'
+
   # `github.user` is what the `gh` wrapper in `dotfiles.ps1` reads to pick the account of the
   # current directory. It is set globally to the account of the settings above, so `gh` works
   # outside of a checkout; an `includeIf` section for another account overrides it per
