@@ -25,9 +25,7 @@ install_git() {
 }
 
 install_gh() {
-  # The package lists are already fresh here, so a missing wget only needs the
-  # install, not another update.
-  (type -p wget >/dev/null || sudo apt install -y wget) &&
+  (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y) ) &&
     sudo mkdir -p -m 755 /etc/apt/keyrings &&
     out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg &&
     cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null &&
@@ -45,8 +43,7 @@ install_go() {
 }
 
 install_eza() {
-  # The package lists were refreshed at the top of this file; only the new
-  # eza repository needs a second update, further down.
+  sudo apt update
   sudo apt install -y gpg
   sudo mkdir -p /etc/apt/keyrings
   wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
@@ -84,43 +81,30 @@ install_mo() {
 info "install deps with apt"
 info "arch: $ARCH, arm: $IS_ARM"
 
-# Refresh the package lists once for the whole script. Repositories added
-# later (git/gh/go/eza) still refresh them again after the new source is in
-# place, since those entries did not exist for this update.
 sudo apt-get -q -y update
 
-# One transaction for the base toolchain. `build-essential` already pulls in
-# `g++`, and `cmake`/`pkg-config` used to be listed twice; apt resolves the
-# whole set once instead of once per package.
-sudo apt-get install -q -y \
-  build-essential llvm llvm-dev clang lld mold \
-  libssl-dev openssl openssh-client openssh-server \
-  cmake pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev \
-  python3
-
+sudo apt-get install -q -y build-essential
+sudo apt-get install -q -y llvm llvm-dev clang lld mold
 install "sudo apt-get install -q -y autoconf" "autoconf"
 install "sudo apt-get install -q -y automake" "automake"
+install "sudo apt-get install -q -y pkg-config" "pkg-config"
+install "sudo apt-get install -q -y cmake" "cmake"
+sudo apt-get install -q -y libssl-dev openssl openssh-client openssh-server
+sudo apt-get install -q -y cmake g++ pkg-config libfontconfig1-dev libxcb-xfixes0-dev libxkbcommon-dev python3
 
 install "install_git" "git"
 install "install_gh" "gh"
+install "sudo apt-get install -q -y curl" "curl"
+install "sudo apt-get install -q -y wget" "wget"
 
-# Everything below comes from the distribution archive, so one `apt-get
-# install` can cover all of it. Each package is still skipped when its command
-# is already on PATH.
-apt_install_missing \
-  curl:curl \
-  wget:wget \
-  gzip:gzip \
-  7zip:7z \
-  unzip:unzip \
-  xsel:xsel \
-  xclip:xclip \
-  zoxide:zoxide \
-  fzf:fzf \
-  ripgrep:rg
+install "sudo apt-get install -q -y gzip" "gzip"
+install "sudo apt-get install -q -y 7zip" "7z"
+install "sudo apt-get install -q -y unzip" "unzip"
 
-# python3 and its development packages are one unit: `pip3` without them is
-# useless, so both checks install the same set.
+install "sudo apt-get install -q -y xsel" "xsel"
+install "sudo apt-get install -q -y xclip" "xclip"
+install "sudo apt-get install -q -y zoxide" "zoxide"
+
 install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "python3"
 install "sudo apt-get install -q -y python3 python3-dev python3-venv python3-pip python3-docutils" "pip3"
 
@@ -129,6 +113,8 @@ install "install_nodejs" "npm"
 
 install "install_go" "go"
 
+install "sudo apt-get install -q -y fzf" "fzf"
+install "sudo apt-get install -q -y ripgrep" "rg"
 install "install_bat" "bat"
 install "install_fd" "fd"
 install "install_eza" "eza"

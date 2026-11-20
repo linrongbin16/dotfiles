@@ -4,44 +4,42 @@
 
 info "install deps with brew"
 
-# Kept for fresh machines and local runs: `brew install` reads the formula
-# metadata this refreshes. In CI the macOS runner image already updated
-# Homebrew during provisioning, so this is a no-op ("Already up-to-date").
 brew update
 
-# One `brew install` for everything that is missing. Homebrew resolves the
-# dependency graph and fetches the bottles in one transaction instead of
-# starting a Ruby process per formula; keg-only tools are checked through their
-# absolute path (`openssl`, `macos-trash`).
-brew_install_missing \
-  lld:lld \
-  autoconf:autoconf \
-  automake:automake \
-  pkg-config:pkg-config \
-  cmake:cmake \
-  "openssl:$(brew --prefix openssl)/bin/openssl" \
-  git:git \
-  gh:gh \
-  curl:curl \
-  wget:wget \
-  gzip:gzip \
-  p7zip:7z \
-  unzip:unzip \
-  python3:python3 \
-  node:node \
-  deno:deno \
-  oven-sh/bun/bun:bun \
-  go:go \
-  "macos-trash:$(brew --prefix macos-trash)/bin/trash" \
-  zoxide:zoxide \
-  fzf:fzf \
-  lazygit:lazygit \
-  moor:moor \
-  ripgrep:rg \
-  bat:bat \
-  fd:fd \
-  eza:eza \
-  tree-sitter-cli:tree-sitter \
-  k1LoW/tap/mo:mo \
-  mise:mise \
-  neovim:nvim
+install "brew install lld" "lld"
+install "brew install autoconf" "autoconf"
+install "brew install automake" "automake"
+install "brew install pkg-config" "pkg-config"
+install "brew install cmake" "cmake"
+install "brew install openssl" "$(brew --prefix openssl)/bin/openssl"
+
+install "brew install git" "git"
+install "brew install gh" "gh"
+install "brew install curl" "curl"
+install "brew install wget" "wget"
+
+install "brew install gzip" "gzip"
+install "brew install p7zip" "7z"
+install "brew install unzip" "unzip"
+
+install "brew install python3" "python3"
+
+install "brew install node" "node"
+install "brew install deno" "deno"
+install "brew install oven-sh/bun/bun" "bun"
+
+install "brew install go" "go"
+install "brew install macos-trash" "$(brew --prefix macos-trash)/bin/trash"
+install "brew install zoxide" "zoxide"
+install "brew install fzf" "fzf"
+install "brew install lazygit" "lazygit"
+install "brew install moor" "moor"
+install "brew install ripgrep" "rg"
+install "brew install bat" "bat"
+install "brew install fd" "fd"
+install "brew install eza" "eza"
+install "brew install tree-sitter-cli" "tree-sitter"
+install "brew install k1LoW/tap/mo" "mo"
+install "brew install mise" "mise"
+
+install "brew install neovim" "nvim"

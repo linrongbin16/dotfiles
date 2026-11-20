@@ -29,9 +29,6 @@ jobs:
       - name: Install zsh
         if: matrix.shell == 'zsh'
         run: |
-          # The runner image ships package lists, and `./install` refreshes
-          # them again a moment later. Try those cached lists first and only
-          # pay for an update when they are too old to resolve zsh.
           sudo apt-get install -y zsh ||
             { sudo apt-get update && sudo apt-get install -y zsh; }
       - name: Install dotfiles
@@ -51,8 +48,6 @@ jobs:
         shell: [bash, zsh]
     runs-on: macos-latest
     steps:
-      # The runner image already provides Xcode's toolchain and Homebrew;
-      # `install` runs `brew update` itself, so neither needs a setup action.
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
