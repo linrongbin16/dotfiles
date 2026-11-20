@@ -32,9 +32,6 @@ Install with below components:
 #### Install Third-Party Pre-Requirements
 
 ```powershell
-# 7zip
-winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
-
 # scoop
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 irm get.scoop.sh | iex
