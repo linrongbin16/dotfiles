@@ -29,15 +29,10 @@ Install with below components:
 
 ![image](https://github.com/linrongbin16/lin.nvim/assets/6496887/bca811b5-8b1a-42c0-9283-c38e75f2f06a)
 
-#### Install Third-Party Pre-Requirements
-
-```powershell
-# scoop
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-irm get.scoop.sh | iex
-```
-
 #### Run PowerShell Command
+
+`install.ps1` installs the third-party pre-requirements itself: PowerShell 7 (through `winget`)
+and [scoop](https://scoop.sh).
 
 ```powershell
 git clone https://github.com/linrongbin16/dotfiles.git $env:USERPROFILE\.dotfiles
