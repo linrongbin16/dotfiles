@@ -10,28 +10,25 @@ brew update
 brew install lld autoconf automake pkg-config cmake
 
 # ssh/ssl
-install "brew install openssl" "$(brew --prefix openssl)/bin/openssl"
+brew install openssl
 
 # git
-install "brew install git" "git"
-install "brew install gh" "gh"
+brew install git gh
 
 # cli tools
 brew install curl wget gzip p7zip unzip
 
 # python
-install "brew install python3" "python3"
+brew install python3
 
 # node/deno/bun
-install "brew install node" "node"
-install "brew install deno" "deno"
-install "brew install oven-sh/bun/bun" "bun"
+brew install node deno oven-sh/bun/bun
 
 # go
-install "brew install go" "go"
+brew install go
 
 # trash
-install "brew install macos-trash" "$(brew --prefix macos-trash)/bin/trash"
+brew install macos-trash
 
 # develop tools
 brew install zoxide fzf lazygit moor ripgrep bat fd eza tree-sitter-cli k1LoW/tap/mo mise
