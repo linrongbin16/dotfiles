@@ -1,12 +1,10 @@
 #!/bin/bash
 
-# set -x
-
 # Platform detection is done once by `install` (see the top of that file):
-# `OS_ARCH` is the `uname -m` name, `ARCH` the dpkg package architecture and
-# `IS_ARM` the 0/1 flag. Fail loudly instead of expanding to empty strings
+# `ARCH` is the `uname -m` name, `DOTFILES_ARCH` the dpkg package architecture
+# and `IS_ARM` the 0/1 flag. Fail loudly instead of expanding to empty strings
 # when this file is sourced without `install`.
-: "${ARCH:?ARCH is not set - source this file from install}"
+: "${DOTFILES_ARCH:?DOTFILES_ARCH is not set - source this file from install}"
 : "${IS_ARM:?IS_ARM is not set - source this file from install}"
 
 install_nodejs() {
@@ -74,12 +72,12 @@ install_mo() {
   local tag version
   tag="$(basename "$(curl -fsSL -o /dev/null -w '%{url_effective}' https://github.com/k1LoW/mo/releases/latest)")"
   version="${tag#v}"
-  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/mo_${version}-1_${ARCH}.deb"
-  sudo apt-get install -q -y "./mo_${version}-1_${ARCH}.deb"
+  curl -fsSL -O "https://github.com/k1LoW/mo/releases/download/${tag}/mo_${version}-1_${DOTFILES_ARCH}.deb"
+  sudo apt-get install -q -y "./mo_${version}-1_${DOTFILES_ARCH}.deb"
 }
 
 info "install deps with apt"
-info "arch: $ARCH, arm: $IS_ARM"
+info "arch: $DOTFILES_ARCH, arm: $IS_ARM"
 
 sudo apt-get -q -y update
 

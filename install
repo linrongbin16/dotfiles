@@ -22,16 +22,16 @@ set -Eeuo pipefail
 # set -x
 
 OS="$(uname -s)"
-OS_ARCH="$(uname -m)"
+ARCH="$(uname -m)"
 
-ARCH="$OS_ARCH"
-case "$OS_ARCH" in
-x86_64) ARCH="amd64" ;;
-aarch64 | arm64) ARCH="arm64" ;;
+DOTFILES_ARCH="$ARCH"
+case "$ARCH" in
+x86_64) DOTFILES_ARCH="amd64" ;;
+aarch64 | arm64) DOTFILES_ARCH="arm64" ;;
 esac
 
 IS_ARM=0
-case "$OS_ARCH" in
+case "$ARCH" in
 aarch64 | arm*) IS_ARM=1 ;;
 esac
 
