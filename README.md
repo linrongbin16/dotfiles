@@ -30,9 +30,6 @@ Install with below components:
 #### Install Third-Party Pre-Requirements
 
 ```powershell
-# pwsh
-winget install --no-upgrade --disable-interactivity Microsoft.PowerShell
-
 # 7zip
 winget install --no-upgrade --disable-interactivity -e --id 7zip.7zip
 
@@ -44,6 +41,8 @@ irm get.scoop.sh | iex
 scoop install git
 ```
 
+PowerShell 7 is not on this list: `install.ps1` installs it with `winget` when `pwsh.exe` is missing, then runs the rest of the installation under it. Nothing else has to be run under `powershell.exe` 5.1.
+
 #### Run PowerShell Command
 
 ```powershell
@@ -52,3 +51,5 @@ git clone https://github.com/linrongbin16/dotfiles.git .dotfiles
 cd .dotfiles
 .\install.ps1
 ```
+
+The same command works from either `powershell.exe` (5.1) or `pwsh.exe` (7): the entry point always re-launches `inst/install.ps1` under `pwsh.exe`, which is where the installation itself lives.
