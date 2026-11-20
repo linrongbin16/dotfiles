@@ -606,6 +606,12 @@ function InstallNeovim()
     throw "installed 'bob-nvim' but 'bob' is not usable (expected '${cargoBin}')"
   }
 
+  # Put `nvim-bin` in the process PATH first, so `bob use` takes its "already in PATH" early return
+  # instead of blocking on an interactive "add bob-managed Neovim binary to your $PATH?" prompt.
+  # Answering that prompt rewrites the whole user Path in lowercase; skipping it never writes the
+  # registry at all. `dotfiles.ps1` prepends the same directory in every shell it starts.
+  AddProcessPathEntry (Join-Path $env:LOCALAPPDATA "bob\nvim-bin")
+
   RunCommand -command "bob use stable"
 }
 
