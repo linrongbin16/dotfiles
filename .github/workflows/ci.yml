@@ -26,11 +26,18 @@ jobs:
         shell: [bash, zsh]
     runs-on: ${{ matrix.os }}
     steps:
+      # The runner images do not ship zsh, and the README already lists it as an
+      # Ubuntu prerequisite, so the zsh jobs install it before using `$SHELL`.
+      - name: Install zsh
+        if: matrix.shell == 'zsh'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-          SHELL: /bin/${{ matrix.shell }}
+          SHELL: /usr/bin/${{ matrix.shell }}
         run: |
           git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
           cd ~/.dotfiles
