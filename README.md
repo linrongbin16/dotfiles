@@ -24,10 +24,6 @@ git clone https://github.com/linrongbin16/dotfiles.git ~/.dotfiles \
 
 ### Windows
 
-#### Enable developer mode
-
-Please see: [active developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development#activate-developer-mode).
-
 #### Install [Visual Studio](https://www.visualstudio.com/)
 
 Install with below components:
