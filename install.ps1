@@ -69,6 +69,29 @@ function GetScoopApps()
   return $script:ScoopApps
 }
 
+# Install a scoop package and pin it with `scoop hold`, so `scoop update` leaves it alone.
+#
+# `scoop install` skips an app that is already there, so a re-run of this script does not chase
+# the bucket either: the version that was installed the first time is the version that stays --
+# which is the whole point of holding it. Moving it forward is a deliberate
+# `scoop unhold <app> && scoop update <app>`, not something a routine re-run does silently.
+#
+# A held app is skipped by `scoop update -a` and by `scoop update '*'`, and an explicit
+# `scoop update <app> --force` does not get past it either: `libexec/scoop-update.ps1` resolves
+# the upgrade inside `if ($force -or $status.outdated)` and takes the
+# `warn "'<app>' is held to version ..."` branch when `$status.hold` is set. `scoop status`
+# still lists it as behind ("Held package"), it just never upgrades it. Holding an app that is
+# already held only prints `INFO '<app>' is already held.` and exits 0, so no probe is needed.
+function InstallScoopHeld([string]$app)
+{
+  # No `-target` argument on purpose: owning the version is what is being asked for, so a
+  # `python` left on PATH by some other installer must not turn the install into a no-op.
+  InstallScoop $app
+
+  $name = $app.Split('/')[-1]
+  InvokeChecked -command "scoop hold ${name}" -action "hold '${name}', so 'scoop update' skips it"
+}
+
 # Install a scoop package unless scoop already has it.
 function InstallScoop([string]$app, [string]$target)
 {
@@ -294,55 +317,10 @@ function InstallMo()
   AddProcessPathEntry -dir $localBin
 }
 
-# The newest stable Python 3 that publishes a Windows archive for `$arch`, e.g. `3.15.2`.
-#
-# The FTP index cannot answer this: python.org creates the directory of an upcoming release
-# before it publishes the Windows builds, so the newest entry (say `3.16.0`) holds only the
-# `python-3.16.0a1-*` alpha archives. Ask the release API for every stable release instead,
-# newest first, and keep the first one whose archive really exists.
-function GetLatestPythonVersion([string]$arch)
-{
-  $api = 'https://www.python.org/api/v2/downloads/release/?is_published=true'
-  $json = & curl.exe -fsSL $api
-  if ($LASTEXITCODE -ne 0 -or -not $json)
-  {
-    throw "failed to download the Python release list from ${api}"
-  }
-
-  # The two statements are separate for Windows PowerShell 5.1: piping straight from
-  # `ConvertFrom-Json` into `Where-Object` there hands the filter the whole array as one object
-  # (`$_.pre_release` is then an array, so the filter drops every record), while PowerShell 7
-  # unrolls it. Binding the result first makes both hosts enumerate the releases.
-  $releases = $json | ConvertFrom-Json
-  $versions = @(
-    # `pre_release` filters out the alphas and betas, the name pattern the installers and the
-    # `Python install manager` entries; `[version]` sorts `3.15.2` above `3.9.1`.
-    $releases | Where-Object { -not $_.pre_release } | ForEach-Object {
-      if ($_.name -match '^Python (3\.\d+\.\d+)$')
-      {
-        [version]$Matches[1]
-      }
-    } | Sort-Object -Descending -Unique
-  )
-
-  foreach ($version in $versions)
-  {
-    $url = "https://www.python.org/ftp/python/${version}/python-${version}-${arch}.zip"
-    # A `HEAD` request only: the archive is ~37 MB, and this answer decides which one to fetch.
-    & curl.exe -fsSI -o NUL $url
-    if ($LASTEXITCODE -eq 0)
-    {
-      return "${version}"
-    }
-  }
-
-  throw "no stable Python 3 publishes a windows-${arch} archive"
-}
-
 # Turn off the `python.exe` / `python3.exe` *app execution aliases* in
 # `%LOCALAPPDATA%\Microsoft\WindowsApps`. They are untargeted redirectors to the Microsoft
-# Store, and while they are on PATH `python` opens the Store instead of the interpreter
-# installed below. They are NTFS reparse points owned by the App Installer package (which
+# Store, and while they are on PATH `python` opens the Store instead of the interpreter that
+# scoop installed. They are NTFS reparse points owned by the App Installer package (which
 # Windows marks non-removable), and deleting the entry is what the "App execution aliases"
 # toggle in Settings does.
 function DisableWindowsAppsPythonAlias()
@@ -365,275 +343,35 @@ function DisableWindowsAppsPythonAlias()
   }
 }
 
-# Install the latest stable Python 3 from python.org into `~/.local\python3`.
+# Install the latest stable Python 3 through scoop, then pin it.
 #
-# The python.org ZIP build is used rather than the `.exe` installer on purpose: the installer
-# writes its own registry entries and shortcuts, picks the install location itself, and has no
-# way to put `pip`'s scripts on PATH. The ZIP is a plain directory -- `python.exe` finds its
-# `Lib` and `DLLs` next to itself -- so it can live where the rest of `~/.local` lives, and
-# `pip` works out of it (`Lib\site-packages` ships pip already).
+# The `python` bucket entry wraps python.org's own `.exe` build: its installer script expands
+# the dark archive inside and unrolls the MSIs, so nothing interactive ever runs here -- the
+# GUI that makes `winget install` unusable on this machine never gets a chance to appear.
+#
+# Scoop also owns what a hand-rolled ZIP install has to rebuild: `python3.exe` comes from the
+# `bin` list, the `pip` console scripts from `post_install` calling `ensurepip`, and `Scripts`
+# onto PATH from `env_add_path`. All of that is the bucket maintainer's problem now.
 function InstallPython3()
 {
-  $arch = "amd64"
-  if ($isArm)
-  {
-    $arch = "arm64"
-  }
-  $version = GetLatestPythonVersion -arch $arch
+  InstallScoopHeld "python"
 
-  $pythonDir = Join-Path $HOME ".local\python3"
-  $python = Join-Path $pythonDir "python.exe"
-
-  $installed = ""
-  if (Test-Path -Path $python)
-  {
-    # `python --version` writes to stderr on 5.1-era builds; ask the interpreter for the triple
-    # it is running, which also proves the copy still starts.
-    $installed = @(& $python -c "import sys; print('%d.%d.%d' % sys.version_info[:3])" 2>$null) | Select-Object -Last 1
-    $installed = "$installed".Trim()
-  }
-
-  if ($installed -eq $version)
-  {
-    SkipInfo "python ${version}"
-  } else
-  {
-    $url = "https://www.python.org/ftp/python/${version}/python-${version}-${arch}.zip"
-    $tempBase = $env:TEMP
-    if (-not $tempBase)
-    {
-      $tempBase = $env:TMP
-    }
-    if (-not $tempBase)
-    {
-      $tempBase = [System.IO.Path]::GetTempPath()
-    }
-    $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
-    $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("python3-install-" + [guid]::NewGuid().ToString("N"))))
-
-    try
-    {
-      New-Item -ItemType Directory -Force -Path $workDir | Out-Null
-      $archive = Join-Path $workDir "python.zip"
-      Info "download '${url}'"
-      & curl.exe -fsSL -o $archive $url
-      if ($LASTEXITCODE -ne 0)
-      {
-        throw "failed to download ${url}"
-      }
-
-      # Unpack next to the archive first and only then swap it in, so a broken download cannot
-      # leave a half-written `~/.local\python3` behind. `tar` reads the zip and takes ~1.5s,
-      # against ~7s for `Expand-Archive`.
-      $extractDir = Join-Path $workDir "python"
-      New-Item -ItemType Directory -Force -Path $extractDir | Out-Null
-      tar -xf $archive -C $extractDir
-      if ($LASTEXITCODE -ne 0)
-      {
-        throw "failed to extract ${url}"
-      }
-      if (-not (Test-Path -Path (Join-Path $extractDir "python.exe")))
-      {
-        throw "the archive ${url} does not contain python.exe"
-      }
-
-      # An upgrade replaces the directory, `Lib\site-packages` included: the packages installed
-      # with `pip` belong to the interpreter version that was there.
-      Remove-Item -Path $pythonDir -Recurse -Force -ErrorAction SilentlyContinue
-      # `Move-Item` into an existing directory would nest it instead of replacing it, which
-      # would leave the old interpreter in place: fail rather than pretend the install worked.
-      if (Test-Path -Path $pythonDir)
-      {
-        throw "failed to remove the previous python installation in ${pythonDir}"
-      }
-      # `Move-Item` also refuses to create the missing parents, i.e. `~/.local` on a machine
-      # where nothing else has been installed into it yet.
-      New-Item -ItemType Directory -Force -Path (Split-Path -Path $pythonDir -Parent) | Out-Null
-      Move-Item -Path $extractDir -Destination $pythonDir
-      Info "installed python ${version} into ${pythonDir}"
-    } finally
-    {
-      # Remove only the directory this function created, and only when it really is a child of
-      # the temporary directory. A leftover must not fail an otherwise finished installation.
-      if ((Split-Path -Path $workDir -Parent) -eq $tempRoot)
-      {
-        Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
-      }
-    }
-  }
-
-  # The Windows build ships `python.exe` only, while the Linux and macOS dotfiles call `python3`:
-  # copy the interpreter instead of symlinking it, which would need developer mode.
-  Copy-Item -Path $python -Destination (Join-Path $pythonDir "python3.exe") -Force
-
-  # `pip` puts the console scripts of a package here, and warns on every install when the
-  # directory is not on PATH.
-  $scriptsDir = Join-Path $pythonDir "Scripts"
-  New-Item -ItemType Directory -Force -Path $scriptsDir | Out-Null
-
-  # The ZIP ships `pip` only as a module (`python -m pip`): `Scripts` stays empty until something
-  # is installed, and there is no `pip.exe`/`pip3.exe` at all. Reinstall the bundled wheel to let
-  # it write the console scripts -- `--no-index` keeps it offline, and the version does not
-  # change. It has to run *after* the directory stops moving, because `pip.exe` hard-codes the
-  # interpreter path it was generated for.
-  $pip3 = Join-Path $scriptsDir "pip3.exe"
-  if (Test-Path -Path $pip3)
-  {
-    SkipInfo "the pip console scripts"
-  } else
-  {
-    InvokeChecked -command "& '${python}' -m pip install --no-index --force-reinstall --find-links '${pythonDir}\Lib\ensurepip\_bundled' pip" -action "install the pip console scripts"
-  }
-
-  AddUserPathEntry -dir $pythonDir
-  AddProcessPathEntry -dir $pythonDir
-  AddUserPathEntry -dir $scriptsDir
-  AddProcessPathEntry -dir $scriptsDir
-
+  # `Add-Path` prepends, so the scoop directories sit ahead of the `%LOCALAPPDATA%` aliases --
+  # but on a machine where the Store aliases are still armed, `python3` there is a redirector
+  # to the Microsoft Store, and an ordering accident should not decide which one wins.
   DisableWindowsAppsPythonAlias
 }
 
-# The newest Node.js LTS that publishes a Windows archive for `$arch`, e.g. `v26.13.1`.
+# Install the latest Node.js LTS through scoop, then pin it.
 #
-# `dist/index.json` lists every release down to the nightlies; the `lts` field is the LTS
-# codename (`"Lithium"`) or `false`, so it is the field that separates the two channels. The
-# list is already ordered newest first, and the first LTS entry is the latest one -- Node.js
-# keeps a single "active LTS" line, the older lines only receive maintenance patches.
-function GetLatestNodejsVersion([string]$arch)
-{
-  $api = "https://nodejs.org/dist/index.json"
-  $json = & curl.exe -fsSL $api
-  if ($LASTEXITCODE -ne 0 -or -not $json)
-  {
-    throw "failed to download the Node.js release list from ${api}"
-  }
-
-  # Bound to a variable first for the same reason as in `GetLatestPythonVersion`: Windows
-  # PowerShell 5.1 hands the whole array to the filter when it is piped straight out of
-  # `ConvertFrom-Json`.
-  $releases = $json | ConvertFrom-Json
-  $versions = @(
-    # `lts` is falsy for the current line and for every nightly (`v27.0.0-nightly...`), and the
-    # version pattern drops the pre-releases of an LTS line as well.
-    $releases | Where-Object { $_.lts -and $_.version -match '^v\d+\.\d+\.\d+$' } |
-      ForEach-Object { $_.version }
-  )
-  if ($versions.Count -eq 0)
-  {
-    throw "the Node.js release list at ${api} holds no LTS release"
-  }
-
-  foreach ($version in $versions)
-  {
-    $url = "https://nodejs.org/dist/${version}/node-${version}-win-${arch}.zip"
-    # A `HEAD` request only: the archive is ~40 MB, and this answer decides which one to fetch.
-    & curl.exe -fsSI -o NUL $url
-    if ($LASTEXITCODE -eq 0)
-    {
-      return $version
-    }
-  }
-
-  throw "no Node.js LTS publishes a windows-${arch} archive"
-}
-
-# Install the latest Node.js LTS from nodejs.org into `~/.local\nodejs`.
-#
-# The ZIP build is used rather than the `.msi` installer for the same reasons as Python: the
-# installer writes its own registry entries and shortcuts and picks the install location
-# itself, while the ZIP is a plain directory that can live where the rest of `~/.local` lives.
-# `node.exe` looks for nothing outside its own directory, and `npm.cmd` resolves the interpreter
-# next to itself, so a relocated copy keeps working.
+# Same reasoning as `InstallPython3`: the bucket ships the official nodejs.org archive (a plain
+# directory inside a `.7z`), `env_add_path` puts it on PATH, and `post_install` rewrites `npmrc`
+# so the global prefix and the cache land in the persisted directory instead of `%APPDATA%`.
+# Node.js keeps a single active LTS line, so `nodejs-lts` *is* "latest LTS" -- the bucket's
+# `checkver` reads `dist/index.json` the same way the old getter did.
 function InstallNodejs()
 {
-  $arch = "x64"
-  if ($isArm)
-  {
-    $arch = "arm64"
-  }
-  $version = GetLatestNodejsVersion -arch $arch
-
-  $nodejsDir = Join-Path $HOME ".local\nodejs"
-  $nodejs = Join-Path $nodejsDir "node.exe"
-
-  $installed = ""
-  if (Test-Path -Path $nodejs)
-  {
-    $installed = @(& $nodejs -v 2>$null) | Select-Object -Last 1
-    $installed = "$installed".Trim()
-  }
-
-  if ($installed -eq $version)
-  {
-    SkipInfo "nodejs ${version}"
-  } else
-  {
-    $url = "https://nodejs.org/dist/${version}/node-${version}-win-${arch}.zip"
-    $tempBase = $env:TEMP
-    if (-not $tempBase)
-    {
-      $tempBase = $env:TMP
-    }
-    if (-not $tempBase)
-    {
-      $tempBase = [System.IO.Path]::GetTempPath()
-    }
-    $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
-    $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("nodejs-install-" + [guid]::NewGuid().ToString("N"))))
-
-    try
-    {
-      New-Item -ItemType Directory -Force -Path $workDir | Out-Null
-      $archive = Join-Path $workDir "nodejs.zip"
-      Info "download '${url}'"
-      & curl.exe -fsSL -o $archive $url
-      if ($LASTEXITCODE -ne 0)
-      {
-        throw "failed to download ${url}"
-      }
-
-      # The archive holds a single `node-<version>-win-<arch>` directory: unpack it into the
-      # work directory and rename that one, instead of moving the whole work directory around.
-      tar -xf $archive -C $workDir
-      if ($LASTEXITCODE -ne 0)
-      {
-        throw "failed to extract ${url}"
-      }
-      $extractDir = Join-Path $workDir "node-${version}-win-${arch}"
-      if (-not (Test-Path -Path (Join-Path $extractDir "node.exe")))
-      {
-        throw "the archive ${url} does not contain node.exe"
-      }
-
-      # An upgrade replaces the directory: the global packages under `node_modules` belong to
-      # the Node.js version that installed them.
-      Remove-Item -Path $nodejsDir -Recurse -Force -ErrorAction SilentlyContinue
-      # `Move-Item` into an existing directory would nest it instead of replacing it, which
-      # would leave the old Node.js in place: fail rather than pretend the install worked.
-      if (Test-Path -Path $nodejsDir)
-      {
-        throw "failed to remove the previous nodejs installation in ${nodejsDir}"
-      }
-      # `Move-Item` also refuses to create the missing parents, i.e. `~/.local` on a machine
-      # where nothing else has been installed into it yet.
-      New-Item -ItemType Directory -Force -Path (Split-Path -Path $nodejsDir -Parent) | Out-Null
-      Move-Item -Path $extractDir -Destination $nodejsDir
-      Info "installed nodejs ${version} into ${nodejsDir}"
-    } finally
-    {
-      # Remove only the directory this function created, and only when it really is a child of
-      # the temporary directory. A leftover must not fail an otherwise finished installation.
-      if ((Split-Path -Path $workDir -Parent) -eq $tempRoot)
-      {
-        Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
-      }
-    }
-  }
-
-  # `npm` and `npx` are the `npm.cmd`/`npx.cmd` shims that sit next to `node.exe`, so the one
-  # directory also carries them onto PATH.
-  AddUserPathEntry -dir $nodejsDir
-  AddProcessPathEntry -dir $nodejsDir
+  InstallScoopHeld "nodejs-lts"
 }
 
 function Deps()
