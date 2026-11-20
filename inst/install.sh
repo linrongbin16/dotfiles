@@ -66,6 +66,36 @@ set_github_credential_helper() {
   done
 }
 
+# `./bootstrap` downloads a repository tarball when there is no checkout, and a
+# tarball carries no `.git`. Turn that directory into a real checkout once
+# `core_deps` has installed `git`, so `git pull` keeps working afterwards and
+# the next `./install` runs against the same branch.
+#
+# `checkout -f -B` rather than `clone`: the files are already on disk and match
+# the branch, and `-f` keeps a locally edited copy from turning into a
+# conflict on the very first command of a fresh install.
+checkout_git() {
+  if [ -d "$DOTFILES_HOME/.git" ]; then
+    skip_info "git checkout"
+    return 0
+  fi
+
+  local repo branch
+  repo="${DOTFILES_REPO:-linrongbin16/dotfiles}"
+  branch="${DOTFILES_BRANCH:-main}"
+
+  info "turn '$DOTFILES_HOME' into a git checkout of '$repo@$branch'"
+
+  git init -q -b "$branch" "$DOTFILES_HOME"
+  git -C "$DOTFILES_HOME" remote add origin "https://github.com/${repo}.git"
+  # Only the tip is needed: the tarball was a single snapshot of it, and a full
+  # history would be a needless download on a machine that just bootstrapped.
+  git -C "$DOTFILES_HOME" fetch -q --depth=1 origin "refs/heads/${branch}:refs/remotes/origin/${branch}"
+  git -C "$DOTFILES_HOME" checkout -q -f -B "$branch" --track "origin/$branch"
+
+  info "turn '$DOTFILES_HOME' into a git checkout of '$repo@$branch' - done"
+}
+
 git_configs() {
   git config --global user.email "linrongbin16@outlook.com"
   git config --global user.name "linrongbin16"
@@ -156,6 +186,7 @@ profile_configs() {
 
 main() {
   core_deps
+  checkout_git
   go_deps
   rust_deps
   prompt_deps

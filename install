@@ -28,6 +28,17 @@ set -Eeuo pipefail
 # the values back instead of repeating the same `uname` calls and the same
 # architecture mapping.
 DOTFILES_HOME="$HOME/.dotfiles"
+
+# The README installs by piping `bootstrap` into a shell, and `bootstrap`
+# downloads this repository and re-runs `install` from the checkout - so by the
+# time this file runs, `$DOTFILES_HOME` is there. See `bootstrap` for why that
+# split exists (`git` is installed later, by `inst/apt.sh` and `inst/brew.sh`).
+if [ ! -f "$DOTFILES_HOME/inst/util.sh" ]; then
+  printf '[dotfiles] - %s\n' "'$DOTFILES_HOME' is not a checkout, install it with 'bootstrap':" >&2
+  printf '[dotfiles] - %s\n' "curl -fsSL 'https://raw.githubusercontent.com/${DOTFILES_REPO:-linrongbin16/dotfiles}/${DOTFILES_BRANCH:-main}/bootstrap' | bash" >&2
+  exit 1
+fi
+
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 

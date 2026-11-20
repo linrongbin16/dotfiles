@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# The first thing a new machine runs, and the only file it has to fetch:
+#
+#   curl -fsSL https://raw.githubusercontent.com/linrongbin16/dotfiles/main/bootstrap | bash
+#
+# `install` cannot do this itself, because it lives in the repository it would
+# have to download, and the tool that would download that repository - `git` -
+# is one of the things this project installs (see `inst/apt.sh` and
+# `inst/brew.sh`). A fresh macOS or Ubuntu box has neither `git` nor a clone,
+# but both ship `curl` and `tar`, so this script uses those: fetch the
+# repository tarball from GitHub's CDN, unpack it into `~/.dotfiles`, and hand
+# over to `install` from the checkout that just appeared.
+#
+# `codeload.github.com` is where `github.com/<repo>/archive/...` redirects to;
+# `raw.githubusercontent.com` serves single files (this one), not archives.
+#
+# `DOTFILES_REPO` / `DOTFILES_BRANCH` pick a fork or a branch; they are exported
+# so `inst/install.sh` can turn the checkout into a real git repository against
+# the same place. `DOTFILES_DOWNLOAD_ONLY` stops after the download, which is
+# how CI checks this path without running a full installation.
+#
+# Fail fast, and for the same reasons as `install`: a failing `curl` in a pipe
+# must abort instead of handing an empty script to the shell, and a failed
+# command inside a function must abort too.
+set -Eeuo pipefail
+
+DOTFILES_HOME="$HOME/.dotfiles"
+
+export DOTFILES_REPO="${DOTFILES_REPO:-linrongbin16/dotfiles}"
+export DOTFILES_BRANCH="${DOTFILES_BRANCH:-main}"
+
+# `inst/util.sh`, and with it `info`, is inside the checkout this script is
+# about to create, so print the messages directly.
+info() {
+  printf '[dotfiles] - %s\n' "$*"
+}
+
+download() {
+  local url tmp
+  url="https://codeload.github.com/${DOTFILES_REPO}/tar.gz/refs/heads/${DOTFILES_BRANCH}"
+  tmp="$(mktemp -d)"
+
+  # A failed download or a truncated archive would otherwise leave the temp
+  # directory behind. The success path clears the variable itself, because the
+  # `exec` at the bottom replaces this process and an EXIT trap would never run.
+  DOTFILES_BOOTSTRAP_TMP="$tmp"
+  trap 'if [ -n "${DOTFILES_BOOTSTRAP_TMP:-}" ]; then rm -rf "$DOTFILES_BOOTSTRAP_TMP"; fi' EXIT
+
+  info "download '${DOTFILES_REPO}@${DOTFILES_BRANCH}' with: 'curl'"
+
+  if ! command -v curl >/dev/null 2>&1; then
+    info "'curl' is required to download the dotfiles, install it first" >&2
+    exit 1
+  fi
+  if ! command -v tar >/dev/null 2>&1; then
+    info "'tar' is required to unpack the dotfiles, install it first" >&2
+    exit 1
+  fi
+
+  # `codeload` occasionally drops the TLS connection mid-handshake, and `-f`
+  # turns that into a bare "failed" with no archive to retry from. A few
+  # retries make the first command a new machine runs survive it.
+  if ! curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused "$url" -o "$tmp/dotfiles.tar.gz"; then
+    info "download '$url' - failed, check DOTFILES_REPO / DOTFILES_BRANCH" >&2
+    exit 1
+  fi
+
+  mkdir -p "$tmp/src"
+  # The archive has a single top-level directory (`dotfiles-main/`); stripping
+  # it makes the checkout land directly in `$DOTFILES_HOME`.
+  if ! tar -xzf "$tmp/dotfiles.tar.gz" -C "$tmp/src" --strip-components=1; then
+    info "unpack '$url' - failed" >&2
+    exit 1
+  fi
+
+  mkdir -p "$DOTFILES_HOME"
+  cp -R "$tmp/src/." "$DOTFILES_HOME/"
+
+  rm -rf "$tmp"
+  DOTFILES_BOOTSTRAP_TMP=""
+
+  info "download '${DOTFILES_REPO}@${DOTFILES_BRANCH}' with: 'curl' - done"
+}
+
+if [ -f "$DOTFILES_HOME/install" ] && [ -f "$DOTFILES_HOME/inst/util.sh" ]; then
+  # Already there: `./bootstrap` is then just a shorter way to run `./install`,
+  # and a second run after an interrupted one does not download twice.
+  info "'$DOTFILES_HOME' already exists, skip the download"
+else
+  download
+fi
+
+if [ -n "${DOTFILES_DOWNLOAD_ONLY:-}" ]; then
+  exit 0
+fi
+
+# `curl ... | bash` leaves stdin as the pipe the script was read from, and the
+# Homebrew installer reads `[ -t 0 ]` to decide whether it may prompt for the
+# password. Hand back the terminal when the session has one, and `/dev/null`
+# otherwise (CI, `ssh` without a tty) - the same stdin those runs already use.
+stdin_path=/dev/null
+if [ -t 2 ]; then
+  stdin_path=/dev/tty
+fi
+
+info "run the installation with: 'install'"
+# `bash` rather than `./install`: the tarball keeps the executable bit, but
+# naming the interpreter costs nothing and survives an archive that lost it.
+# `exec` replaces this process, so `install` is the only thing the user waits
+# on and its exit code is this script's exit code.
+exec bash "$DOTFILES_HOME/install" <"$stdin_path"

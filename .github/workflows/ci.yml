@@ -18,6 +18,41 @@ env:
   CARGO_NET_RETRY: 3
   CARGO_TERM_COLOR: always
 jobs:
+  bootstrap:
+    name: Bootstrap (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # The install path in the README, isolated from the full installations
+      # below: a machine with no `git` and no checkout, downloading the
+      # repository with `curl` alone. Fast enough to be worth running on its
+      # own, and it fails loudly if the tarball URL, the unpack, or the
+      # re-exec breaks.
+      - name: Download without git
+        env:
+          DOTFILES_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          DOTFILES_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          # `git` is what this step must not need, and the runner has it, so
+          # shadow it with a stub that fails: anything reaching for `git` here
+          # would report success on a fresh machine only by accident.
+          mkdir -p "$RUNNER_TEMP/no-git"
+          printf '#!/bin/sh\necho "bootstrap must not need git" >&2\nexit 127\n' \
+            >"$RUNNER_TEMP/no-git/git"
+          chmod +x "$RUNNER_TEMP/no-git/git"
+
+          curl -fsSL "https://raw.githubusercontent.com/${DOTFILES_REPO}/${DOTFILES_BRANCH}/bootstrap" |
+            env PATH="$RUNNER_TEMP/no-git:$PATH" \
+              DOTFILES_REPO="$DOTFILES_REPO" \
+              DOTFILES_BRANCH="$DOTFILES_BRANCH" \
+              DOTFILES_DOWNLOAD_ONLY=1 \
+              bash
+
+          test -f "$HOME/.dotfiles/inst/util.sh"
+          test -f "$HOME/.dotfiles/install"
+          echo "downloaded $(find "$HOME/.dotfiles" -type f | wc -l) files"
   ubuntu:
     name: Ubuntu
     strategy:
@@ -34,12 +69,16 @@ jobs:
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          DOTFILES_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          DOTFILES_BRANCH: ${{ github.head_ref || github.ref_name }}
           SHELL: /usr/bin/${{ matrix.shell }}
         run: |
-          git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
-          cd ~/.dotfiles
-          $SHELL ./install
+          # The documented install command, run as documented: no `git`, no
+          # pre-existing clone. `pipefail` keeps a failed `curl` from looking
+          # like a successful install of an empty script.
+          set -o pipefail
+          curl -fsSL "https://raw.githubusercontent.com/${DOTFILES_REPO}/${DOTFILES_BRANCH}/bootstrap" |
+            $SHELL
           $SHELL ~/.dotfiles/dotfiles.sh
   macos:
     name: MacOS
@@ -51,12 +90,13 @@ jobs:
       - name: Install dotfiles
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          DOTFILES_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          DOTFILES_BRANCH: ${{ github.head_ref || github.ref_name }}
           SHELL: /bin/${{ matrix.shell }}
         run: |
-          git clone --single-branch --branch "$BRANCH_NAME" --depth=1 https://github.com/linrongbin16/dotfiles ~/.dotfiles
-          cd ~/.dotfiles
-          $SHELL ./install
+          set -o pipefail
+          curl -fsSL "https://raw.githubusercontent.com/${DOTFILES_REPO}/${DOTFILES_BRANCH}/bootstrap" |
+            $SHELL
           $SHELL ~/.dotfiles/dotfiles.sh
   windows:
     name: Windows (${{ matrix.os }}, ${{ matrix.shell }})
