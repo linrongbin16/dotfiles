@@ -720,12 +720,12 @@ function Main()
   RustDeps
   GitConfigs
   ProfileConfigs
+  Info "done"
 }
 
 try
 {
   Main
-  Info "done"
 } catch
 {
   # Report the reason, then exit non-zero so CI (and the caller) sees the failure.
