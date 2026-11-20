@@ -43,6 +43,5 @@ irm get.scoop.sh | iex
 scoop install git
 
 git clone https://github.com/linrongbin16/dotfiles.git $env:USERPROFILE\.dotfiles
-cd $env:USERPROFILE\.dotfiles
-.\install.ps1
+& "$env:USERPROFILE\.dotfiles\install.ps1"
 ```
