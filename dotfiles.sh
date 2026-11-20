@@ -6,7 +6,8 @@
 # `TERM` below still apply to bash.
 
 # performance
-ulimit -n 10240
+# Apple M1 chip is 61440 by default; fall back to the classic 10240
+ulimit -n 61440 2>/dev/null || ulimit -n 10240
 ulimit -u 2660
 
 # Which shell is sourcing this file, not which one is the login shell: `$SHELL`
