@@ -78,7 +78,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git clone --single-branch --branch ${{ steps.extract_branch.outputs.branch }} --depth=1 https://github.com/linrongbin16/dotfiles $env:USERPROFILE\.dotfiles
-          & '${{ matrix.shell }}' -NoLogo -NoProfile -ExecutionPolicy Bypass -File $env:USERPROFILE\.dotfiles\install.ps1
+          cd $env:USERPROFILE\.dotfiles
+          & '${{ matrix.shell }}' -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
       - name: Evaluate dotfiles.ps1
         run: |
-          & '${{ matrix.shell }}' -NoLogo -NoProfile -ExecutionPolicy Bypass -File $env:USERPROFILE\.dotfiles\dotfiles.ps1
+          cd $env:USERPROFILE\.dotfiles
+          & '${{ matrix.shell }}' -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\dotfiles.ps1
