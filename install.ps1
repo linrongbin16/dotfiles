@@ -347,6 +347,31 @@ function JsDeps()
   InstallScoop "bun"
 }
 
+# Run `$file` with `$arguments` and return its exit code, for the one call that has to pass an
+# *empty* argument to a native command.
+#
+# A PowerShell command line cannot express that: Windows PowerShell 5.1 drops an empty argument
+# entirely, so `git config --replace-all <key> ""` reached git as `--replace-all <key>` and died
+# with `wrong number of arguments, should be from 2 to 3`. PowerShell 7 passes `""` through, but
+# as the two characters `\"\"`, which lands in `.gitconfig` as a literal `\"\"` value.
+# `ProcessStartInfo` hands the argument string to `CreateProcess` verbatim, and both hosts keep
+# the empty argument.
+function InvokeProcess([string]$file, [string]$arguments)
+{
+  $info = New-Object System.Diagnostics.ProcessStartInfo
+  $info.FileName = $file
+  $info.Arguments = $arguments
+  $info.UseShellExecute = $false
+  $info.RedirectStandardError = $true
+  $process = [System.Diagnostics.Process]::Start($info)
+  $stderr = $process.StandardError.ReadToEnd()
+  $process.WaitForExit()
+  if ($process.ExitCode -ne 0)
+  {
+    throw "command failed with exit code $($process.ExitCode): '${file} ${arguments}': ${stderr}"
+  }
+}
+
 # Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
 # with the token `gh` already stored (the keyring) instead of asking for a password.
 #
@@ -366,7 +391,16 @@ function SetGitHubCredentialHelper()
   foreach ($ghHost in @('github.com', 'gist.github.com'))
   {
     $key = "credential.https://${ghHost}.helper"
-    RunCommand -command "git config --global --replace-all ${key} ''"
+
+    # A *leading empty* `helper` value, then the `gh` command: `git` accumulates helpers from
+    # `system`, `global` and repo scope, and an empty value clears the list built so far. Git for
+    # Windows ships `manager` at system scope, so without the reset `manager` would run first and
+    # prompt for a password -- the exact failure this is here to prevent.
+    #
+    # `--replace-all` rather than `--add`: a re-run then rewrites the pair instead of stacking a
+    # second copy of the same shell command, which makes `git` call the keyring twice.
+    InvokeProcess -file 'git' -arguments ('config --global --replace-all "{0}" ""' -f $key)
+
     RunCommand -command "git config --global --add ${key} '!gh auth git-credential'"
   }
 }
