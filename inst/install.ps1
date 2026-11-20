@@ -461,9 +461,6 @@ function Deps()
   InstallMo
   InstallScoop "mise"
   InstallScoop "starship"
-
-  # neovim
-  InstallScoop "neovim" "nvim"
 }
 
 # Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
@@ -600,6 +597,26 @@ function InstallCargoBinstall()
   }
 }
 
+# Install the latest stable neovim through `bob`, instead of a scoop package that pins one build.
+#
+# `bob` keeps every version it installs in its own directory and switches by rewriting that
+# directory's `nvim-bin`; `dotfiles.ps1` already puts `%LOCALAPPDATA%\bob\nvim-bin` on PATH, so
+# `nvim` here is whatever `bob use` selected last.
+function InstallNeovim()
+{
+  # Fail here, with the reason, rather than in `bob use` with a bare
+  # "not recognized as the name of a cmdlet".
+  if (-not (TestCommand "bob"))
+  {
+    $cargoBin = Join-Path $HOME ".cargo\bin"
+    throw "installed 'bob-nvim' but 'bob' is not usable (expected '${cargoBin}')"
+  }
+
+  # `bob use` is idempotent (an already-installed version is a no-op), and "stable" is resolved
+  # upstream, so a probe here would only go stale: let bob decide what stable is today.
+  RunCommand -command "bob use stable"
+}
+
 function RustDeps()
 {
   Info "install rust deps for windows"
@@ -609,6 +626,8 @@ function RustDeps()
   InstallCargo "rmz"
   InstallCargo "cpz"
   InstallCargo "tree-sitter-cli"
+  InstallCargo "bob-nvim"
+  InstallNeovim
 }
 
 # Detect the encoding an existing startup file is stored in, by its byte order mark.
