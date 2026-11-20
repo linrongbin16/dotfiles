@@ -335,17 +335,8 @@ function CoreDeps()
 
   InstallMo
 
-  # Niubash (`niu`): a bash-compatible shell for Windows, no WSL and no MSYS. Its README installs
-  # from the in-repo scoop manifest, because the Extras-bucket submission
-  # (ScoopInstaller/Extras#19334) has not merged yet -- switch this to `InstallScoop "niubash"`
-  # once `scoop search niubash` finds it. `InstallScoop` cannot guard the URL form: it derives
-  # the name from the last URL segment, i.e. `niubash.json`, which never matches the installed
-  # app `niubash` in `scoop list`. Going through it would re-run the install on every run, so
-  # the plain `RunCommand` relies on scoop's own idempotence (it warns "'niubash' (1.5.0) is
-  # already installed" and exits 0).
+  # Niubash (`niu`): https://github.com/unixwin/niubash
   RunCommand -command "scoop install https://raw.githubusercontent.com/unixwin/niubash/master/installer/scoop/niubash.json"
-
-  # InstallScoop "extras/alacritty"
 }
 
 function JsDeps()
@@ -666,18 +657,7 @@ function ProfileConfigs()
     AddProfileSource -path $path -line $line
   }
 
-  # Niubash reads exactly one startup file on Windows, `~/.niubashrc`, in plain bash syntax
-  # (`~/.bashrc` is never sourced there), so the bash half of the dotfiles gets its own line.
-  # Same guard as `profile_configs` in the `install` script: the line only sources
-  # `dotfiles.sh` when the checkout is there, instead of erroring on a machine without it.
-  #
-  # Force LF: `niu setup` writes this file with LF, and `AppendAllText` would otherwise inject
-  # CRLF into a bash script. niu tolerates CRLF, but a mixed-ending rc trips `git diff` and any
-  # editor that normalizes on save.
-  #
-  # `-probe` covers an rc that was already wired by hand with a bare `. ~/.dotfiles/dotfiles.sh`:
-  # appending the guarded line next to it would source `dotfiles.sh` twice and stack the PATH
-  # entries it prepends.
+  # Add source `dotfiles.sh` for `~/.niubashrc`.
   $niubashrc = Join-Path $env:USERPROFILE ".niubashrc"
   AddProfileSource `
     -path $niubashrc `
