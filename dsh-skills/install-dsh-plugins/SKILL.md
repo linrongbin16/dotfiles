@@ -1,8 +1,8 @@
 ---
 name: install-dsh-plugins
-description: 用于为 dsh / dsh-tui 安装、重装或更新当前 profile 中已安装的插件，并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。
+description: 用于为 dsh / dsh-tui 安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。
 metadata:
-  version: "1.1"
+  version: "1.2"
 ---
 
 # 安装或更新 DSH 插件
@@ -17,6 +17,46 @@ metadata:
 确保每个 registry 插件都被排除在 pnpm 的 `minimumReleaseAge` 门槛之外，然后执行
 `dsh plugin --profile <target> add <pkg>@latest ...`，把这批插件安装或更新到最新的
 兼容版本。目标 profile 里已有、但源 profile 没有的插件不会被改动。
+
+也可以改用本 skill 目录下的 `plugins.json` 清单：它写死了这台机器期望的插件列表
+（profile = `dsh-tui`），不依赖任何 profile 的当前状态——新机器或被改乱的 profile
+按清单重装即可。
+
+## 插件清单（plugins.json）
+
+本 skill 目录下的 `plugins.json` 记录这台机器期望的插件列表：
+
+```json
+{
+  "profile": "dsh-tui",
+  "plugins": [
+    { "name": "@dmh2002/dsh-connect-minmax", "spec": "link:${HOME}/.dsh/dsh-connect-minmax" },
+    { "name": "@dmh2002/dsh-connect-qoder", "spec": "latest" },
+    { "name": "dsh-connect-trae", "spec": "latest" },
+    { "name": "dsh-connect-workbuddy", "spec": "latest" },
+    { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
+    { "name": "billion-context", "spec": "latest" }
+  ]
+}
+```
+
+| 插件 | 说明 |
+|---|---|
+| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`~/.dsh/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:` 规格，`${HOME}` 会被替换成用户主目录。 |
+| `@dmh2002/dsh-connect-qoder` | registry 包，凭据用 PAT，见下面的凭据表。 |
+| `dsh-connect-trae` | registry 包，读 Trae 客户端的 storage.json。 |
+| `dsh-connect-workbuddy` | registry 包，读 WorkBuddy 桌面端认证文件。 |
+| `dsh-bash-native` | 只装在 Windows 上（`os: ["windows"]`），其它平台自动跳过。 |
+| `billion-context` | 上下文压缩插件；更新它需要重启正在跑的会话。 |
+
+用清单安装：
+
+```bash
+node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
+  --manifest "<skill-dir>/plugins.json" --apply
+```
+
+不带 `--profile` 时，目标 profile 取清单里的 `profile` 字段（`dsh-tui`）。
 
 ## 约束（动手前先读）
 
@@ -123,6 +163,10 @@ skill 目录就是 `skill` 工具报告的目录。运行：
 # 只出计划：列出插件、目标 profile、排除块改动和将执行的命令。
 node "<skill-dir>/scripts/install-dsh-plugins.mjs"
 
+# 按清单安装（不依赖任何 profile 的当前状态）。
+node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
+  --manifest "<skill-dir>/plugins.json"
+
 # 应用到当前 profile（DSH_PROFILE=dsh-tui 时就是 dsh-tui）。
 node "<skill-dir>/scripts/install-dsh-plugins.mjs" --apply
 
@@ -136,12 +180,23 @@ node "<skill-dir>/scripts/install-dsh-plugins.mjs" --apply \
 | 选项 | 含义 |
 |---|---|
 | `--source <name>` | 读取插件列表的源 profile。默认：当前 `$DSH_PROFILE`。 |
-| `--profile <name>` | 目标 profile；可重复或逗号分隔。默认：当前 profile。 |
+| `--manifest <file>` | 读取插件列表的清单文件（JSON），而不是 profile；不带 `--profile` 时用清单里的 `profile` 字段作为目标。 |
+| `--profile <name>` | 目标 profile；可重复或逗号分隔。默认：当前 profile，或清单里的 profile。 |
 | `--apply` | 执行修改并运行 `dsh plugin add`。不加时只打印计划。 |
 | `--no-age-exclude` | 不改 `minimumReleaseAgeExclude`；本次安装仍传 `--config.minimumReleaseAge=0`。 |
 | `--help` | 用法。 |
 
 ## 脚本做了什么
+
+清单模式（`--manifest`）：
+
+1. 读清单 JSON，取 `profile` 字段作为默认目标 profile。
+2. 逐条处理 `plugins`：带 `os` 的条目只在列出的平台上安装（当前平台按
+   `windows`/`darwin`/`linux` 判定），`spec` 里的 `${HOME}` 替换成用户主目录，
+   `link:`/`file:` 规格里的反斜杠转成正斜杠（pnpm 的路径解析不认反斜杠）。
+3. 其余步骤与 profile 模式相同。
+
+profile 模式（默认）：
 
 1. 解析 `DSH_HOME`（默认 `~/.dsh`）和源 manifest：
    `<DSH_HOME>/profiles/<source>/package.json`。

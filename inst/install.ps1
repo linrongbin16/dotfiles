@@ -726,6 +726,91 @@ function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n
   [System.IO.File]::AppendAllText($path, $block, $encoding)
 }
 
+# Install the skills kept in `dsh-skills/` into `~/.dsh/skills`, one link per skill.
+#
+# The Unix installer (`inst/install.sh`, function `dsh_skills`) links them, and this does the
+# same: a link rather than a copy keeps the installed skills equal to the checkout, so editing
+# or pulling a skill takes effect without re-running the installer. The reason `ghostty_configs`
+# links its directory instead of copying it is the same.
+#
+# dsh discovers a skill from its directory, so each top-level directory under `dsh-skills/` is
+# one skill; files such as `.gitkeep` are skipped.
+function DshSkills()
+{
+  Info "install dsh skills for windows"
+
+  # The repository root is the parent of `inst/`, where this file lives.
+  $sourceDir = Join-Path (Split-Path -Parent $PSScriptRoot) 'dsh-skills'
+
+  # `DSH_HOME` overrides the default location, the same way it does for dsh itself
+  # (`@deepseek-ai/dsh-home-paths` reads it before falling back to `~/.dsh`).
+  $dshHome = if ($env:DSH_HOME) { $env:DSH_HOME } else { Join-Path $HOME '.dsh' }
+  $targetDir = Join-Path $dshHome 'skills'
+
+  if (-not (Test-Path -LiteralPath $sourceDir -PathType Container))
+  {
+    Info "'${sourceDir}' is not a directory, skip..."
+    return
+  }
+
+  New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+
+  foreach ($skill in (Get-ChildItem -LiteralPath $sourceDir -Directory | Sort-Object -Property Name))
+  {
+    $source = $skill.FullName
+    $target = Join-Path $targetDir $skill.Name
+
+    $existing = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
+
+    if ($existing -and $existing.LinkType)
+    {
+      # A link from a previous run that already points at this checkout: nothing to redo.
+      $linkTarget = @($existing.Target)[0]
+      if ($linkTarget)
+      {
+        if (-not [System.IO.Path]::IsPathRooted($linkTarget))
+        {
+          $linkTarget = Join-Path (Split-Path -Parent $target) $linkTarget
+        }
+        if ([System.IO.Path]::GetFullPath($linkTarget).TrimEnd('\') -eq
+            [System.IO.Path]::GetFullPath($source).TrimEnd('\'))
+        {
+          SkipInfo $skill.Name
+          continue
+        }
+      }
+
+      # A stale link: remove the link itself, not the directory it points at.
+      Info "remove the stale link '$target'"
+      Remove-Item -LiteralPath $target -Force
+      $existing = $null
+    }
+    elseif ($existing)
+    {
+      # A real directory from a manual install: the repository stays the source of truth,
+      # the same way the Unix installer replaces whatever is in the way.
+      Info "remove '$target' (replaced by the link to the checkout)"
+      Remove-Item -LiteralPath $target -Recurse -Force
+    }
+
+    # A symbolic link first, because that is what the Unix installer creates and what dsh's
+    # skill loader documents. Creating one needs developer mode (which `Deps` turns on) or an
+    # elevated shell; a directory junction is the fallback for a machine that has neither --
+    # it needs no elevation, and dsh resolves both the same way.
+    try
+    {
+      New-Item -ItemType SymbolicLink -Path $target -Target $source -ErrorAction Stop | Out-Null
+    }
+    catch
+    {
+      Info "symbolic link failed ('$($_.Exception.Message)'), fall back to a junction"
+      New-Item -ItemType Junction -Path $target -Target $source -ErrorAction Stop | Out-Null
+    }
+
+    Info "link '$source' to '$target' - done"
+  }
+}
+
 function ProfileConfigs()
 {
   Info "install PROFILE configs for windows"
@@ -757,6 +842,7 @@ function Main()
   Deps
   RustDeps
   GitConfigs
+  DshSkills
   ProfileConfigs
   Info "done"
 }

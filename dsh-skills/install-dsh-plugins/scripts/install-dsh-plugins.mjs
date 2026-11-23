@@ -2,11 +2,12 @@
 /**
  * install-dsh-plugins — install or update the plugins of a DSH profile.
  *
- * The plugin list is read from a source profile (the current one by default),
- * every target profile gets `minimumReleaseAgeExclude` entries for those
- * registry packages, and finally one `dsh plugin add ...@latest` run brings the
- * target to the latest compatible versions. Local (`link:`/`file:`) and aliased
- * (`npm:`) specs are preserved verbatim.
+ * The plugin list is read from a source profile (the current one by default) or
+ * from a manifest file (`plugins.json` in this skill, or one given with
+ * --manifest), every target profile gets `minimumReleaseAgeExclude` entries for
+ * those registry packages, and finally one `dsh plugin add ...@latest` run
+ * brings the target to the latest compatible versions. Local (`link:`/`file:`)
+ * and aliased (`npm:`) specs are preserved verbatim.
  *
  * Defaults to a dry run: --apply is required to write files or run pnpm.
  */
@@ -14,7 +15,7 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 const USAGE = `用法：install-dsh-plugins.mjs [选项]
 
@@ -24,13 +25,21 @@ const USAGE = `用法：install-dsh-plugins.mjs [选项]
 
 选项：
   --source <name>       读取插件列表的源 profile（默认：$DSH_PROFILE）
+  --manifest <file>     读取插件列表的清单文件（JSON），而不是 profile；
+                        不带 --profile 时用清单里的 profile 字段作为目标
   --profile <name>      目标 profile，可重复或用逗号分隔
-                        （默认：当前 profile）
+                        （默认：当前 profile，或清单里的 profile）
   --apply               写入 pnpm-workspace.yaml 并运行 dsh plugin
   --no-age-exclude      不修改 minimumReleaseAgeExclude
   -h, --help            显示此帮助
 
 不加 --apply 时不会改动任何内容，只打印计划。
+
+清单格式（见本 skill 目录下的 plugins.json）：
+  { "profile": "dsh-tui",
+    "plugins": [ { "name": "<包名>", "spec": "latest | link:<路径>",
+                   "os": ["windows", "darwin", "linux"], "note": "…" } ] }
+清单里带 "os" 的条目只在列出的平台上安装；spec 里的 \${HOME} 会被替换成用户主目录。
 
 在 WSL 下，四个 connector 插件需要 Windows 客户端中的凭据；见 skill 的
 “四个 connector 插件的凭据前提”一节。本安装器只更新包，不验证这些凭据。`;
@@ -50,7 +59,7 @@ function fail(message) {
 }
 
 function parseArgs(argv) {
-  const options = { source: undefined, profiles: [], apply: false, ageExclude: true };
+  const options = { source: undefined, manifest: undefined, profiles: [], apply: false, ageExclude: true };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     const value = () => {
@@ -60,6 +69,7 @@ function parseArgs(argv) {
       return next;
     };
     if (arg === '--source') options.source = value();
+    else if (arg === '--manifest') options.manifest = value();
     else if (arg === '--profile') options.profiles.push(...value().split(',').map(s => s.trim()).filter(Boolean));
     else if (arg === '--apply') options.apply = true;
     else if (arg === '--no-age-exclude') options.ageExclude = false;
@@ -133,6 +143,54 @@ function pluginEntries(manifest) {
     }
   }
   return { plugins, skipped };
+}
+
+/**
+ * Plugin list from a manifest file (`plugins.json`).
+ *
+ * The manifest is the hand-written list of the plugins a DSH profile is meant
+ * to have: a name, the spec to install, and optionally the platforms it
+ * applies to. Entries whose `os` does not include the current platform are
+ * skipped, so a Windows-only plugin does not break a Linux run.
+ */
+function manifestEntries(manifest) {
+  const platform = process.platform === 'win32' ? 'windows' : process.platform;
+  const plugins = [];
+  const skipped = [];
+
+  for (const entry of manifest?.plugins ?? []) {
+    const name = entry?.name;
+    if (!name) {
+      skipped.push({ name: '(unnamed)', spec: '', reason: 'no name' });
+      continue;
+    }
+    const os = Array.isArray(entry.os) ? entry.os : null;
+    if (os && !os.includes(platform)) {
+      skipped.push({ name, spec: entry.spec ?? 'latest', reason: `only for ${os.join(', ')}` });
+      continue;
+    }
+
+    const raw = entry.spec ?? 'latest';
+    const spec = raw.replace(/\$\{HOME\}/g, homedir());
+    if (spec.startsWith('workspace:')) {
+      skipped.push({ name, spec, reason: 'workspace protocol' });
+      continue;
+    }
+    plugins.push({ name, spec: normalizeLocalPath(spec), local: isLocalSpec(spec), note: entry.note });
+  }
+  return { plugins, skipped };
+}
+
+/**
+ * A `link:`/`file:` spec holds a filesystem path, and pnpm wants forward
+ * slashes in it -- a Windows path with backslashes ends the path at the first
+ * backslash for the shell and for pnpm's own parser.
+ */
+function normalizeLocalPath(spec) {
+  if (!/^(link|file):/i.test(spec)) return spec;
+  const scheme = spec.slice(0, spec.indexOf(':') + 1);
+  const rest = spec.slice(scheme.length).replace(/\\/g, '/');
+  return scheme + rest;
 }
 
 /** Package name of a minimumReleaseAgeExclude item: `pkg`, `pkg@1.2.3`,
@@ -299,6 +357,36 @@ function main() {
   const options = parseArgs(process.argv.slice(2));
   const home = process.env.DSH_HOME?.trim() || join(homedir(), '.dsh');
   const current = profileName();
+
+  if (options.manifest !== undefined) {
+    const manifestPath = resolve(options.manifest);
+    const manifest = readJson(manifestPath);
+    if (manifest === undefined) {
+      fail(`cannot read manifest ${manifestPath}`);
+    }
+    const { plugins, skipped } = manifestEntries(manifest);
+    const defaultTarget = manifest.profile ?? current;
+    if (defaultTarget === undefined) {
+      fail('the manifest has no "profile" field: pass --profile <name>');
+    }
+    const targets = [...new Set(options.profiles.length > 0 ? options.profiles : [defaultTarget])];
+
+    process.stdout.write(`manifest: ${manifestPath}\n`);
+    process.stdout.write('plugins:\n');
+    for (const plugin of plugins) {
+      process.stdout.write(
+        `  - ${plugin.name} (${plugin.spec}${plugin.local ? ', local' : ''}${plugin.note ? `, ${plugin.note}` : ''})\n`,
+      );
+    }
+    for (const item of skipped) {
+      process.stdout.write(`  skip ${item.name} (${item.reason})\n`);
+    }
+    process.stdout.write(`target profiles: ${targets.join(', ')}\n`);
+    process.stdout.write(`mode: ${options.apply ? 'apply' : 'dry-run (pass --apply to change anything)'}\n`);
+    installPlugins(home, plugins, targets, options);
+    return;
+  }
+
   if (current === undefined) {
     fail('cannot determine the current profile: set DSH_PROFILE or DSH_PROFILE_DIR, or pass --source/--profile');
   }
@@ -342,6 +430,14 @@ function main() {
   process.stdout.write(`target profiles: ${targets.join(', ')}\n`);
   process.stdout.write(`mode: ${options.apply ? 'apply' : 'dry-run (pass --apply to change anything)'}\n`);
 
+  installPlugins(home, plugins, targets, options);
+}
+
+/**
+ * Install (or, without --apply, only print) the plugin list into every target
+ * profile: age-exclude entries first, then one `dsh plugin add` run.
+ */
+function installPlugins(home, plugins, targets, options) {
   const registryNames = plugins.filter(plugin => !plugin.local).map(plugin => plugin.name);
   const specs = plugins.map(plugin => `${plugin.name}@${plugin.local ? plugin.spec : 'latest'}`);
 
