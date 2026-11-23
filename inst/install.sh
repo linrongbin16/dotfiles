@@ -146,6 +146,55 @@ ghostty_configs() {
   touch "$HOME/.config/ghostty/ghostty-custom"
 }
 
+# Install the skills kept in `dsh-skills/` into `~/.dsh/skills`, one symlink per
+# skill. A link rather than a copy keeps the installed skills equal to the
+# checkout: editing or pulling a skill takes effect without re-running the
+# installer, the same reason `ghostty_configs` links its directory instead of
+# copying it.
+#
+# dsh discovers a skill from its directory, so each top-level directory under
+# `dsh-skills/` is one skill; files such as `.gitkeep` are skipped.
+dsh_skills() {
+  local source_dir="$DOTFILES_HOME/dsh-skills"
+  local target_dir="$HOME/.dsh/skills"
+
+  if [ ! -d "$source_dir" ]; then
+    info "'$source_dir' is not a directory, skip..."
+    return 0
+  fi
+
+  mkdir -p "$target_dir"
+
+  local skill name target
+  while IFS= read -r skill; do
+    # `find` prints nothing when the directory only holds `.gitkeep`, and the
+    # here-string below then yields one empty line.
+    [ -n "$skill" ] || continue
+
+    name="$(basename "$skill")"
+    target="$target_dir/$name"
+
+    # A link from a previous run already points at this checkout, so there is
+    # nothing to redo.
+    if [ -L "$target" ] && [ "$(readlink "$target")" = "$skill" ]; then
+      skip_info "$name"
+      continue
+    fi
+
+    # Replace whatever is in the way (an older link, or a real directory from a
+    # manual install) so the repository stays the source of truth. `rm -rf` on
+    # a link removes the link itself, not the directory it points at.
+    if [ -e "$target" ] || [ -L "$target" ]; then
+      rm -rf "$target"
+    fi
+
+    ln -s "$skill" "$target"
+    info "link '$skill' to '$target' - done"
+  done <<EOF
+$(find "$source_dir" -mindepth 1 -maxdepth 1 -type d)
+EOF
+}
+
 profile_configs() {
   local line='[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh'
   local zshrc="$HOME/.zshrc"
@@ -172,6 +221,7 @@ main() {
   prompt_deps
   git_configs
   ghostty_configs
+  dsh_skills
   profile_configs
   info "done"
 }
