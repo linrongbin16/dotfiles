@@ -1,0 +1,32 @@
+{
+  "profile": "dsh-tui",
+  "plugins": [
+    {
+      "name": "@dmh2002/dsh-connect-minmax",
+      "spec": "link:${HOME}/.dsh/dsh-connect-minmax",
+      "note": "不在 npm registry 上，必须用本地 link；见 SKILL.md 的准备步骤"
+    },
+    {
+      "name": "@dmh2002/dsh-connect-qoder",
+      "spec": "latest"
+    },
+    {
+      "name": "dsh-connect-trae",
+      "spec": "latest"
+    },
+    {
+      "name": "dsh-connect-workbuddy",
+      "spec": "latest"
+    },
+    {
+      "name": "dsh-bash-native",
+      "spec": "latest",
+      "os": ["windows"],
+      "note": "只装在 Windows 上"
+    },
+    {
+      "name": "billion-context",
+      "spec": "latest"
+    }
+  ]
+}
