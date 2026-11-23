@@ -2,7 +2,7 @@
 name: install-dsh-plugins
 description: 用于为 dsh / dsh-tui 安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。也覆盖只能从 GitHub Release 下载 tgz 离线安装的插件（如 dsh-our-free-model）。
 metadata:
-  version: "1.3"
+  version: "1.5"
 ---
 
 # 安装或更新 DSH 插件
@@ -22,6 +22,30 @@ metadata:
 （profile = `dsh-tui`），不依赖任何 profile 的当前状态——新机器或被改乱的 profile
 按清单重装即可。
 
+## 本地插件目录约定
+
+所有不走 registry 的插件（`link:` 的本地 clone、`file:` 的离线 tgz）一律放在
+**当前 profile 下的 `plugins/`**：`<DSH_HOME>/profiles/<profile>/plugins/`。
+本机 dsh-tui profile 就是 `~/.dsh/profiles/dsh-tui/plugins/`。
+
+```
+~/.dsh/profiles/dsh-tui/plugins/
+├── dsh-connect-minmax/                    # link: 的源码 clone（含 lib/、node_modules/）
+├── dsh-our-free-model-2.9.0.tgz           # file: 的离线包
+└── dsh-our-free-model-2.8.5.tgz           # 旧版本，可保留可删
+```
+
+不要散落在 `~/plugins/`、`~/.dsh/plugins/`、`~/.dsh/` 根目录或 profile 的
+`vendor/` 下。放在 profile 内部的理由：本地依赖和 profile 的 `node_modules`、
+`pnpm-lock.yaml` 属于同一套安装状态，profile 就是它们的归属；`link:`/`file:`
+规格会写成相对 profile 的 `plugins/...`，跟着 profile 目录整体搬移或复制仍成立。
+
+多 profile 场景：每个 profile 各自维护自己的 `plugins/`。tgz 需要在多个 profile
+使用时各放一份；不要用跨 profile 的相对路径去共享，那会让 profile 无法独立搬运。
+
+`link:` 目标必须是已构建好的 clone（`npm install --include=dev && npm run build`，
+产物在 `lib/`），`link:` 到源码目录不会自动编译。
+
 ## 插件清单（plugins.json）
 
 本 skill 目录下的 `plugins.json` 记录这台机器期望的插件列表：
@@ -30,7 +54,7 @@ metadata:
 {
   "profile": "dsh-tui",
   "plugins": [
-    { "name": "@dmh2002/dsh-connect-minmax", "spec": "link:${HOME}/.dsh/dsh-connect-minmax" },
+    { "name": "@dmh2002/dsh-connect-minmax", "spec": "link:${HOME}/.dsh/profiles/dsh-tui/plugins/dsh-connect-minmax" },
     { "name": "@dmh2002/dsh-connect-qoder", "spec": "latest" },
     { "name": "dsh-connect-trae", "spec": "latest" },
     { "name": "dsh-connect-workbuddy", "spec": "latest" },
@@ -38,7 +62,7 @@ metadata:
     { "name": "billion-context", "spec": "latest" },
     {
       "name": "dsh-our-free-model",
-      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/vendor/dsh-our-free-model-2.9.0.tgz"
+      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/plugins/dsh-our-free-model-2.9.0.tgz"
     }
   ]
 }
@@ -46,13 +70,13 @@ metadata:
 
 | 插件 | 说明 |
 |---|---|
-| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`~/.dsh/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:` 规格，`${HOME}` 会被替换成用户主目录。 |
+| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`~/.dsh/profiles/dsh-tui/plugins/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:` 规格，`${HOME}` 会被替换成用户主目录。 |
 | `@dmh2002/dsh-connect-qoder` | registry 包，凭据用 PAT，见下面的凭据表。 |
 | `dsh-connect-trae` | registry 包，读 Trae 客户端的 storage.json。 |
 | `dsh-connect-workbuddy` | registry 包，读 WorkBuddy 桌面端认证文件。 |
 | `dsh-bash-native` | 只装在 Windows 上（`os: ["windows"]`），其它平台自动跳过。 |
 | `billion-context` | 上下文压缩插件；更新它需要重启正在跑的会话。 |
-| `dsh-our-free-model` | **离线安装**：registry 上的同名包停在 2.1.0，不能 `@latest`。必须先从 GitHub Release 下载 tgz 放到 profile 的 `vendor/`，再用 `file:` 规格安装。详见下面的「离线安装 dsh-our-free-model」。 |
+| `dsh-our-free-model` | **离线安装**：registry 上的同名包停在 2.1.0，不能 `@latest`。必须先从 GitHub Release 下载 tgz 放到 profile 的 `plugins/`，再用 `file:` 规格安装。详见下面的「离线安装 dsh-our-free-model」。 |
 
 用清单安装：
 
@@ -85,31 +109,32 @@ curl -sL https://api.github.com/repos/Ebony-Vinyl/dsh-our-free-model/releases/la
 
 ```bash
 PROFILE_DIR="${DSH_HOME:-$HOME/.dsh}/profiles/dsh-tui"
+PLUGINS_DIR="$PROFILE_DIR/plugins"
 VER=2.9.0                     # 换成上面 tag_name 去掉 v 的版本
 BASE=https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/download/v$VER
 
-mkdir -p "$PROFILE_DIR/vendor"
-curl -fL "$BASE/dsh-our-free-model-$VER.tgz" -o "$PROFILE_DIR/vendor/dsh-our-free-model-$VER.tgz"
+mkdir -p "$PLUGINS_DIR"
+curl -fL "$BASE/dsh-our-free-model-$VER.tgz" -o "$PLUGINS_DIR/dsh-our-free-model-$VER.tgz"
 curl -fL "$BASE/SHA256SUMS" -o /tmp/ofm-SHA256SUMS
 
 # Windows 用 certutil -hashfile <file> SHA256，或 (Get-FileHash <file> -Algorithm SHA256).Hash
-( cd "$PROFILE_DIR/vendor" && sha256sum -c /tmp/ofm-SHA256SUMS --ignore-missing )
+( cd "$PLUGINS_DIR" && sha256sum -c /tmp/ofm-SHA256SUMS --ignore-missing )
 ```
 
 校验必须通过再往下走。`SHA256SUMS` 里那一行的目标名是
-`dsh-our-free-model-<版本>.tgz`，所以要在 `vendor/` 目录里比对。
+`dsh-our-free-model-<版本>.tgz`，所以要在 `$PLUGINS_DIR` 里比对。
 
 **2. 用本地绝对路径安装**
 
 ```bash
 dsh plugin --profile dsh-tui add \
-  "$PROFILE_DIR/vendor/dsh-our-free-model-$VER.tgz"
+  "$PLUGINS_DIR/dsh-our-free-model-$VER.tgz"
 ```
 
-装完 dependencies 里是 `file:C:/.../vendor/dsh-our-free-model-2.9.0.tgz` 这种
-file: 规格，`dsh.profile.bundles` 末尾自动多一行 `dsh-our-free-model`。
+装完 dependencies 里是 `file:/home/<user>/.dsh/profiles/dsh-tui/plugins/dsh-our-free-model-2.9.0.tgz`
+这种 file: 规格，`dsh.profile.bundles` 末尾自动多一行 `dsh-our-free-model`。
 
-清单模式下这一步由脚本代劳——只要 tgz 已经放进 `vendor/`，直接：
+清单模式下这一步由脚本代劳——只要 tgz 已经放进 profile 的 `plugins/`，直接：
 
 ```bash
 node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
@@ -124,7 +149,7 @@ registry 门槛），`${HOME}` 替换成主目录。**tgz 不在位时脚本会�
 
 版本号写死在清单的 `spec` 里（`...-2.9.0.tgz`），升级是显式动作：
 
-1. 按上面第 1 步下载新版本 tgz 到 `vendor/`，校验；
+1. 按上面第 1 步下载新版本 tgz 到 profile 的 `plugins/`，校验；
 2. 把 `plugins.json` 里 `dsh-our-free-model` 那条 `spec` 的版本号改成新版本
    （只有这一处；`SKILL.md` 里的示例值顺手一起改）；
 3. 重跑清单安装（或直接 `dsh plugin add` 新 tgz 的绝对路径）。
@@ -138,7 +163,7 @@ registry 门槛），`${HOME}` 替换成主目录。**tgz 不在位时脚本会�
   `duplicate loader entry id: our-free-model`。装完就是一条 loader 条目。
 - 装完要重启 `dsh` / `dsh-tui`，首次启动时插件会去注册模型、刷新可用性缓存。
 - 手工复制发布文件时必须整包复制（含 `adapter/`、`src/`、`locale/`、
-  `vendor/` 下的引擎资源与 `vendor/channel-pack/` 的 `pack.js`、WASM），只拷入口
+  包内的 `vendor/` 引擎资源与 `vendor/channel-pack/` 的 `pack.js`、WASM），只拷入口
   脚本会导致渠道加载失败——用官方 tgz 就没这个问题。
 - 之前的 `@ebony-vinyl/dsh-our-free-model`（2.8.3，`link:` 装法）已废弃；
   如果 profile 里还留着，先 `dsh plugin --profile dsh-tui remove @ebony-vinyl/dsh-our-free-model`。
@@ -321,7 +346,7 @@ profile 对齐；`dsh-tui safe` 列出第三方插件。
   `--profile <target>` 重跑，或用 `dsh plugin` 逐个安装其余插件。
 - 更新后 `link:` 插件丢失：链接路径移动了。用
   `dsh plugin --profile <target> add <name>@link:<path>` 手动恢复。
-- 脚本报 `missing local package for dsh-our-free-model`：`vendor/` 里没有清单
-  指定的那个版本的 tgz。先按「离线安装 dsh-our-free-model」第 1 步下载校验，
+- 脚本报 `missing local package for dsh-our-free-model`：profile 的 `plugins/` 里没有
+  清单指定的那个版本的 tgz。先按「离线安装 dsh-our-free-model」第 1 步下载校验，
   别改成 `latest`——那会装到 npm 上停在 2.1.0 的旧包。
 

@@ -3,8 +3,8 @@
   "plugins": [
     {
       "name": "@dmh2002/dsh-connect-minmax",
-      "spec": "link:${HOME}/.dsh/dsh-connect-minmax",
-      "note": "不在 npm registry 上，必须用本地 link；见 SKILL.md 的准备步骤"
+      "spec": "link:${HOME}/.dsh/profiles/dsh-tui/plugins/dsh-connect-minmax",
+      "note": "不在 npm registry 上，必须用本地 link；clone 放在 profile 的 plugins/ 下（见 SKILL.md「本地插件目录约定」）"
     },
     {
       "name": "@dmh2002/dsh-connect-qoder",
@@ -21,7 +21,9 @@
     {
       "name": "dsh-bash-native",
       "spec": "latest",
-      "os": ["windows"],
+      "os": [
+        "windows"
+      ],
       "note": "只装在 Windows 上"
     },
     {
@@ -30,8 +32,8 @@
     },
     {
       "name": "dsh-our-free-model",
-      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/vendor/dsh-our-free-model-2.9.0.tgz",
-      "note": "离线安装：先从 GitHub Release 下载同版本 tgz 放进 profile 的 vendor/，再 dsh plugin add 该绝对路径；绝不装 npm 上的同名旧包。见 SKILL.md「离线安装 dsh-our-free-model」"
+      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/plugins/dsh-our-free-model-2.9.0.tgz",
+      "note": "离线安装：先从 GitHub Release 下载同版本 tgz 放进 profile 的 plugins/，再 dsh plugin add 该绝对路径；绝不装 npm 上的同名旧包。见 SKILL.md「离线安装 dsh-our-free-model」"
     }
   ]
 }

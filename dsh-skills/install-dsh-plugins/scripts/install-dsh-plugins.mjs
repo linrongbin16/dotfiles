@@ -200,8 +200,8 @@ function normalizeLocalPath(spec) {
 /**
  * A `file:` spec points at a local tarball. pnpm's own error for a missing one
  * is buried in the install log, so check up front: an offline plugin such as
- * dsh-our-free-model must have its tgz downloaded into the profile's vendor/
- * directory first, and saying that plainly beats a failed pnpm run.
+ * dsh-our-free-model must have its tgz downloaded into the target profile's
+ * plugins/ directory first, and saying that plainly beats a failed pnpm run.
  *
  * Relative paths are resolved against the target profile, matching how pnpm
  * resolves them from the profile's package.json.
