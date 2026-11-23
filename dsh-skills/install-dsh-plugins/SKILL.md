@@ -1,8 +1,8 @@
 ---
 name: install-dsh-plugins
-description: 用于为 dsh / dsh-tui 安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。
+description: 用于为 dsh / dsh-tui 安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。也覆盖只能从 GitHub Release 下载 tgz 离线安装的插件（如 dsh-our-free-model）。
 metadata:
-  version: "1.2"
+  version: "1.3"
 ---
 
 # 安装或更新 DSH 插件
@@ -35,7 +35,11 @@ metadata:
     { "name": "dsh-connect-trae", "spec": "latest" },
     { "name": "dsh-connect-workbuddy", "spec": "latest" },
     { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
-    { "name": "billion-context", "spec": "latest" }
+    { "name": "billion-context", "spec": "latest" },
+    {
+      "name": "dsh-our-free-model",
+      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/vendor/dsh-our-free-model-2.9.0.tgz"
+    }
   ]
 }
 ```
@@ -48,6 +52,7 @@ metadata:
 | `dsh-connect-workbuddy` | registry 包，读 WorkBuddy 桌面端认证文件。 |
 | `dsh-bash-native` | 只装在 Windows 上（`os: ["windows"]`），其它平台自动跳过。 |
 | `billion-context` | 上下文压缩插件；更新它需要重启正在跑的会话。 |
+| `dsh-our-free-model` | **离线安装**：registry 上的同名包停在 2.1.0，不能 `@latest`。必须先从 GitHub Release 下载 tgz 放到 profile 的 `vendor/`，再用 `file:` 规格安装。详见下面的「离线安装 dsh-our-free-model」。 |
 
 用清单安装：
 
@@ -57,6 +62,86 @@ node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
 ```
 
 不带 `--profile` 时，目标 profile 取清单里的 `profile` 字段（`dsh-tui`）。
+
+## 离线安装 dsh-our-free-model
+
+这个插件**不走 registry**：npm 上的同名包 `dsh-our-free-model` 停在 2.1.0
+（2026-10-19 之后没再发布），而 GitHub Release 已经到 2.9.0。所以清单里写的是
+`file:` 规格，装的是自己下载、校验过的 tgz——`@latest` 会把它降级成那个旧的
+npm 包，不要用。
+
+两步，先下载再安装：
+
+**1. 从 GitHub Release 下载 tgz**
+
+```bash
+# 最新 release 的资产列表（tag + 每个资产的下载地址）
+curl -sL https://api.github.com/repos/Ebony-Vinyl/dsh-our-free-model/releases/latest \
+  | grep -E '"(tag_name|browser_download_url)"'
+```
+
+资产里 `dsh-our-free-model-<版本>.tgz` 是插件包，`SHA256SUMS` 是校验清单
+（同目录还有桌面端的 `.exe` / `.dmg`，和插件无关）。下载并校验：
+
+```bash
+PROFILE_DIR="${DSH_HOME:-$HOME/.dsh}/profiles/dsh-tui"
+VER=2.9.0                     # 换成上面 tag_name 去掉 v 的版本
+BASE=https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/download/v$VER
+
+mkdir -p "$PROFILE_DIR/vendor"
+curl -fL "$BASE/dsh-our-free-model-$VER.tgz" -o "$PROFILE_DIR/vendor/dsh-our-free-model-$VER.tgz"
+curl -fL "$BASE/SHA256SUMS" -o /tmp/ofm-SHA256SUMS
+
+# Windows 用 certutil -hashfile <file> SHA256，或 (Get-FileHash <file> -Algorithm SHA256).Hash
+( cd "$PROFILE_DIR/vendor" && sha256sum -c /tmp/ofm-SHA256SUMS --ignore-missing )
+```
+
+校验必须通过再往下走。`SHA256SUMS` 里那一行的目标名是
+`dsh-our-free-model-<版本>.tgz`，所以要在 `vendor/` 目录里比对。
+
+**2. 用本地绝对路径安装**
+
+```bash
+dsh plugin --profile dsh-tui add \
+  "$PROFILE_DIR/vendor/dsh-our-free-model-$VER.tgz"
+```
+
+装完 dependencies 里是 `file:C:/.../vendor/dsh-our-free-model-2.9.0.tgz` 这种
+file: 规格，`dsh.profile.bundles` 末尾自动多一行 `dsh-our-free-model`。
+
+清单模式下这一步由脚本代劳——只要 tgz 已经放进 `vendor/`，直接：
+
+```bash
+node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
+  --manifest "<skill-dir>/plugins.json" --apply
+```
+
+脚本对 `file:` 规格原样转发、绝不加入 `minimumReleaseAgeExclude`（本地依赖不经过
+registry 门槛），`${HOME}` 替换成主目录。**tgz 不在位时脚本会装失败**，所以先做
+第 1 步。
+
+### 升级
+
+版本号写死在清单的 `spec` 里（`...-2.9.0.tgz`），升级是显式动作：
+
+1. 按上面第 1 步下载新版本 tgz 到 `vendor/`，校验；
+2. 把 `plugins.json` 里 `dsh-our-free-model` 那条 `spec` 的版本号改成新版本
+   （只有这一处；`SKILL.md` 里的示例值顺手一起改）；
+3. 重跑清单安装（或直接 `dsh plugin add` 新 tgz 的绝对路径）。
+
+旧的 tgz 可以删掉，不会自动清理。
+
+### 注意
+
+- **不要往 profile 的 `cordis.patch.yml` 加条目**。插件自带的
+  `cordis.patch.yml` 已经 insert 了 `id: our-free-model`，再加一条会报
+  `duplicate loader entry id: our-free-model`。装完就是一条 loader 条目。
+- 装完要重启 `dsh` / `dsh-tui`，首次启动时插件会去注册模型、刷新可用性缓存。
+- 手工复制发布文件时必须整包复制（含 `adapter/`、`src/`、`locale/`、
+  `vendor/` 下的引擎资源与 `vendor/channel-pack/` 的 `pack.js`、WASM），只拷入口
+  脚本会导致渠道加载失败——用官方 tgz 就没这个问题。
+- 之前的 `@ebony-vinyl/dsh-our-free-model`（2.8.3，`link:` 装法）已废弃；
+  如果 profile 里还留着，先 `dsh plugin --profile dsh-tui remove @ebony-vinyl/dsh-our-free-model`。
 
 ## 约束（动手前先读）
 
@@ -195,6 +280,8 @@ node "<skill-dir>/scripts/install-dsh-plugins.mjs" --apply \
    `windows`/`darwin`/`linux` 判定），`spec` 里的 `${HOME}` 替换成用户主目录，
    `link:`/`file:` 规格里的反斜杠转成正斜杠（pnpm 的路径解析不认反斜杠）。
 3. 其余步骤与 profile 模式相同。
+4. `file:` 条目在安装前先检查 tgz 在不在本地：不在就打印缺失的绝对路径并以
+   退出码 1 中止（比 pnpm 埋在日志里的报错好读）。相对路径按目标 profile 解析。
 
 profile 模式（默认）：
 
@@ -234,3 +321,7 @@ profile 对齐；`dsh-tui safe` 列出第三方插件。
   `--profile <target>` 重跑，或用 `dsh plugin` 逐个安装其余插件。
 - 更新后 `link:` 插件丢失：链接路径移动了。用
   `dsh plugin --profile <target> add <name>@link:<path>` 手动恢复。
+- 脚本报 `missing local package for dsh-our-free-model`：`vendor/` 里没有清单
+  指定的那个版本的 tgz。先按「离线安装 dsh-our-free-model」第 1 步下载校验，
+  别改成 `latest`——那会装到 npm 上停在 2.1.0 的旧包。
+

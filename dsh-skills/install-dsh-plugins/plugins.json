@@ -27,6 +27,11 @@
     {
       "name": "billion-context",
       "spec": "latest"
+    },
+    {
+      "name": "dsh-our-free-model",
+      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/vendor/dsh-our-free-model-2.9.0.tgz",
+      "note": "离线安装：先从 GitHub Release 下载同版本 tgz 放进 profile 的 vendor/，再 dsh plugin add 该绝对路径；绝不装 npm 上的同名旧包。见 SKILL.md「离线安装 dsh-our-free-model」"
     }
   ]
 }
