@@ -24,11 +24,11 @@ const USAGE = `用法：install-dsh-plugins.mjs [选项]
   dsh plugin --profile <target> add <pkg>@latest ... --config.minimumReleaseAge=0
 
 选项：
-  --source <name>       读取插件列表的源 profile（默认：$DSH_PROFILE）
+  --source <name>       读取插件列表的源 profile（默认：当前 profile）
   --manifest <file>     读取插件列表的清单文件（JSON），而不是 profile；
-                        不带 --profile 时用清单里的 profile 字段作为目标
+                        不指定 --profile 时安装到当前 profile
   --profile <name>      目标 profile，可重复或用逗号分隔
-                        （默认：当前 profile，或清单里的 profile）
+                        （默认：当前 profile）
   --apply               写入 pnpm-workspace.yaml 并运行 dsh plugin
   --no-age-exclude      不修改 minimumReleaseAgeExclude
   -h, --help            显示此帮助
@@ -36,10 +36,13 @@ const USAGE = `用法：install-dsh-plugins.mjs [选项]
 不加 --apply 时不会改动任何内容，只打印计划。
 
 清单格式（见本 skill 目录下的 plugins.json）：
-  { "profile": "dsh-tui",
-    "plugins": [ { "name": "<包名>", "spec": "latest | link:<路径> | file:<tgz 路径>",
+  { "plugins": [ { "name": "<包名>", "spec": "latest | link:<路径> | file:<tgz 路径>",
                    "os": ["windows", "darwin", "linux"], "note": "…" } ] }
-清单里带 "os" 的条目只在列出的平台上安装；spec 里的 \${HOME} 会被替换成用户主目录。
+清单里带 "os" 的条目只在列出的平台上安装。spec 支持按目标 profile 展开占位符：
+  \${HOME}        用户主目录
+  \${DSH_HOME}    DSH 主目录（默认 ~/.dsh）
+  \${PROFILE}     目标 profile 名
+  \${PROFILE_DIR} 目标 profile 目录（<DSH_HOME>/profiles/<profile>）
 
 file: 规格装的是本地 tarball（例如 dsh-our-free-model 只能从 GitHub Release
 下载 tgz 再离线安装），脚本原样转发，不会去 registry 找同名包，也不会写入
@@ -93,12 +96,45 @@ function readJson(path) {
   }
 }
 
+function readProcFile(path) {
+  try {
+    return readFileSync(path, 'utf8');
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * DSH does not export DSH_PROFILE into plugin/tool shells, so when a script is
+ * run from inside a `dsh --profile <name>` session, recover the profile name
+ * from the ancestor process command line. This keeps the skill's default
+ * target aligned with the session the user is actually running.
+ */
+function profileFromProcessTree() {
+  if (process.platform !== 'linux') return undefined;
+  let pid = process.ppid;
+  const seen = new Set();
+  while (pid !== undefined && pid > 1 && !seen.has(pid)) {
+    seen.add(pid);
+    const argv = readProcFile(`/proc/${pid}/cmdline`)?.split('\0').filter(Boolean);
+    if (argv) {
+      for (let i = 0; i < argv.length - 1; i += 1) {
+        if (argv[i] === '--profile' && !argv[i + 1].startsWith('-')) return argv[i + 1];
+      }
+    }
+    const status = readProcFile(`/proc/${pid}/status`);
+    const parent = /^PPid:\s+(\d+)/m.exec(status ?? '');
+    pid = parent ? Number(parent[1]) : undefined;
+  }
+  return undefined;
+}
+
 function profileName() {
   if (process.env.DSH_PROFILE?.trim()) return process.env.DSH_PROFILE.trim();
   if (process.env.DSH_PROFILE_DIR?.trim()) {
     return process.env.DSH_PROFILE_DIR.replace(/[\\/]+$/, '').split(/[\\/]/).pop();
   }
-  return undefined;
+  return profileFromProcessTree();
 }
 
 function profileDir(home, name) {
@@ -174,13 +210,12 @@ function manifestEntries(manifest) {
       continue;
     }
 
-    const raw = entry.spec ?? 'latest';
-    const spec = raw.replace(/\$\{HOME\}/g, homedir());
+    const spec = entry.spec ?? 'latest';
     if (spec.startsWith('workspace:')) {
       skipped.push({ name, spec, reason: 'workspace protocol' });
       continue;
     }
-    plugins.push({ name, spec: normalizeLocalPath(spec), local: isLocalSpec(spec), note: entry.note });
+    plugins.push({ name, spec, local: isLocalSpec(spec), note: entry.note });
   }
   return { plugins, skipped };
 }
@@ -197,6 +232,15 @@ function normalizeLocalPath(spec) {
   return scheme + rest;
 }
 
+/** Expand a manifest spec for one concrete target profile. */
+function applySpecContext(spec, { home, profile, dir }) {
+  return spec
+    .replace(/\$\{HOME\}/g, homedir())
+    .replace(/\$\{DSH_HOME\}/g, home)
+    .replace(/\$\{PROFILE_DIR\}/g, dir)
+    .replace(/\$\{PROFILE\}/g, profile);
+}
+
 /**
  * A `file:` spec points at a local tarball. pnpm's own error for a missing one
  * is buried in the install log, so check up front: an offline plugin such as
@@ -207,7 +251,7 @@ function normalizeLocalPath(spec) {
  * resolves them from the profile's package.json.
  */
 function missingLocalTarget(spec, profileDirPath) {
-  const match = /^file:(.+)$/i.exec(spec.trim());
+  const match = /^(?:file|link):(.+)$/i.exec(spec.trim());
   if (!match) return undefined;
   const raw = match[1].trim();
   const path = /^([A-Za-z]:[\\/]|[\\/])/.test(raw) ? raw : resolve(profileDirPath, raw);
@@ -386,11 +430,10 @@ function main() {
       fail(`cannot read manifest ${manifestPath}`);
     }
     const { plugins, skipped } = manifestEntries(manifest);
-    const defaultTarget = manifest.profile ?? current;
-    if (defaultTarget === undefined) {
-      fail('the manifest has no "profile" field: pass --profile <name>');
+    if (current === undefined && options.profiles.length === 0) {
+      fail('cannot determine the current profile: set DSH_PROFILE or DSH_PROFILE_DIR, or pass --profile <name>');
     }
-    const targets = [...new Set(options.profiles.length > 0 ? options.profiles : [defaultTarget])];
+    const targets = [...new Set(options.profiles.length > 0 ? options.profiles : [current])];
 
     process.stdout.write(`manifest: ${manifestPath}\n`);
     process.stdout.write('plugins:\n');
@@ -459,12 +502,15 @@ function main() {
  * profile: age-exclude entries first, then one `dsh plugin add` run.
  */
 function installPlugins(home, plugins, targets, options) {
-  const registryNames = plugins.filter(plugin => !plugin.local).map(plugin => plugin.name);
-  const specs = plugins.map(plugin => `${plugin.name}@${plugin.local ? plugin.spec : 'latest'}`);
-
   let failed = false;
   for (const target of targets) {
     const dir = profileDir(home, target);
+    const resolvedPlugins = plugins.map(plugin => {
+      const spec = normalizeLocalPath(applySpecContext(plugin.spec, { home, profile: target, dir }));
+      return { ...plugin, spec, local: isLocalSpec(spec) };
+    });
+    const registryNames = resolvedPlugins.filter(plugin => !plugin.local).map(plugin => plugin.name);
+    const specs = resolvedPlugins.map(plugin => `${plugin.name}@${plugin.local ? plugin.spec : 'latest'}`);
     process.stdout.write(`\n== target '${target}' (${dir})\n`);
 
     if (!existsSync(join(dir, 'package.json'))) {
@@ -482,13 +528,13 @@ function installPlugins(home, plugins, targets, options) {
       }
     } else {
       process.stdout.write(`  installed now:\n`);
-      for (const plugin of plugins) {
+      for (const plugin of resolvedPlugins) {
         const version = installedVersion(dir, plugin.name);
         process.stdout.write(`    - ${plugin.name}: ${version ?? 'not installed'}\n`);
       }
     }
 
-    const missing = plugins
+    const missing = resolvedPlugins
       .map(plugin => ({ plugin, path: missingLocalTarget(plugin.spec, dir) }))
       .filter(item => item.path !== undefined);
     if (missing.length > 0) {

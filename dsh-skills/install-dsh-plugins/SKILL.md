@@ -1,35 +1,37 @@
 ---
 name: install-dsh-plugins
-description: 用于为 dsh / dsh-tui 安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。也覆盖只能从 GitHub Release 下载 tgz 离线安装的插件（如 dsh-our-free-model）。
+description: 用于为当前 DSH profile（<profile>）安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。也覆盖只能从 GitHub Release 下载 tgz 离线安装的插件（如 dsh-our-free-model）。
 metadata:
-  version: "1.5"
+  version: "1.6"
 ---
 
 # 安装或更新 DSH 插件
 
 `dsh` 和 `dsh-tui` 不各自维护插件库：两者运行同一个 DSH profile，`dsh-tui`
-只是该 profile 里的 TUI bundle。profile 的 pnpm 配置位于
-`<profile>/pnpm-workspace.yaml`，本机是
-`~/.dsh/profiles/dsh-tui/pnpm-workspace.yaml`。装在这个 profile 里的插件对两个
-入口都可见。
+只是该 profile 里的 TUI bundle。本 skill 默认面向**当前 profile**（`<profile>`），
+profile 的 pnpm 配置位于
+`<DSH_HOME>/profiles/<profile>/pnpm-workspace.yaml`，本机通常是
+`~/.dsh/profiles/<profile>/pnpm-workspace.yaml`。装在这个 profile 里的插件对
+`dsh`、`dsh-tui` 或该 profile 的其它入口都可见。
 
 辅助脚本读取源 profile 的 `dsh.profile.bundles`（该列表缺失时回退到直接依赖），
 确保每个 registry 插件都被排除在 pnpm 的 `minimumReleaseAge` 门槛之外，然后执行
-`dsh plugin --profile <target> add <pkg>@latest ...`，把这批插件安装或更新到最新的
+`dsh plugin --profile <profile> add <pkg>@latest ...`，把这批插件安装或更新到最新的
 兼容版本。目标 profile 里已有、但源 profile 没有的插件不会被改动。
 
-也可以改用本 skill 目录下的 `plugins.json` 清单：它写死了这台机器期望的插件列表
-（profile = `dsh-tui`），不依赖任何 profile 的当前状态——新机器或被改乱的 profile
-按清单重装即可。
+也可以改用本 skill 目录下的 `plugins.json` 清单：它记录这台机器期望的插件列表，
+不绑定某个固定 profile，本地路径用 `${PROFILE_DIR}` 按目标 profile 展开。
+清单模式同样默认安装到当前 profile，不依赖任何 profile 的当前状态——新机器或
+被改乱的 profile 按清单重装即可。
 
 ## 本地插件目录约定
 
 所有不走 registry 的插件（`link:` 的本地 clone、`file:` 的离线 tgz）一律放在
 **当前 profile 下的 `plugins/`**：`<DSH_HOME>/profiles/<profile>/plugins/`。
-本机 dsh-tui profile 就是 `~/.dsh/profiles/dsh-tui/plugins/`。
+例如当前 profile 是 `web` 时就是 `~/.dsh/profiles/web/plugins/`。
 
 ```
-~/.dsh/profiles/dsh-tui/plugins/
+<DSH_HOME>/profiles/<profile>/plugins/
 ├── dsh-connect-minmax/                    # link: 的源码 clone（含 lib/、node_modules/）
 ├── dsh-our-free-model-2.9.0.tgz           # file: 的离线包
 └── dsh-our-free-model-2.8.5.tgz           # 旧版本，可保留可删
@@ -52,9 +54,8 @@ metadata:
 
 ```json
 {
-  "profile": "dsh-tui",
   "plugins": [
-    { "name": "@dmh2002/dsh-connect-minmax", "spec": "link:${HOME}/.dsh/profiles/dsh-tui/plugins/dsh-connect-minmax" },
+    { "name": "@dmh2002/dsh-connect-minmax", "spec": "link:${PROFILE_DIR}/plugins/dsh-connect-minmax" },
     { "name": "@dmh2002/dsh-connect-qoder", "spec": "latest" },
     { "name": "dsh-connect-trae", "spec": "latest" },
     { "name": "dsh-connect-workbuddy", "spec": "latest" },
@@ -62,15 +63,24 @@ metadata:
     { "name": "billion-context", "spec": "latest" },
     {
       "name": "dsh-our-free-model",
-      "spec": "file:${HOME}/.dsh/profiles/dsh-tui/plugins/dsh-our-free-model-2.9.0.tgz"
+      "spec": "file:${PROFILE_DIR}/plugins/dsh-our-free-model-2.9.0.tgz"
     }
   ]
 }
 ```
 
+`spec` 支持以下按目标 profile 展开的占位符：
+
+| 占位符 | 展开结果 |
+|---|---|
+| `${HOME}` | 用户主目录 |
+| `${DSH_HOME}` | DSH 主目录（默认 `~/.dsh`） |
+| `${PROFILE}` | 目标 profile 名，如 `web` |
+| `${PROFILE_DIR}` | 目标 profile 目录，如 `~/.dsh/profiles/web` |
+
 | 插件 | 说明 |
 |---|---|
-| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`~/.dsh/profiles/dsh-tui/plugins/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:` 规格，`${HOME}` 会被替换成用户主目录。 |
+| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`<DSH_HOME>/profiles/<profile>/plugins/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:${PROFILE_DIR}/plugins/dsh-connect-minmax`。 |
 | `@dmh2002/dsh-connect-qoder` | registry 包，凭据用 PAT，见下面的凭据表。 |
 | `dsh-connect-trae` | registry 包，读 Trae 客户端的 storage.json。 |
 | `dsh-connect-workbuddy` | registry 包，读 WorkBuddy 桌面端认证文件。 |
@@ -85,7 +95,9 @@ node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
   --manifest "<skill-dir>/plugins.json" --apply
 ```
 
-不带 `--profile` 时，目标 profile 取清单里的 `profile` 字段（`dsh-tui`）。
+不带 `--profile` 时，目标就是**当前 profile**。脚本依次从
+`DSH_PROFILE`、`DSH_PROFILE_DIR` 或父进程里的 `dsh --profile <name>` 推断；都推断
+不到时会报错，此时显式传 `--profile <name>`。
 
 ## 离线安装 dsh-our-free-model
 
@@ -108,7 +120,8 @@ curl -sL https://api.github.com/repos/Ebony-Vinyl/dsh-our-free-model/releases/la
 （同目录还有桌面端的 `.exe` / `.dmg`，和插件无关）。下载并校验：
 
 ```bash
-PROFILE_DIR="${DSH_HOME:-$HOME/.dsh}/profiles/dsh-tui"
+PROFILE=web                    # 换成当前 profile（或 DSH_PROFILE 的值）
+PROFILE_DIR="${DSH_HOME:-$HOME/.dsh}/profiles/$PROFILE"
 PLUGINS_DIR="$PROFILE_DIR/plugins"
 VER=2.9.0                     # 换成上面 tag_name 去掉 v 的版本
 BASE=https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/download/v$VER
@@ -127,11 +140,12 @@ curl -fL "$BASE/SHA256SUMS" -o /tmp/ofm-SHA256SUMS
 **2. 用本地绝对路径安装**
 
 ```bash
-dsh plugin --profile dsh-tui add \
+dsh plugin --profile "$PROFILE" add \
   "$PLUGINS_DIR/dsh-our-free-model-$VER.tgz"
 ```
 
-装完 dependencies 里是 `file:/home/<user>/.dsh/profiles/dsh-tui/plugins/dsh-our-free-model-2.9.0.tgz`
+装完 dependencies 里是
+`file:/home/<user>/.dsh/profiles/<profile>/plugins/dsh-our-free-model-2.9.0.tgz`
 这种 file: 规格，`dsh.profile.bundles` 末尾自动多一行 `dsh-our-free-model`。
 
 清单模式下这一步由脚本代劳——只要 tgz 已经放进 profile 的 `plugins/`，直接：
@@ -142,7 +156,7 @@ node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
 ```
 
 脚本对 `file:` 规格原样转发、绝不加入 `minimumReleaseAgeExclude`（本地依赖不经过
-registry 门槛），`${HOME}` 替换成主目录。**tgz 不在位时脚本会装失败**，所以先做
+registry 门槛），`${PROFILE_DIR}` 替换成目标 profile 目录。**tgz 不在位时脚本会装失败**，所以先做
 第 1 步。
 
 ### 升级
@@ -166,7 +180,7 @@ registry 门槛），`${HOME}` 替换成主目录。**tgz 不在位时脚本会�
   包内的 `vendor/` 引擎资源与 `vendor/channel-pack/` 的 `pack.js`、WASM），只拷入口
   脚本会导致渠道加载失败——用官方 tgz 就没这个问题。
 - 之前的 `@ebony-vinyl/dsh-our-free-model`（2.8.3，`link:` 装法）已废弃；
-  如果 profile 里还留着，先 `dsh plugin --profile dsh-tui remove @ebony-vinyl/dsh-our-free-model`。
+  如果 profile 里还留着，先 `dsh plugin --profile <profile> remove @ebony-vinyl/dsh-our-free-model`。
 
 ## 约束（动手前先读）
 
@@ -187,7 +201,7 @@ registry 门槛），`${HOME}` 替换成主目录。**tgz 不在位时脚本会�
 
 ## 四个 connector 插件的凭据前提
 
-典型的 `dsh-tui` profile 里有四个 connector 插件。其中三个读取桌面客户端已在本机
+典型的 DSH profile 里有四个 connector 插件。其中三个读取桌面客户端已在本机
 创建的凭据；Qoder 是例外，使用 PAT。它们都不是自包含的：`dsh plugin add` 成功
 只代表“装上了”，不代表“能用”——先确认凭据路径，更新后再发一次真实请求。
 
@@ -246,13 +260,13 @@ test -r "$WINHOME/AppData/Roaming/Trae CN/User/globalStorage/storage.json" \
 # WorkBuddy：认证文件 + Windows 应用能提供解密密钥。
 WORKBUDDY_AUTH_FILE="$WINHOME/AppData/Local/CodeBuddyExtension/Data/Public/auth/workbuddy-desktop.info" \
 WORKBUDDY_APP_EXECUTABLE="$WINHOME/AppData/Local/Programs/WorkBuddy/WorkBuddy.exe" \
-  dsh plugin --profile dsh-tui exec dsh-connect-workbuddy doctor
+  dsh plugin --profile <profile> exec dsh-connect-workbuddy doctor
 # 预期看到 "Desktop auth file: present"、"Encrypted-credential support: available"，
 # 且 CN 账号数非 0。
 
 # Qoder：PAT 已配置且上游可达。
-dsh plugin --profile dsh-tui exec dsh-connect-qoder doctor
-dsh plugin --profile dsh-tui exec dsh-connect-qoder status
+dsh plugin --profile <profile> exec dsh-connect-qoder doctor
+dsh plugin --profile <profile> exec dsh-connect-qoder status
 ```
 
 Qoder 从未配置过时，`doctor` 会报告 `PAT ... missing` 和
@@ -270,39 +284,45 @@ PAT（或 vault 账号）。Qoder CN 桌面登录文件不能替代。
 skill 目录就是 `skill` 工具报告的目录。运行：
 
 ```bash
-# 只出计划：列出插件、目标 profile、排除块改动和将执行的命令。
+# 只出计划：列出插件、当前 profile、排除块改动和将执行的命令。
 node "<skill-dir>/scripts/install-dsh-plugins.mjs"
 
-# 按清单安装（不依赖任何 profile 的当前状态）。
+# 按清单安装到当前 profile（不绑定固定 profile）。
 node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
-  --manifest "<skill-dir>/plugins.json"
+  --manifest "<skill-dir>/plugins.json" --apply
 
-# 应用到当前 profile（DSH_PROFILE=dsh-tui 时就是 dsh-tui）。
-node "<skill-dir>/scripts/install-dsh-plugins.mjs" --apply
-
-# 同时同步到另一个兼容 profile（例如 web）。
+# 从当前 profile 已装的插件同步到另一个 profile。
 node "<skill-dir>/scripts/install-dsh-plugins.mjs" --apply \
-  --profile dsh-tui --profile web
+  --profile web
+
+# 显式指定目标 profile（无法从当前会话推断时使用）。
+node "<skill-dir>/scripts/install-dsh-plugins.mjs" \
+  --manifest "<skill-dir>/plugins.json" --profile web --apply
 ```
 
 选项：
 
 | 选项 | 含义 |
 |---|---|
-| `--source <name>` | 读取插件列表的源 profile。默认：当前 `$DSH_PROFILE`。 |
-| `--manifest <file>` | 读取插件列表的清单文件（JSON），而不是 profile；不带 `--profile` 时用清单里的 `profile` 字段作为目标。 |
-| `--profile <name>` | 目标 profile；可重复或逗号分隔。默认：当前 profile，或清单里的 profile。 |
+| `--source <name>` | 读取插件列表的源 profile。默认：当前 profile。 |
+| `--manifest <file>` | 读取插件列表的清单文件（JSON），而不是 profile；不带 `--profile` 时安装到当前 profile。 |
+| `--profile <name>` | 目标 profile；可重复或逗号分隔。默认：当前 profile。 |
 | `--apply` | 执行修改并运行 `dsh plugin add`。不加时只打印计划。 |
 | `--no-age-exclude` | 不改 `minimumReleaseAgeExclude`；本次安装仍传 `--config.minimumReleaseAge=0`。 |
 | `--help` | 用法。 |
+
+当前 profile 的推断顺序：`DSH_PROFILE` → `DSH_PROFILE_DIR` 的目录名 →
+父进程链中的 `dsh --profile <name>`。最后一种用于 DSH 未把 profile 名注入插件
+shell 的情况；推断不到时必须用 `--profile` 显式指定。
 
 ## 脚本做了什么
 
 清单模式（`--manifest`）：
 
-1. 读清单 JSON，取 `profile` 字段作为默认目标 profile。
+1. 读清单 JSON，目标 profile 默认取当前 profile（显式 `--profile` 优先）。
 2. 逐条处理 `plugins`：带 `os` 的条目只在列出的平台上安装（当前平台按
-   `windows`/`darwin`/`linux` 判定），`spec` 里的 `${HOME}` 替换成用户主目录，
+   `windows`/`darwin`/`linux` 判定）；按目标 profile 展开 `spec` 里的
+   `${HOME}`、`${DSH_HOME}`、`${PROFILE}`、`${PROFILE_DIR}`，
    `link:`/`file:` 规格里的反斜杠转成正斜杠（pnpm 的路径解析不认反斜杠）。
 3. 其余步骤与 profile 模式相同。
 4. `file:` 条目在安装前先检查 tgz 在不在本地：不在就打印缺失的绝对路径并以
@@ -329,12 +349,13 @@ profile 模式（默认）：
 ## 验证
 
 ```bash
-dsh plugin --profile dsh-tui ls
-sed -n '/^minimumReleaseAgeExclude:/,/^[^ #-]/p' ~/.dsh/profiles/dsh-tui/pnpm-workspace.yaml
+dsh plugin --profile <profile> ls
+sed -n '/^minimumReleaseAgeExclude:/,/^[^ #-]/p' \
+  "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/pnpm-workspace.yaml"
 ```
 
-然后重启 `dsh --profile dsh-tui` 或 `dsh-tui`。`dsh-tui doctor` 报告启动器/
-profile 对齐；`dsh-tui safe` 列出第三方插件。
+然后重启当前入口，例如 `dsh --profile <profile>` 或 `dsh-tui`。`dsh-tui doctor`
+报告启动器/profile 对齐；`dsh-tui safe` 列出第三方插件。
 
 ## 排障
 
