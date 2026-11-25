@@ -3,7 +3,7 @@
     {
       "name": "@dmh2002/dsh-connect-minmax",
       "spec": "link:${PROFILE_DIR}/plugins/dsh-connect-minmax",
-      "note": "不在 npm registry 上，必须用本地 link；clone 放在 profile 的 plugins/ 下（见 SKILL.md「本地插件目录约定」）"
+      "note": "不在 npm registry 上，必须用本地 link；先 git clone 到 profile 的 plugins/dsh-connect-minmax 并 pnpm install && pnpm build（无 prepare 脚本，必须手动构建），再装这个 link:。见 SKILL.md「从 git clone 安装 @dmh2002/dsh-connect-minmax」"
     },
     {
       "name": "@dmh2002/dsh-connect-qoder",

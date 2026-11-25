@@ -1,8 +1,8 @@
 ---
 name: install-dsh-plugins
-description: 用于为当前 DSH profile（<profile>）安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。也覆盖只能从 GitHub Release 下载 tgz 离线安装的插件（如 dsh-our-free-model）。
+description: 用于为当前 DSH profile（<profile>）安装、重装或更新插件（默认取当前 profile 已装的插件，也可用本 skill 的 plugins.json 清单指定要装哪些），并刷新它们的 pnpm minimumReleaseAgeExclude 条目；默认把这些插件从 pnpm minimumReleaseAge 中排除。也覆盖不走 registry 的两种装法：只能从 GitHub Release 下载 tgz 离线安装的插件（如 dsh-our-free-model），以及必须 git clone 到 profile 的 plugins/ 下先构建再用绝对路径 link: 安装的插件（如 dsh-connect-minmax），含 WSL 下让插件读到 Windows 桌面客户端凭据的处理。
 metadata:
-  version: "1.6"
+  version: "1.7"
 ---
 
 # 安装或更新 DSH 插件
@@ -80,7 +80,7 @@ profile 的 pnpm 配置位于
 
 | 插件 | 说明 |
 |---|---|
-| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`<DSH_HOME>/profiles/<profile>/plugins/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:${PROFILE_DIR}/plugins/dsh-connect-minmax`。 |
+| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`<DSH_HOME>/profiles/<profile>/plugins/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:${PROFILE_DIR}/plugins/dsh-connect-minmax`。完整流程见下面的「从 git clone 安装 @dmh2002/dsh-connect-minmax」。 |
 | `@dmh2002/dsh-connect-qoder` | registry 包，凭据用 PAT，见下面的凭据表。 |
 | `dsh-connect-trae` | registry 包，读 Trae 客户端的 storage.json。 |
 | `dsh-connect-workbuddy` | registry 包，读 WorkBuddy 桌面端认证文件。 |
@@ -181,6 +181,174 @@ registry 门槛），`${PROFILE_DIR}` 替换成目标 profile 目录。**tgz 不
   脚本会导致渠道加载失败——用官方 tgz 就没这个问题。
 - 之前的 `@ebony-vinyl/dsh-our-free-model`（2.8.3，`link:` 装法）已废弃；
   如果 profile 里还留着，先 `dsh plugin --profile <profile> remove @ebony-vinyl/dsh-our-free-model`。
+
+## 从 git clone 安装 @dmh2002/dsh-connect-minmax
+
+`@dmh2002/dsh-connect-minmax` **不在 npm registry 上**（`npm view` 返回 E404），
+安装方式就是它 README 的「安装」一节：把本仓库根目录作为「安装本地目录」传给
+插件管理器，等价于 `plugin_manager` 的 `install_bundle`（`target` 传目录绝对路径），
+在 CLI 里就是 `dsh plugin add "<abs path>"` 的 `link:` 形式。安装是**链接式**的：
+改完代码只要重新 `pnpm build`，不用重装；但新增/替换的 JS 模块要重启宿主才生效。
+
+### 1. clone 到 profile 的 plugins 目录
+
+```bash
+PROFILE=web
+PROFILE_DIR="${DSH_HOME:-$HOME/.dsh}/profiles/$PROFILE"
+PLUGINS_DIR="$PROFILE_DIR/plugins"
+
+mkdir -p "$PLUGINS_DIR"
+git clone https://github.com/dingminhua/dsh-connect-minmax \
+  "$PLUGINS_DIR/dsh-connect-minmax"
+cd "$PLUGINS_DIR/dsh-connect-minmax"
+```
+
+### 2. 构建（必须，`link:` 不会自动编译）
+
+仓库**没有 `prepare` 脚本**（只有 `prepack: npm run build` 和 `build: tsdown`），
+而 `link:` 安装不会触发 `prepack`，所以**必须手动构建**。`tsdown` / `typescript`
+都在 `devDependencies` 里，装依赖时不能漏 dev：
+
+```bash
+pnpm install          # 或 npm install --include=dev
+pnpm build            # → lib/index.js、lib/index.d.ts、lib/client.js
+```
+
+`lib/` 不存在或比 `src/` 旧时，`link:` 装上去会在宿主里报模块缺失/语法错误。
+构建产物约 160 KB × 2（`lib/index.js` 162 KB + `lib/client.js` 161 KB）。
+只想跳过测试快速确认能构建时，`pnpm run build` 就够；`pnpm run check` 会连
+`typecheck`、`vitest` 一起跑。
+
+### 3. 用绝对路径 link 安装
+
+```bash
+dsh plugin --profile "$PROFILE" add \
+  "@dmh2002/dsh-connect-minmax@link:$PLUGINS_DIR/dsh-connect-minmax"
+```
+
+等价写法（显式 `link:`）：`"@dmh2002/dsh-connect-minmax@link:/abs/path"`。
+装完 `package.json` 的 dependencies 是
+`"@dmh2002/dsh-connect-minmax": "link:/abs/path/plugins/dsh-connect-minmax"`，
+`dsh.profile.bundles` 末尾自动多一行 `@dmh2002/dsh-connect-minmax`。
+
+`link:` 规格**不要**写进 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude`——
+本地依赖不经过 registry 门槛。
+
+### 4. WSL 下找到 Windows 客户端的凭据（关键一步）
+
+MiniMax Code（mcode）是 Windows 客户端，登录态在 **Windows 用户目录**：
+`<WinHome>/.minimax/auth/prod/<cn|en>/mcode-public/{auth-state.json,auth.json}`。
+WSL 里的插件默认按 `$HOME/.minimax` 找；如果没做软链接，就会显示「未登录」。
+
+插件的解析顺序（`src/auth.ts` 的 `resolveDataDir`）：
+
+```
+显式 options.dataDir  >  env DSH_MINIMAX_DATA_DIR  >  join($HOME 或 $USERPROFILE, '.minimax')
+```
+
+所以最稳的做法是**显式钉住环境变量**，不依赖软链接：
+
+```bash
+# 追加到服务/入口的 env 文件，例如 ~/.dsh/service.d/web.env
+DSH_MINIMAX_DATA_DIR=/mnt/c/Users/<WinUser>/.minimax
+```
+
+区域是由 `auth-state.json` 里的 `region` 决定的（`resolveLayout(dataDir,'auto')`
+先试 `cn` 再试 `global`）。**只有 Windows 侧存在 `auth/prod/cn/` 时，就只有国内版
+可用**；`auth/prod/en/` 不存在时国际版路由永远未登录，这是正常的，不是装错。
+
+WSL 里 `~/.minimax` 若是 `→ /mnt/c/Users/<WinUser>/.minimax` 的软链接，默认值也能
+命中；但 env 显式指定可以避免「服务由 systemd 启动、`$HOME` 与交互 shell 不一致」
+这类问题，也更方便以后换机器。
+
+自续期（`selfRenewal` 默认 true）要往 auth.json 写回，所以那个目录必须可写——
+drvfs 下真实可写，动手前确认：
+
+```bash
+test -w /mnt/c/Users/<WinUser>/.minimax/auth/prod/cn/mcode-public && echo writable
+```
+
+Windows 侧的 broker 是命名管道 `\\.\pipe\mcode-auth-lease-<sha256(canonicalDataDir).slice(0,16)>`
+（`src/lease.ts` 的 `windowsPipeName`），WSL 里按 Linux 逻辑去找的是 Unix socket
+`<dataDir>/run/mcode-auth-lease-v1.sock` 和能力文件 `<dataDir>/run/mcode-auth-lease-v1.cap`
+——两个都不存在，所以 `verify-upstream.mjs` 会打印
+`❌ auth lease broker — ENOENT ... mcode-auth-lease-v1.cap；回退到本地文件：可用`，
+紧接着 `✅ 可用 access token — 来源=本地文件`。**这是设计好的降级路径，不是故障**；
+WSL 下能用的就是文件凭据 + 自续期。
+
+### 5. 重启宿主（在 agent 内部要用分离的 restart）
+
+systemd 服务就是当前 agent 的父进程，直接 `systemctl --user restart` 会把工具调用
+打断（`Error: tool call aborted`）。用 `systemd-run` 把重启甩到独立 unit：
+
+```bash
+# <unit> 换成实际 unit（如 dsh-web.service）；<port> 换成 webserver 端口（如 3081）。
+systemd-run --user --collect --unit=dsh-restart-$(date +%s) /bin/bash -c '
+  sleep 2
+  systemctl --user restart <unit>
+  sleep 14
+  curl -s http://127.0.0.1:<port>/plugins/dsh-connect-minmax/status > /tmp/minmax-status.json
+'
+```
+
+不是 systemd 起的（前台 `dsh --profile web`）就正常重启那个进程；关键是**不要从
+agent 自己的进程树里杀**，否则同样是 `tool call aborted`。
+
+### 6. 验证
+
+插件路由不带鉴权，loopback 上直接 curl 即可（前缀就是 loader 条目 id）：
+
+```bash
+# 登录态 + 区域 + 可用模型
+curl -s http://127.0.0.1:3081/plugins/dsh-connect-minmax/status
+# 期望：route=minimax、regionLabel=国内版、login.state=ready、source=file、
+#       models 里出现 MiniMax-M3.1-Flash / MiniMax-M3 / MiniMax-M2.7(-highspeed)、
+#       renewal.state=enabled
+
+# 真实上游请求（注意字段是 route，不是 region）
+curl -s -X POST http://127.0.0.1:3081/plugins/dsh-connect-minmax/model/test \
+  -H 'content-type: application/json' \
+  -d '{"route":"minimax","model":"MiniMax-M3.1-Flash"}'
+# 期望：{"ok":true,"latencyMs":...,"sample":"..."}
+```
+
+`POST /model/test` 传 `{"model":...,"region":"cn"}` 会返回 400
+`{"error":"route and model are required"}`——字段名是 `route`。
+
+确认环境变量真的进了服务进程：
+
+```bash
+tr '\0' '\n' < /proc/$(systemctl --user show -p MainPID --value dsh-web.service)/environ \
+  | grep DSH_MINIMAX_DATA_DIR
+```
+
+插件自带的诊断脚本（在 clone 里跑，比 curl 更细）：
+
+```bash
+DSH_MINIMAX_DATA_DIR=/mnt/c/Users/<WinUser>/.minimax node scripts/verify-upstream.mjs
+```
+
+### 7. 两个已知坑
+
+- **`route "minimax" 已被其它 provider 注册`**：`dsh-our-free-model` 的
+  `vendor/channel-pack/pack.js` 也注册了 `minimax` 产品（`registerAdapterIdempotent`
+  会静默跳过并打印 `[llm-register] adapter for "minimax" 已注册…`）。两个插件都想
+  占 `minimax` 这条路由时只有先注册的赢，后注册的会被 `registerRoute` 跳过
+  （日志：`路由 "X" 已被其它 provider 注册…跳过`）。真要用 minmax 卡片，就先确认
+  模型选择器里那条 `MiniMax（本机登录）` 是哪个插件提供的。
+- **`scripts/e2e-plugin.mjs` 报 `TypeError: ctx.effect is not a function`**：那是仓库里
+  过时的 stub 脚本，`apply()` 签名换了它没跟上，**不是插件缺陷**。用
+  `verify-upstream.mjs` / `e2e-actions.mjs` 验证，或者直接看宿主里的卡片。
+
+### 8. 更新
+
+```bash
+cd "$PROFILE_DIR/plugins/dsh-connect-minmax"
+git pull && pnpm install && pnpm build
+# 然后按第 5 步重启宿主（新 JS 模块必须重启才加载）
+```
+
+不需要重新 `dsh plugin add`：`link:` 指向同一目录，构建产物就地更新。
 
 ## 约束（动手前先读）
 
@@ -367,6 +535,16 @@ sed -n '/^minimumReleaseAgeExclude:/,/^[^ #-]/p' \
   `--profile <target>` 重跑，或用 `dsh plugin` 逐个安装其余插件。
 - 更新后 `link:` 插件丢失：链接路径移动了。用
   `dsh plugin --profile <target> add <name>@link:<path>` 手动恢复。
+- `link:` 插件装上了但宿主里报模块缺失 / 卡片不出：clone 没构建，或在构建前就
+  `dsh plugin add` 了。进 clone 跑 `pnpm install && pnpm build`，确认 `lib/index.js`
+  存在，再重启宿主。
+- 插件装了但「未登录」、且只有国际版路由：数据目录解析错了。按
+  「从 git clone 安装 @dmh2002/dsh-connect-minmax」第 4 步钉住
+  `DSH_MINIMAX_DATA_DIR`（或对应的 `<PLUGIN>_DATA_DIR`），重启后用
+  `/proc/<MainPID>/environ` 确认变量真的在服务进程里。
+- 在 agent 自己启动的会话里重启服务会把工具调用打断（`Error: tool call aborted`）：
+  改用 `systemd-run --user --collect` 把 `systemctl --user restart` 甩到独立 unit，
+  见同一节第 5 步。
 - 脚本报 `missing local package for dsh-our-free-model`：profile 的 `plugins/` 里没有
   清单指定的那个版本的 tgz。先按「离线安装 dsh-our-free-model」第 1 步下载校验，
   别改成 `latest`——那会装到 npm 上停在 2.1.0 的旧包。
