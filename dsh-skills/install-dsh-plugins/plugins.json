@@ -33,6 +33,26 @@
       "name": "dsh-our-free-model",
       "spec": "file:${PROFILE_DIR}/plugins/dsh-our-free-model-2.9.0.tgz",
       "note": "离线安装：先从 GitHub Release 下载同版本 tgz 放进 profile 的 plugins/，再 dsh plugin add 该绝对路径；绝不装 npm 上的同名旧包。见 SKILL.md「离线安装 dsh-our-free-model」"
+    },
+    {
+      "name": "dsh-free-search",
+      "spec": "link:${PROFILE_DIR}/plugins/dsh-free-search",
+      "note": "按上游 README：git clone 到 profile 的 plugins/dsh-free-search 后装其绝对路径（= link:）。仓库自带已构建的 lib/，不需要 build、也没有 build 脚本。装完会自动接管 web.searchProvider。见 SKILL.md「dsh-free-search」"
+    },
+    {
+      "name": "dsh-better-sidebar",
+      "spec": "latest",
+      "note": "registry 包，但插件版本必须与宿主线匹配（0.2.2-rc.3+ 用 0.33.x；0.2.2-rc.2 固定 0.32.1；0.2.1 线固定 0.28.2）。装完要硬刷新浏览器。见 SKILL.md「dsh-better-sidebar」"
+    },
+    {
+      "name": "dsh-session-manager",
+      "spec": "latest",
+      "note": "registry 包；也可用 github:hkkz9522/dsh-session-manager 从 GitHub 装。engines.node 要求 ^22.15.0 || >=24.0.0。见 SKILL.md「dsh-session-manager」"
+    },
+    {
+      "name": "dsh-purge-community",
+      "spec": "https://github.com/kingcharleslzy-ai/dsh-purge/releases/download/v1.7.20/dsh-purge-community-1.7.20.tgz",
+      "note": "不在 npm registry 上（npm view 返回 E404），只能装 GitHub Release 的固定版本 tgz 绝对 URL；绝不写成 add dsh-purge 或 add dsh-purge-community。见 SKILL.md「dsh-purge-community」"
     }
   ]
 }
