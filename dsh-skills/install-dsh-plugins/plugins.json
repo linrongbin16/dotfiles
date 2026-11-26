@@ -3,36 +3,37 @@
     {
       "name": "@dmh2002/dsh-connect-minmax",
       "spec": "link:${PROFILE_DIR}/plugins/dsh-connect-minmax",
-      "note": "不在 npm registry 上，必须用本地 link；先 git clone 到 profile 的 plugins/dsh-connect-minmax 并 pnpm install && pnpm build（无 prepare 脚本，必须手动构建），再装这个 link:。见 SKILL.md「从 git clone 安装 @dmh2002/dsh-connect-minmax」"
+      "note": "不在 npm 上：clone 到 profile 的 plugins/ 并构建后再装此 link:"
     },
-    {
-      "name": "@dmh2002/dsh-connect-qoder",
-      "spec": "latest"
-    },
-    {
-      "name": "dsh-connect-trae",
-      "spec": "latest"
-    },
-    {
-      "name": "dsh-connect-workbuddy",
-      "spec": "latest"
-    },
-    {
-      "name": "dsh-bash-native",
-      "spec": "latest",
-      "os": [
-        "windows"
-      ],
-      "note": "只装在 Windows 上"
-    },
-    {
-      "name": "billion-context",
-      "spec": "latest"
-    },
+    { "name": "@dmh2002/dsh-connect-qoder", "spec": "latest" },
+    { "name": "dsh-connect-trae", "spec": "latest" },
+    { "name": "dsh-connect-workbuddy", "spec": "latest" },
+    { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
+    { "name": "billion-context", "spec": "latest" },
     {
       "name": "dsh-our-free-model",
       "spec": "file:${PROFILE_DIR}/plugins/dsh-our-free-model-2.9.0.tgz",
-      "note": "离线安装：先从 GitHub Release 下载同版本 tgz 放进 profile 的 plugins/，再 dsh plugin add 该绝对路径；绝不装 npm 上的同名旧包。见 SKILL.md「离线安装 dsh-our-free-model」"
+      "note": "npm 上的同名包停更：从 Release 下 tgz 放进 profile 的 plugins/，再装绝对路径。升级时改这里的版本号"
+    },
+    {
+      "name": "dsh-free-search",
+      "spec": "link:${PROFILE_DIR}/plugins/dsh-free-search",
+      "note": "registry 上的同名包落后于仓库：clone 后装 link:，仓库自带 lib/ 不需要构建"
+    },
+    {
+      "name": "dsh-better-sidebar",
+      "spec": "latest",
+      "note": "版本必须跟宿主线走：装错会被宿主拒绝，需精确版本时手装（脚本会按 latest 装）"
+    },
+    {
+      "name": "dsh-session-manager",
+      "spec": "latest",
+      "note": "engines.node 门槛较高，装在过旧的 node 上会被拒"
+    },
+    {
+      "name": "dsh-purge-community",
+      "spec": "https://github.com/kingcharleslzy-ai/dsh-purge/releases/download/v1.7.20/dsh-purge-community-1.7.20.tgz",
+      "note": "不在 npm 上：只能装 Release 的固定版本 tgz 直链。升级时换 tag 与文件名"
     }
   ]
 }
