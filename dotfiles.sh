@@ -95,7 +95,8 @@ fi
 
 # zoxide
 if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init --cmd cd "$DOTFILES_SHELL")"
+  # eval "$(zoxide init --cmd cd "$DOTFILES_SHELL")"
+  eval "$(zoxide init "$DOTFILES_SHELL")"
 fi
 
 # git-prompt.zsh {{{
