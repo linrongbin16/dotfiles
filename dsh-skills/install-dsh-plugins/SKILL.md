@@ -42,8 +42,7 @@ metadata:
 多 profile 场景：每个 profile 各自维护自己的 `plugins/`。tgz 需要在多个 profile
 使用时各放一份；不要用跨 profile 的相对路径去共享，那会让 profile 无法独立搬运。
 
-`link:` 目标必须是已构建好的 clone（`npm install --include=dev && npm run build`，
-产物在 `lib/`），`link:` 到源码目录不会自动编译。
+`link:` 目标必须是已构建好的 clone，`link:` 到源码目录不会自动编译。
 
 ## 插件清单（plugins.json）
 
@@ -90,7 +89,7 @@ metadata:
 
 | 插件                          | 说明                                                                                                                                                                                                                                                                                            |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`<DSH_HOME>/profiles/<profile>/plugins/dsh-connect-minmax`，需先 `npm install --include=dev && npm run build`），因此清单里写 `link:${PROFILE_DIR}/plugins/dsh-connect-minmax`。完整流程见下面的「从 git clone 安装 @dmh2002/dsh-connect-minmax」。 |
+| `@dmh2002/dsh-connect-minmax` | **不在 npm registry 上**，只能装本机 clone（`<DSH_HOME>/profiles/<profile>/plugins/dsh-connect-minmax`，需先 `pnpm install && pnpm build`），因此清单里写 `link:${PROFILE_DIR}/plugins/dsh-connect-minmax`。完整流程见下面的「从 git clone 安装 @dmh2002/dsh-connect-minmax」。 |
 | `@dmh2002/dsh-connect-qoder`  | registry 包，凭据用 PAT，见下面的凭据表。                                                                                                                                                                                                                                                       |
 | `dsh-connect-trae`            | registry 包，读 Trae 客户端的 storage.json。                                                                                                                                                                                                                                                    |
 | `dsh-connect-workbuddy`       | registry 包，读 WorkBuddy 桌面端认证文件。                                                                                                                                                                                                                                                      |
@@ -222,8 +221,8 @@ cd "$PLUGINS_DIR/dsh-connect-minmax"
 都在 `devDependencies` 里，装依赖时不能漏 dev：
 
 ```bash
-pnpm install          # 或 npm install --include=dev
-pnpm build            # → lib/index.js、lib/index.d.ts、lib/client.js
+pnpm install
+pnpm build
 ```
 
 `lib/` 不存在或比 `src/` 旧时，`link:` 装上去会在宿主里报模块缺失/语法错误。
@@ -461,7 +460,6 @@ Baidu / Kimi / Aliyun / Doubao / Google CSE / Metaso / Yandex / Yuanbao / SpecSt
 
 ```bash
 # 条目在不在（前缀是 loader 条目 id：web-search-free）
-grep -n "web-search-free" "$PROFILE_DIR/cordis.patch.yml"   # 插件自己的 patch 插入的，profile 里通常没有
 dsh --profile web --dump-config | grep -A3 "id: web-search-free"
 # 期望：- id: web-search-free / name: dsh-free-search / config: disabledEngines: [] / bingMarket: zh-CN
 
@@ -782,8 +780,7 @@ sed -n '/^minimumReleaseAgeExclude:/,/^[^ #-]/p' \
   "${DSH_HOME:-$HOME/.dsh}/profiles/<profile>/pnpm-workspace.yaml"
 ```
 
-然后重启当前入口，例如 `dsh --profile <profile>`
-报告启动器/profile 对齐；`dsh-tui safe` 列出第三方插件。
+然后重启当前入口，例如 `dsh --profile <profile>`。
 
 ### 逐个确认这 4 个新插件的装法（判断依据）：
 
