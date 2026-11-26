@@ -6,12 +6,10 @@
 : "${IS_ARM:?IS_ARM is not set - source this file from inst/install.sh}"
 
 install_nodejs() {
-  # https://github.com/nodesource/distributions
+  # https://nodesource.com/products/distributions
   sudo apt-get install -y curl
-  curl -fsSL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
-  sudo -E bash nodesource_setup.sh
-  sudo apt-get -q update
-  sudo apt-get -q -y install nodejs
+  curl -fsSL https://deb.nodesource.com/setup_26.x | sudo -E bash -
+  sudo apt-get install -q -y nodejs
 }
 
 install_gh() {
