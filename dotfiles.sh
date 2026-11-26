@@ -30,7 +30,6 @@ alias gs="git status"
 alias gp="git pull"
 alias gP="git push"
 alias ga="git add"
-alias gco="git commit"
 
 # gh
 #
