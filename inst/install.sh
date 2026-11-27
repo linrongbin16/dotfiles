@@ -153,14 +153,7 @@ install_ai_agents() {
   install "curl -fsSL https://chatgpt.com/codex/install.sh | sh" "codex"
 }
 
-# Install the skills kept in `dsh-skills/` into `~/.dsh/skills`, one symlink per
-# skill. A link rather than a copy keeps the installed skills equal to the
-# checkout: editing or pulling a skill takes effect without re-running the
-# installer, the same reason `ghostty_configs` links its directory instead of
-# copying it.
-#
-# dsh discovers a skill from its directory, so each top-level directory under
-# `dsh-skills/` is one skill; files such as `.gitkeep` are skipped.
+# Install skills in `dsh-skills/` into `~/.dsh/skills`.
 dsh_skills() {
   local source_dir="$DOTFILES_HOME/dsh-skills"
   local target_dir="$HOME/.dsh/skills"
