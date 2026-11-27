@@ -10,6 +10,7 @@
     { "name": "dsh-connect-workbuddy", "spec": "latest" },
     { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
     { "name": "billion-context", "spec": "latest" },
+    { "name": "@liustack/modlens", "spec": "latest" },
     {
       "name": "dsh-our-free-model",
       "spec": "file:${PROFILE_DIR}/plugins/dsh-our-free-model-2.9.0.tgz",
