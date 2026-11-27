@@ -146,6 +146,13 @@ ghostty_configs() {
   touch "$HOME/.config/ghostty/ghostty-custom"
 }
 
+install_ai_agents() {
+  install "npm install --prefix=$HOME/.local/ -g pnpm" "pnpm"
+  install "npm install --prefix=$HOME/.local/ -g '@deepseek-ai/dsh'" "dsh"
+  install "curl -fsSL https://claude.ai/install.sh | bash" "claude"
+  install "curl -fsSL https://chatgpt.com/codex/install.sh | sh" "codex"
+}
+
 # Install the skills kept in `dsh-skills/` into `~/.dsh/skills`, one symlink per
 # skill. A link rather than a copy keeps the installed skills equal to the
 # checkout: editing or pulling a skill takes effect without re-running the
@@ -221,6 +228,7 @@ main() {
   prompt_deps
   git_configs
   ghostty_configs
+  install_ai_agents
   dsh_skills
   profile_configs
   info "done"
