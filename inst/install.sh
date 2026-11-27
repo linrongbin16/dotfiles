@@ -146,7 +146,7 @@ ghostty_configs() {
   touch "$HOME/.config/ghostty/ghostty-custom"
 }
 
-install_ai_agents() {
+ai_agents() {
   install "npm install --prefix=$HOME/.local/ -g pnpm" "pnpm"
   install "npm install --prefix=$HOME/.local/ -g '@deepseek-ai/dsh'" "dsh"
   install "curl -fsSL https://claude.ai/install.sh | bash" "claude"
@@ -221,7 +221,7 @@ main() {
   prompt_deps
   git_configs
   ghostty_configs
-  install_ai_agents
+  ai_agents
   dsh_skills
   profile_configs
   info "done"
