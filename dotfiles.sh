@@ -99,6 +99,14 @@ if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init "$DOTFILES_SHELL")"
 fi
 
+# atuin
+if [ -f "$HOME/.atuin/bin/env" ]; then
+  . "$HOME/.atuin/bin/env"
+fi
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init "$DOTFILES_SHELL")"
+fi
+
 # git-prompt.zsh {{{
 if [ "$DOTFILES_SHELL" = "zsh" ] && [ -f "$HOME/.zsh/git-prompt.zsh/git-prompt.zsh" ]; then
   source $HOME/.zsh/git-prompt.zsh/git-prompt.zsh

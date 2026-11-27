@@ -1,5 +1,5 @@
-inline_height = 5
-max_preview_height = 4
+inline_height = 7
+max_preview_height = 6
 enter_accept = true
 search_mode = "daemon-fuzzy"
 
