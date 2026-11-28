@@ -2,7 +2,7 @@
 name: install-dsh-plugins
 description: 为当前 DSH profile（<profile>）安装、重装或更新插件：判断每个包该走哪条安装路径（registry / 本地 clone / 离线包 / 固定 URL），执行安装，然后验证并重启宿主。
 metadata:
-  version: "2.0"
+  version: "2.1"
 ---
 
 # 安装或更新 DSH 插件
@@ -15,8 +15,8 @@ metadata:
 2. **不走 registry 的东西放 profile 的 `plugins/` 下**，规格写成相对 profile 的路径。
 3. **装完必须重启宿主**；客户端插件还要硬刷新浏览器。装成功 ≠ 能用。
 
-本文件只写判断方法和会变的地方的**查询方式**，不写具体版本号——版本、引擎区间、
-release 地址都会变，用下面的命令现查。
+本文件只写判断方法和会变的地方的**查询方式**，不写具体版本号、引擎区间、release
+地址、客户端凭据位置都会随上游升级而变，用下面的命令现查。
 
 ## 一、先判断这个包该走哪条路
 
@@ -80,13 +80,12 @@ profile 的 `node_modules`、`pnpm-lock.yaml` 属于同一套安装状态，`lin
 
 | 插件 | 判断 |
 | --- | --- |
-| `@dmh2002/dsh-connect-minmax` | 不在 npm 上 → clone + `link:`，且必须构建 |
 | `dsh-free-search` | registry 上的同名包落后于仓库 → clone + `link:`，无需构建 |
 | `dsh-our-free-model` | npm 上的同名包停更 → 从 Release 下 tgz，用 `file:` |
 | `dsh-purge-community` | 只发 Release tgz → 固定版本 URL |
 | `dsh-better-sidebar` | registry 包，但版本必须跟宿主线走 |
 | `dsh-session-manager` | registry 包，`engines.node` 门槛较高 |
-| `@dmh2002/dsh-connect-qoder`、`dsh-connect-trae`、`dsh-connect-workbuddy` | registry 包，依赖本机桌面客户端的凭据（见第八节） |
+| `dsh-connect-*` 系列 | registry 包，依赖本机桌面客户端的凭据（见第八节） |
 | `dsh-bash-native` | registry 包，只装在 Windows（清单里 `os: ["windows"]`，其它平台自动跳过） |
 | `billion-context` | registry 包；它占着上下文压缩槽，在用它压缩的会话里更新要重启 |
 
@@ -214,9 +213,9 @@ README 里给的「插件市场 / 安装器」这两条替代路径在需要备�
 
 ## 八、WSL 下读 Windows 客户端的凭据
 
-connector 类插件（minmax / trae / workbuddy 等）读的是**桌面客户端在 Windows 用户目录
-下**建好的凭据文件。`dsh plugin add` 成功只代表「装上了」；凭据路径不对，卡片只会显示
-「未登录」，且**不会**报安装错误。
+connector 类插件（`dsh-connect-*` 系列）读的是**桌面客户端在 Windows 用户目录下**建好的
+凭据文件。`dsh plugin add` 成功只代表「装上了」；凭据路径不对，卡片只会显示「未登录」，
+且**不会**报安装错误。
 
 通用判断法：
 
@@ -224,10 +223,12 @@ connector 类插件（minmax / trae / workbuddy 等）读的是**桌面客户端
 WINHOME="$(wslpath "$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r')")"
 ```
 
+**凭据位置、文件名和环境变量名会随客户端与插件升级而变**——不要在 skill 里记具体值，
+按当前装上的那一版现查：插件的 README / `docs/` 是权威说明，需要时用
+`grep -rhoE "env\.[A-Z_]+" <pkg>/lib` 列出它读的环境变量。
+
 - 插件默认按 `$HOME` 找，而 WSL 的 `$HOME` 不是 Windows 用户目录 → 用插件支持的
-  环境变量把根目录**显式钉住**（如 `DSH_MINIMAX_DATA_DIR`、`WORKBUDDY_AUTH_FILE`、
-  `WORKBUDDY_APP_EXECUTABLE`；Qoder 则是有意只认 PAT，不读客户端文件）。
-  变量名以插件 README 为准，钉完用
+  环境变量把根目录**显式钉住**；变量名以插件 README 为准，钉完用
   `tr '\0' '\n' < /proc/$(systemctl --user show -p MainPID --value <unit>)/environ | grep <VAR>`
   确认它真的进了服务进程。
 - 这些 export 要放在**真正启动 dsh 的环境**里（unit 的 EnvironmentFile、wrapper 或

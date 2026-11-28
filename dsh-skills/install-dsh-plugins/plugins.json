@@ -1,13 +1,9 @@
 {
   "plugins": [
-    {
-      "name": "@dmh2002/dsh-connect-minmax",
-      "spec": "link:${PROFILE_DIR}/plugins/dsh-connect-minmax",
-      "note": "不在 npm 上：clone 到 profile 的 plugins/ 并构建后再装此 link:"
-    },
     { "name": "@dmh2002/dsh-connect-qoder", "spec": "latest" },
     { "name": "dsh-connect-trae", "spec": "latest" },
     { "name": "dsh-connect-workbuddy", "spec": "latest" },
+    { "name": "dsh-connect-minimaxcode", "spec": "latest" },
     { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
     { "name": "billion-context", "spec": "latest" },
     { "name": "@liustack/modlens", "spec": "latest" },
@@ -33,7 +29,7 @@
     },
     {
       "name": "dsh-purge-community",
-      "spec": "https://github.com/kingcharleslzy-ai/dsh-purge/releases/download/v1.7.20/dsh-purge-community-1.7.20.tgz",
+      "spec": "https://github.com/kingcharleslzy-ai/dsh-purge/releases/download/v1.7.24/dsh-purge-community-1.7.24.tgz",
       "note": "不在 npm 上：只能装 Release 的固定版本 tgz 直链。升级时换 tag 与文件名"
     }
   ]
