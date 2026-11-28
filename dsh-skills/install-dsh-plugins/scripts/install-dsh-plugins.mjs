@@ -44,9 +44,9 @@ const USAGE = `用法：install-dsh-plugins.mjs [选项]
   \${PROFILE}     目标 profile 名
   \${PROFILE_DIR} 目标 profile 目录（<DSH_HOME>/profiles/<profile>）
 
-file: 规格装的是本地 tarball（例如 dsh-our-free-model 只能从 GitHub Release
-下载 tgz 再离线安装），脚本原样转发，不会去 registry 找同名包，也不会写入
-minimumReleaseAgeExclude。它只检查本地规格指向的路径是否存在。
+file: 规格装的是本地 tarball（上游只发 GitHub Release 的 tgz 时用这条路），脚本
+原样转发，不会去 registry 找同名包，也不会写入 minimumReleaseAgeExclude。它只
+检查本地规格指向的路径是否存在。
 
 在 WSL 下，四个 connector 插件需要 Windows 客户端中的凭据；见 skill 的
 “四个 connector 插件的凭据前提”一节。本安装器只更新包，不验证这些凭据。`;
@@ -243,9 +243,9 @@ function applySpecContext(spec, { home, profile, dir }) {
 
 /**
  * A `file:` spec points at a local tarball. pnpm's own error for a missing one
- * is buried in the install log, so check up front: an offline plugin such as
- * dsh-our-free-model must have its tgz downloaded into the target profile's
- * plugins/ directory first, and saying that plainly beats a failed pnpm run.
+ * is buried in the install log, so check up front: an offline plugin must have
+ * its tgz downloaded into the target profile's plugins/ directory first, and
+ * saying that plainly beats a failed pnpm run.
  *
  * Relative paths are resolved against the target profile, matching how pnpm
  * resolves them from the profile's package.json.

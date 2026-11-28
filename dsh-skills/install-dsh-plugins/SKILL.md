@@ -2,7 +2,7 @@
 name: install-dsh-plugins
 description: 为当前 DSH profile（<profile>）安装、重装或更新插件：判断每个包该走哪条安装路径（registry / 本地 clone / 离线包 / 固定 URL），执行安装，然后验证并重启宿主。
 metadata:
-  version: "2.1"
+  version: "2.2"
 ---
 
 # 安装或更新 DSH 插件
@@ -81,8 +81,8 @@ profile 的 `node_modules`、`pnpm-lock.yaml` 属于同一套安装状态，`lin
 | 插件 | 判断 |
 | --- | --- |
 | `dsh-free-search` | registry 上的同名包落后于仓库 → clone + `link:`，无需构建 |
-| `dsh-our-free-model` | npm 上的同名包停更 → 从 Release 下 tgz，用 `file:` |
 | `dsh-purge-community` | 只发 Release tgz → 固定版本 URL |
+| `dsh-connect-loomy` | 只发 Release tgz，声明 `os:win32` → 下 tgz 用 `file:`（凭据见第八节） |
 | `dsh-better-sidebar` | registry 包，但版本必须跟宿主线走 |
 | `dsh-session-manager` | registry 包，`engines.node` 门槛较高 |
 | `dsh-connect-*` 系列 | registry 包，依赖本机桌面客户端的凭据（见第八节） |
@@ -238,6 +238,11 @@ WINHOME="$(wslpath "$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r')")"
 - 客户端若用**命名管道 / IPC broker** 提供凭据，WSL 一律不可达——插件回落到读文件
   是设计好的降级路径，不是故障。回落到文件要求该目录**可写**（自续期要写回），
   动手前 `test -w <dir>` 确认。
+- 包若在 package.json 里声明 os: ["win32"]，它多半也硬编码了 C: 盘路径：非 win32 时
+  直接返回「未登录」，且不报错。这类包装进 WSL profile 仍可用，前提是把 /mnt/c/...
+  那个实时目录喂给它的 configRoot 覆盖项；dsh plugin add 不会因 os 不匹配而拒绝。
+  实例：dsh-connect-loomy 读 `DSH_LOOMY_CONFIG_ROOT`，值形如
+  `/mnt/c/Users/Public/Loomy/<sha256(用户名)前 12 位>`。
 - 只有一侧区域目录存在（如只有 `cn` 没有 `en`）时，另一侧路由永远未登录，属于正常。
 - 更新前后各验证一次：文件可读 → 重启 → 发一条真实请求。文件存在只是必要条件。
 
@@ -255,6 +260,7 @@ WINHOME="$(wslpath "$(cmd.exe /c echo %USERPROFILE% 2>/dev/null | tr -d '\r')")"
 | 报 `configured web provider "X" is not registered` | 提供该 provider 的插件被停用/卸载，但 profile patch 里还留着 `- id: web` 的 provider 行。删掉那两行，或用插件自带的 restore/clean 命令 |
 | 日志刷 `[plugin] patch: entry "…" not found` | 宿主换了锚点名，插件侧锚点漂移。一般无害，多数插件提供 diagnose/reanchor；不影响其它插件 |
 | 插件装了、路由也在，但 curl 一直 401/403 | 那些路由要浏览器 cookie（见第五节）。用 `--dump-config` 和浏览器实际行为判断 |
+| Windows 客户端已登录，插件卡片却一直「未登录」 | 非 win32 时插件不去猜 C: 盘路径：查它读的 configRoot 覆盖项（通常是环境变量），指到 /mnt/c/... 的实时目录后重启宿主 |
 | 改完/装完界面没变 | 客户端 bundle 不自动重载：硬刷新浏览器；新增服务端 JS 模块还要重启宿主 |
 | 安装时整批中止在某一个包 | 临时从清单里摘掉它，其余照装，单独处理这个 |
 
