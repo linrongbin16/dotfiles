@@ -146,13 +146,6 @@ ghostty_configs() {
   touch "$HOME/.config/ghostty/ghostty-custom"
 }
 
-ai_agents() {
-  install "npm install --prefix=$HOME/.local/ -g pnpm" "pnpm"
-  install "npm install --prefix=$HOME/.local/ -g '@deepseek-ai/dsh'" "dsh"
-  install "curl -fsSL https://claude.ai/install.sh | bash" "claude"
-  install "curl -fsSL https://chatgpt.com/codex/install.sh | sh" "codex"
-}
-
 # Install skills in `dsh-skills/` into `~/.dsh/skills`.
 dsh_skills() {
   local source_dir="$DOTFILES_HOME/dsh-skills"
@@ -221,7 +214,6 @@ main() {
   prompt_deps
   git_configs
   ghostty_configs
-  ai_agents
   dsh_skills
   profile_configs
   info "done"
