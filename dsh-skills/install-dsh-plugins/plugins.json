@@ -4,14 +4,14 @@
     { "name": "dsh-connect-trae", "spec": "latest" },
     { "name": "dsh-connect-workbuddy", "spec": "latest" },
     { "name": "dsh-connect-minimaxcode", "spec": "latest" },
+    {
+      "name": "dsh-connect-loomy",
+      "spec": "file:${PROFILE_DIR}/plugins/dsh-connect-loomy-0.1.2.tgz",
+      "note": "不在 npm 上、只发 Release 的 tgz：下载后放进 profile 的 plugins/ 再装。声明 os:win32，非 win32 下按 SKILL.md 第八节喂 configRoot"
+    },
     { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
     { "name": "billion-context", "spec": "latest" },
     { "name": "@liustack/modlens", "spec": "latest" },
-    {
-      "name": "dsh-our-free-model",
-      "spec": "file:${PROFILE_DIR}/plugins/dsh-our-free-model-2.9.0.tgz",
-      "note": "npm 上的同名包停更：从 Release 下 tgz 放进 profile 的 plugins/，再装绝对路径。升级时改这里的版本号"
-    },
     {
       "name": "dsh-free-search",
       "spec": "link:${PROFILE_DIR}/plugins/dsh-free-search",
