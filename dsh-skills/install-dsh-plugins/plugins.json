@@ -10,6 +10,11 @@
       "note": "不在 npm 上、只发 Release 的 tgz：下载后放进 profile 的 plugins/ 再装。声明 os:win32，非 win32 下按 SKILL.md 第八节喂 configRoot"
     },
     { "name": "dsh-bash-native", "spec": "latest", "os": ["windows"] },
+    {
+      "name": "dsh-codearts",
+      "spec": "latest",
+      "note": "registry 包；装/升级若收尾报 ERR_PNPM_IGNORED_BUILDS，按上游 INSTALL.md 在 profile 的 pnpm-workspace.yaml 加 allowBuilds（@google/genai、protobufjs 置 false）"
+    },
     { "name": "billion-context", "spec": "latest" },
     { "name": "@liustack/modlens", "spec": "latest" },
     {
