@@ -34,9 +34,9 @@ function InvokeChecked([string]$command, [string]$action)
   $status = $LASTEXITCODE
   if ($status -ne 0)
   {
-    throw "command failed with exit code ${status}: '${command}'"
+    throw "command failed with exit code ${status}: '$command'"
   }
-  Info "${action} - done"
+  Info "$action - done"
 }
 
 # Whether `$command` is on PATH *and* actually runs, e.g. `cargo --version` exiting 0.
@@ -50,6 +50,7 @@ function TestCommand([string]$command, [string]$Arguments = "--version")
   {
     return $false
   }
+
   $previous = $ErrorActionPreference
   $ErrorActionPreference = 'Continue'
   try
@@ -62,8 +63,8 @@ function TestCommand([string]$command, [string]$Arguments = "--version")
   return $LASTEXITCODE -eq 0
 }
 
-# The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes
-# two dozen packages and one `scoop list` costs ~0.3s.
+# The scoop app names installed on this machine, e.g. `ripgrep`. Cached: the installer probes two
+# dozen packages and one `scoop list` costs ~0.3s.
 function GetScoopApps()
 {
   if ($null -eq $script:ScoopApps)
@@ -74,19 +75,8 @@ function GetScoopApps()
   return $script:ScoopApps
 }
 
-# Install a scoop package and pin it with `scoop hold`, so `scoop update` leaves it alone.
-function InstallScoopHeld([string]$app)
-{
-  # No `-target` argument on purpose: owning the version is what is being asked for, so a
-  # `python` left on PATH by some other installer must not turn the install into a no-op.
-  InstallScoop $app
-
-  $name = $app.Split('/')[-1]
-  InvokeChecked -command "scoop hold ${name}" -action "hold '${name}', so 'scoop update' skips it"
-}
-
 # Install a scoop package unless scoop already has it.
-function InstallScoop([string]$app, [string]$target)
+function InstallScoop([string]$app)
 {
   $name = $app.Split('/')[-1]
   if ((GetScoopApps) -contains $name)
@@ -95,15 +85,19 @@ function InstallScoop([string]$app, [string]$target)
     return
   }
 
-  # The one question `scoop list` cannot answer: a command from somewhere else says nothing
-  # about what scoop installed, but it does mean scoop's copy would only shadow it.
-  if (-not [string]::IsNullOrEmpty($target) -and (Get-Command -Name $target -ErrorAction SilentlyContinue))
-  {
-    SkipInfo $target
-    return
-  }
+  InvokeChecked -command "scoop install $app" -action "install '$name' with command: 'scoop install $app'"
+}
 
-  InvokeChecked -command "scoop install ${app}" -action "install '${name}' with command: 'scoop install ${app}'"
+# Install a scoop package and pin it with `scoop hold`, so `scoop update` leaves it alone.
+function InstallScoopHeld([string]$app)
+{
+  # No "skip when a command of that name is on PATH" shortcut here on purpose: owning the version
+  # is what is being asked for, so a `python` left behind by some other installer must not turn
+  # this into a no-op.
+  InstallScoop $app
+
+  $name = $app.Split('/')[-1]
+  InvokeChecked -command "scoop hold $name" -action "hold '$name', so 'scoop update' skips it"
 }
 
 # The crates installed into this `CARGO_HOME`, e.g. `rmz`.
@@ -139,25 +133,26 @@ function InstallCargo([string]$crate)
     SkipInfo $crate
   } else
   {
-    $command = "cargo binstall --locked --no-confirm --disable-telemetry ${crate}"
-    InvokeChecked -command $command -action "install '${crate}' with command: '${command}'"
+    $command = "cargo binstall --locked --no-confirm --disable-telemetry $crate"
+    InvokeChecked -command $command -action "install '$crate' with command: '$command'"
   }
 }
 
-# Install a package that provides no command to probe with `Get-Command`, e.g. `mingw` only
-# appends its `bin` directory to PATH. Scoop's own install is idempotent: when the package
-# is already there it warns and exits 0, so no extra guard is needed here.
+# Run `$command` for a package that provides no command to probe with `Get-Command`, e.g. `mingw`
+# only appends a `bin` directory to PATH. Scoop's own install is idempotent (it warns and exits 0
+# when the package is already there), so no extra guard is needed here.
 function RunCommand([string]$command)
 {
-  InvokeChecked -command $command -action "run command: '${command}'"
+  InvokeChecked -command $command -action "run command: '$command'"
 }
 
-# Add `$dir` to the PATH of the current process, when it is not there yet.
-function AddProcessPathEntry([string]$dir)
+# Add `$dir` to the PATH of the current process, when it is not there yet. `-prepend` for a
+# directory that has to win over a copy further down PATH.
+function AddProcessPathEntry([string]$dir, [switch]$prepend)
 {
   if (($env:Path -split ";") -notcontains $dir)
   {
-    $env:Path = "$env:Path;$dir"
+    $env:Path = if ($prepend) { "$dir;$env:Path" } else { "$env:Path;$dir" }
   }
 }
 
@@ -174,21 +169,21 @@ function AddUserPathEntry([string]$dir)
 
 function AddScoopBucket([string]$name)
 {
-  # `scoop bucket add` exits with 2 when the bucket exists (scoop's `lib/buckets.ps1:
-  # add_bucket`), so probe the bucket list instead of special-casing that code.
-  # scoop prints through `Write-Host`, i.e. the information stream, hence `6>&1` to read it back.
+  # `scoop bucket add` exits with 2 when the bucket exists (scoop's `lib/buckets.ps1: add_bucket`),
+  # so probe the bucket list instead of special-casing that code. scoop prints through
+  # `Write-Host`, i.e. the information stream, hence `6>&1` to read it back.
   $global:LASTEXITCODE = 0
   $buckets = & scoop bucket list 6>&1 | Out-String
   if ($LASTEXITCODE -ne 0)
   {
-    throw "failed to list scoop buckets (exit ${LASTEXITCODE})"
+    throw "failed to list scoop buckets (exit $LASTEXITCODE)"
   }
-  if ($buckets -match "(?m)^${name}\s")
+  if ($buckets -match "(?m)^$name\s")
   {
-    SkipInfo "scoop bucket ${name}"
+    SkipInfo "scoop bucket $name"
   } else
   {
-    RunCommand -command "scoop bucket add ${name}"
+    RunCommand -command "scoop bucket add $name"
   }
 }
 
@@ -203,105 +198,73 @@ function InstallMo()
     return
   }
 
-  $latestUrl = & curl.exe -fsSL -o NUL -w "%{url_effective}" "https://github.com/k1LoW/mo/releases/latest"
-  if ($LASTEXITCODE -ne 0 -or -not $latestUrl)
+  # One request for the tag *and* the asset list. It used to be "follow the /releases/latest
+  # redirect for the tag, then guess the file name and see whether the download fails".
+  $release = & curl.exe -fsSL "https://api.github.com/repos/k1LoW/mo/releases/latest" | ConvertFrom-Json
+  if ($LASTEXITCODE -ne 0 -or -not $release)
   {
     throw "failed to resolve the latest release of mo"
   }
-  $tag = "$latestUrl".Trim().Split("/")[-1]
+  $tag = $release.tag_name
+
+  # Upstream publishes a Windows build for x86-64 only, so an ARM64 Windows has to run that build
+  # under emulation. Asking for a native build first means a future upstream release is picked up
+  # without another change here.
+  $architectures = @('amd64')
+  if ($isArm)
+  {
+    $architectures = @('arm64', 'amd64')
+  }
+  $asset = $null
+  foreach ($arch in $architectures)
+  {
+    $asset = $release.assets |
+      Where-Object { $_.name -eq "mo_$tag`_windows_$arch.tar.gz" } |
+      Select-Object -First 1
+    if ($asset)
+    {
+      if ($isArm -and $arch -eq 'amd64')
+      {
+        Info "upstream publishes no Windows/arm64 build of mo, using the x86-64 build (windows runs it under emulation)"
+      }
+      break
+    }
+  }
+  if (-not $asset)
+  {
+    throw "release $tag of mo has no asset for windows ($($architectures -join ', '))"
+  }
 
   # Download and unpack in a private temporary directory. The archive used to be saved into the
-  # current working directory, which left a `mo_<tag>_windows_amd64.tar.gz` behind in the
-  # repository root -- hidden only by the `mo*.tar.gz` rule in `.gitignore`.
-  $tempBase = $env:TEMP
-  if (-not $tempBase)
-  { $tempBase = $env:TMP 
-  }
-  if (-not $tempBase)
-  { $tempBase = [System.IO.Path]::GetTempPath() 
-  }
-  $tempRoot = [System.IO.Path]::GetFullPath($tempBase)
-  $workDir = [System.IO.Path]::GetFullPath((Join-Path $tempRoot ("mo-install-" + [guid]::NewGuid().ToString("N"))))
-
+  # current working directory, which left a mo_<tag>_windows_amd64.tar.gz behind in the repository
+  # root -- hidden only by the mo*.tar.gz rule in .gitignore.
+  #
+  # [System.IO.Path]::GetTempPath() already resolves TEMP -> TMP -> the system temp.
+  $workDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mo-install-" + [guid]::NewGuid().ToString("N"))
+  $localBin = Join-Path $HOME ".local\bin"
   try
   {
-    New-Item -ItemType Directory -Force -Path $workDir | Out-Null
     $archive = Join-Path $workDir "mo.tar.gz"
-
-    # Upstream publishes a Windows build for x86-64 only (`mo_<tag>_windows_amd64.tar.gz`), so an
-    # ARM64 Windows has to run that build under emulation. Ask for a native build first and fall
-    # back to x86-64, so a future upstream release is picked up without another change here.
-    $architectures = @('amd64')
-    if ($isArm)
-    {
-      $architectures = @('arm64', 'amd64')
-    }
-
-    $url = ''
-    $architecture = ''
-    $failure = ''
-    foreach ($arch in $architectures)
-    {
-      $asset = "mo_${tag}_windows_${arch}.tar.gz"
-      $candidateUrl = "https://github.com/k1LoW/mo/releases/download/${tag}/${asset}"
-      try
-      {
-        & curl.exe -fsSL -o $archive $candidateUrl
-        if ($LASTEXITCODE -eq 0)
-        {
-          $url = $candidateUrl
-          $architecture = $arch
-          break
-        }
-        $failure = "curl exited with ${LASTEXITCODE}"
-      } catch
-      {
-        # A host that turns a native exit code into a terminating error must not abort the
-        # whole installation: the next architecture may still be available.
-        $failure = $_.Exception.Message
-      }
-      if ($arch -eq $architectures[-1])
-      {
-        break
-      }
-      Info "no ${arch} build of mo ${tag} (${failure}), trying the next architecture"
-    }
-    if (-not $url)
-    {
-      throw "failed to download mo ${tag} for windows ($($architectures -join ', ')): ${failure}"
-    }
-    if ($isArm -and $architecture -eq 'amd64')
-    {
-      Info "upstream publishes no Windows/arm64 build of mo, using the x86-64 build (windows runs it under emulation)"
-    }
-
-    # Unpack into the temporary directory first, and copy only the binary into `~/.local\bin`:
-    # the archive also holds the license and the readme.
     $extractDir = Join-Path $workDir "extract"
     New-Item -ItemType Directory -Force -Path $extractDir | Out-Null
-    tar -xzf $archive -C $extractDir mo.exe
-    if ($LASTEXITCODE -ne 0)
-    {
-      throw "failed to extract ${url}"
-    }
+
+    InvokeChecked -command "curl.exe -fsSL -o '$archive' '$($asset.browser_download_url)'" `
+      -action "download '$($asset.browser_download_url)'"
+    InvokeChecked -command "tar -xzf '$archive' -C '$extractDir' mo.exe" -action "extract 'mo.exe'"
+
+    # Copy only the binary into ~/.local\bin: the archive also holds the license and the readme.
     $exe = Join-Path $extractDir "mo.exe"
     if (-not (Test-Path -Path $exe))
     {
-      throw "the archive ${url} does not contain mo.exe"
+      throw "the archive $($asset.browser_download_url) does not contain mo.exe"
     }
-
-    $localBin = Join-Path $HOME ".local\bin"
     New-Item -ItemType Directory -Force -Path $localBin | Out-Null
     Copy-Item -Path $exe -Destination (Join-Path $localBin "mo.exe") -Force
-    Info "installed mo ${tag} into ${localBin}"
+    Info "installed mo $tag into $localBin"
   } finally
   {
-    # Remove only the directory this function created, and only when it really is a child of
-    # the temporary directory. A leftover must not fail an otherwise finished installation.
-    if ((Split-Path -Path $workDir -Parent) -eq $tempRoot)
-    {
-      Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
+    # A leftover must not fail an otherwise finished installation.
+    Remove-Item -Path $workDir -Recurse -Force -ErrorAction SilentlyContinue
   }
 
   # add ~/.local/bin to user PATH
@@ -317,46 +280,46 @@ function DisableWindowsAppsPythonAlias()
   foreach ($alias in @("python.exe", "python3.exe"))
   {
     $path = Join-Path $windowsApps $alias
+
     # `Get-Item` rather than `Test-Path`: the entry is a reparse point, so `Test-Path` answers
-    # `$false` for one whose target is gone -- exactly the state the Store leaves behind, and
-    # not something to report as "already disabled" without removing anything.
+    # `$false` for one whose target is gone -- exactly the state the Store leaves behind, and not
+    # something to report as "already disabled" without removing anything.
     $entry = Get-Item -LiteralPath $path -Force -ErrorAction SilentlyContinue
     if (-not $entry)
     {
-      Info "the '${alias}' app execution alias is already disabled, skip..."
+      Info "the '$alias' app execution alias is already disabled, skip..."
       continue
     }
     Remove-Item -LiteralPath $path -Force
-    Info "disabled the '${alias}' app execution alias in ${windowsApps}"
+    Info "disabled the '$alias' app execution alias in $windowsApps"
   }
 }
 
 # Install the latest stable Python 3 through scoop, then pin it.
 #
-# The `python` bucket entry wraps python.org's own `.exe` build: its installer script expands
-# the dark archive inside and unrolls the MSIs, so nothing interactive ever runs here -- the
-# GUI that makes `winget install` unusable on this machine never gets a chance to appear.
+# The `python` bucket entry wraps python.org's own `.exe` build: its installer script expands the
+# dark archive inside and unrolls the MSIs, so nothing interactive ever runs here -- the GUI that
+# makes `winget install` unusable on this machine never gets a chance to appear.
 #
-# Scoop also owns what a hand-rolled ZIP install has to rebuild: `python3.exe` comes from the
-# `bin` list, the `pip` console scripts from `post_install` calling `ensurepip`, and `Scripts`
-# onto PATH from `env_add_path`. All of that is the bucket maintainer's problem now.
+# Scoop also owns what a hand-rolled ZIP install has to rebuild: `python3.exe` comes from the `bin`
+# list, the `pip` console scripts from `post_install` calling `ensurepip`, and `Scripts` onto PATH
+# from `env_add_path`. All of that is the bucket maintainer's problem now.
 function InstallPython3()
 {
   InstallScoopHeld "python"
 
-  # `Add-Path` prepends, so the scoop directories sit ahead of the `%LOCALAPPDATA%` aliases --
-  # but on a machine where the Store aliases are still armed, `python3` there is a redirector
-  # to the Microsoft Store, and an ordering accident should not decide which one wins.
+  # `Add-Path` prepends, so the scoop directories sit ahead of the `%LOCALAPPDATA%` aliases -- but
+  # on a machine where the Store aliases are still armed, `python3` there is a redirector to the
+  # Microsoft Store, and an ordering accident should not decide which one wins.
   DisableWindowsAppsPythonAlias
 }
 
 # Install the latest Node.js LTS through scoop, then pin it.
 #
 # Same reasoning as `InstallPython3`: the bucket ships the official nodejs.org archive (a plain
-# directory inside a `.7z`), `env_add_path` puts it on PATH, and `post_install` rewrites `npmrc`
-# so the global prefix and the cache land in the persisted directory instead of `%APPDATA%`.
-# Node.js keeps a single active LTS line, so `nodejs-lts` *is* "latest LTS" -- the bucket's
-# `checkver` reads `dist/index.json` the same way the old getter did.
+# directory inside a `.7z`), `env_add_path` puts it on PATH, and `post_install` rewrites `npmrc` so
+# the global prefix and the cache land in the persisted directory instead of `%APPDATA%`. Node.js
+# keeps a single active LTS line, so `nodejs-lts` *is* "latest LTS".
 function InstallNodejs()
 {
   InstallScoopHeld "nodejs-lts"
@@ -368,8 +331,7 @@ function InstallNodejs()
 # `AllowDevelopmentWithoutDevLicense` is the value behind the "Developer Mode" toggle (Microsoft's
 # documented alternative to the Settings page). The Settings page also installs the Developer Mode
 # package of optional features, which only remote deployment needs; for local development the value
-# is what decides, and it is set in HKLM, i.e. an elevated process is required -- the account of a
-# developer is an administrator, and the CI runner has the same rights.
+# is what decides.
 function EnableDeveloperMode()
 {
   $key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock'
@@ -381,12 +343,13 @@ function EnableDeveloperMode()
     return
   }
 
-  # Report the reason instead of dying in `New-Item` with a bare "Access to the registry key ...
-  # is denied": the fix is known, and it is not something this script can do on its own.
+  # It lives in HKLM, i.e. an elevated process is required -- the account of a developer is an
+  # administrator, and the CI runner has the same rights. Report that instead of dying in
+  # `New-Item` with a bare "Access to the registry key ... is denied".
   $principal = [System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())
   if (-not $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))
   {
-    throw "enabling developer mode writes '${key}\${name}' and needs an elevated PowerShell - run this script as administrator"
+    throw "enabling developer mode writes '$key\$name' and needs an elevated PowerShell - run this script as administrator"
   }
 
   Info "enable developer mode"
@@ -403,14 +366,14 @@ function Deps()
   # that is allowed to run code that did not come from the Store.
   EnableDeveloperMode
 
-  # `7zip` must be installed *through scoop* and must stay first,
-  # all following scoop installations need it.
+  # `7zip` must be installed *through scoop* and must stay first: every following scoop install
+  # needs it to unpack an archive.
   RunCommand -command "scoop install 7zip"
 
-  # `extras` bucket
   AddScoopBucket -name "extras"
 
-  # shell environment
+  # shell environment. `mingw`, `coreutils` and `niubash` provide no command to probe, hence
+  # `RunCommand` -- scoop's install is idempotent, so it still skips them on a re-run.
   RunCommand -command "scoop install mingw"
   RunCommand -command "scoop install coreutils"
   RunCommand -command "scoop install extras/vcredist2022"
@@ -424,53 +387,49 @@ function Deps()
   {
     InstallScoop "llvm"
   }
-  InstallScoop "make"
-  InstallScoop "cmake"
-
-  # gh
-  InstallScoop "gh"
+  foreach ($app in @("make", "cmake"))
+  {
+    InstallScoop $app
+  }
 
   # cli tools
-  InstallScoop "gzip"
-  InstallScoop "unzip"
-  InstallScoop "curl"
-  InstallScoop "wget"
-  InstallScoop "which"
-  InstallScoop "gawk"
-  InstallScoop "sed"
+  foreach ($app in @("gh", "gzip", "unzip", "curl", "wget", "which", "gawk", "sed"))
+  {
+    InstallScoop $app
+  }
 
   # python3
   InstallPython3
 
   # node/deno/bun
   InstallNodejs
-  InstallScoop "deno"
-  InstallScoop "bun"
+  foreach ($app in @("deno", "bun"))
+  {
+    InstallScoop $app
+  }
 
   # go
   InstallScoop "go"
 
   # develop tools
-  InstallScoop "extras/lazygit"
-  InstallScoop "main/fzf"
-  InstallScoop "fd"
-  InstallScoop "ripgrep"
-  InstallScoop "bat"
-  InstallScoop "eza"
-  InstallScoop "trashy"
+  foreach ($app in @("extras/lazygit", "main/fzf", "fd", "ripgrep", "bat", "eza", "trashy"))
+  {
+    InstallScoop $app
+  }
   InstallMo
-  InstallScoop "mise"
-  InstallScoop "starship"
+  foreach ($app in @("mise", "starship"))
+  {
+    InstallScoop $app
+  }
 }
 
-# Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate
-# with the token `gh` already stored (the keyring) instead of asking for a password.
+# Point the git credential helper at `gh`, so `git pull` / `git push` over HTTPS authenticate with
+# the token `gh` already stored (the keyring) instead of asking for a password.
 #
-# This is what `gh auth setup-git` writes, spelled out here because that command stores the
-# absolute path of the `gh.exe` it ran from -- `C:\users\<user>\scoop\apps\gh\current\...` is a
-# symlink that moves on every scoop upgrade, and a stale copy of the path in `.gitconfig` makes
-# every HTTPS fetch fail with "could not read Password". The bare `gh` below is resolved through
-# PATH on each call instead.
+# This is what `gh auth setup-git` writes, spelled out here because that command stores the absolute
+# path of the `gh.exe` it ran from -- C:\users\<user>\scoop\apps\gh\current\... is a symlink that
+# moves on every scoop upgrade, and a stale copy of the path in .gitconfig makes every HTTPS fetch
+# fail with "could not read Password". The bare `gh` below is resolved through PATH on each call.
 function SetGitHubCredentialHelper()
 {
   # Fail here, with the reason, rather than writing a helper that no `git` invocation can run.
@@ -481,7 +440,7 @@ function SetGitHubCredentialHelper()
 
   foreach ($ghHost in @('github.com', 'gist.github.com'))
   {
-    $key = "credential.https://${ghHost}.helper"
+    $key = "credential.https://$ghHost.helper"
 
     # A *leading empty* `helper` value, then the `gh` command: `git` accumulates helpers from
     # `system`, `global` and repo scope, and an empty value clears the list built so far. Git for
@@ -496,8 +455,7 @@ function SetGitHubCredentialHelper()
     # empty value. 5.1 dropped the argument instead, and `git` died with
     # `wrong number of arguments, should be from 2 to 3`.
     RunCommand -command ('git config --global --replace-all "{0}" ""' -f $key)
-
-    RunCommand -command "git config --global --add ${key} '!gh auth git-credential'"
+    RunCommand -command "git config --global --add $key '!gh auth git-credential'"
   }
 }
 
@@ -505,14 +463,17 @@ function GitConfigs()
 {
   Info "install git configs for windows"
 
-  # [user]
-  RunCommand -command 'git config --global user.email "linrongbin16@outlook.com"'
-  RunCommand -command 'git config --global user.name "linrongbin16"'
-  # [github]
-  RunCommand -command 'git config --global github.user "linrongbin16"'
-
-  RunCommand -command 'git config --global pull.rebase false'
-  RunCommand -command 'git config --global init.defaultBranch main'
+  # [user] / [github] / behavior
+  foreach ($config in @(
+      'user.email "linrongbin16@outlook.com"',
+      'user.name "linrongbin16"',
+      'github.user "linrongbin16"',
+      'pull.rebase false',
+      'init.defaultBranch main'
+    ))
+  {
+    RunCommand -command "git config --global $config"
+  }
 
   # [safe] *
   RunCommand -command 'git config --global --replace-all safe.directory "*"'
@@ -523,14 +484,11 @@ function GitConfigs()
 # Install `rustup` and its default (stable) toolchain from the Rust project instead of scoop.
 function InstallRustup()
 {
-  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would
-  # still be "not recognized" for the `cargo install` calls below on a fresh machine. Done
-  # first: the probes should look at the directory the install puts its proxies in.
+  # The installer edits the *user* PATH, which this process does not pick up, so `cargo` would still
+  # be "not recognized" for the `cargo install` calls below on a fresh machine. Done first: the
+  # probes should look at the directory the install puts its proxies in.
   $cargoBin = Join-Path $HOME ".cargo\bin"
-  if (($env:PATH -split ';') -notcontains $cargoBin)
-  {
-    $env:PATH = "${cargoBin};$env:PATH"
-  }
+  AddProcessPathEntry -dir $cargoBin -prepend
 
   if (TestCommand "rustup")
   {
@@ -548,17 +506,11 @@ function InstallRustup()
   {
     $triple = "aarch64-pc-windows-msvc"
   }
-  $url = "https://static.rust-lang.org/rustup/dist/${triple}/rustup-init.exe"
-  $installer = Join-Path $env:TEMP "rustup-init.exe"
+  $url = "https://static.rust-lang.org/rustup/dist/$triple/rustup-init.exe"
+  $installer = Join-Path ([System.IO.Path]::GetTempPath()) "rustup-init.exe"
 
-  Info "download '${url}'"
-  & curl.exe -fsSL -o $installer $url
-  if ($LASTEXITCODE -ne 0)
-  {
-    throw "failed to download ${url}"
-  }
-
-  InvokeChecked -command "& '${installer}' -y --default-toolchain stable" -action "install rustup with the stable toolchain"
+  InvokeChecked -command "curl.exe -fsSL -o '$installer' '$url'" -action "download '$url'"
+  InvokeChecked -command "& '$installer' -y --default-toolchain stable" -action "install rustup with the stable toolchain"
   # Cleanup only: a leftover installer in TEMP must not fail an otherwise finished install.
   Remove-Item -Path $installer -Force -ErrorAction SilentlyContinue
 
@@ -566,7 +518,7 @@ function InstallRustup()
   # "not recognized as the name of a cmdlet".
   if (-not (TestCommand "cargo"))
   {
-    throw "rustup finished but 'cargo' is not usable (expected '${cargoBin}')"
+    throw "rustup finished but 'cargo' is not usable (expected '$cargoBin')"
   }
 }
 
@@ -580,7 +532,7 @@ function InstallCargoBinstall()
   }
 
   $url = "https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.ps1"
-  Info "download '${url}'"
+  Info "download '$url'"
   $installer = (Invoke-WebRequest -Uri $url).Content
 
   # `iex` runs the body in *this* function's scope, so the variables it assigns (`$tmpdir`, `$zip`,
@@ -589,11 +541,11 @@ function InstallCargoBinstall()
   Invoke-Expression $installer 4>$null
 
   # Fail here, with the reason, rather than in the first `cargo binstall` with a bare
-  # "no such command: `binstall`".
+  # "no such command: binstall".
   if (-not (TestCommand "cargo-binstall" "-V"))
   {
     $cargoBin = Join-Path $HOME ".cargo\bin"
-    throw "ran the cargo-binstall installer but 'cargo-binstall' is not usable (expected '${cargoBin}')"
+    throw "ran the cargo-binstall installer but 'cargo-binstall' is not usable (expected '$cargoBin')"
   }
 }
 
@@ -603,14 +555,14 @@ function InstallNeovim()
   if (-not (TestCommand "bob"))
   {
     $cargoBin = Join-Path $HOME ".cargo\bin"
-    throw "installed 'bob-nvim' but 'bob' is not usable (expected '${cargoBin}')"
+    throw "installed 'bob-nvim' but 'bob' is not usable (expected '$cargoBin')"
   }
 
   # Put `nvim-bin` in the process PATH first, so `bob use` takes its "already in PATH" early return
   # instead of blocking on an interactive "add bob-managed Neovim binary to your $PATH?" prompt.
   # Answering that prompt rewrites the whole user Path in lowercase; skipping it never writes the
   # registry at all. `dotfiles.ps1` prepends the same directory in every shell it starts.
-  AddProcessPathEntry (Join-Path $env:LOCALAPPDATA "bob\nvim-bin")
+  AddProcessPathEntry -dir (Join-Path $env:LOCALAPPDATA "bob\nvim-bin") -prepend
 
   RunCommand -command "bob use stable"
 }
@@ -621,20 +573,20 @@ function RustDeps()
 
   InstallRustup
   InstallCargoBinstall
-  InstallCargo "rmz"
-  InstallCargo "cpz"
-  InstallCargo "tree-sitter-cli"
-  InstallCargo "bob-nvim"
+  foreach ($crate in @("rmz", "cpz", "tree-sitter-cli", "bob-nvim"))
+  {
+    InstallCargo $crate
+  }
   InstallNeovim
 }
 
 # Detect the encoding an existing startup file is stored in, by its byte order mark.
 #
 # This script writes BOM-less UTF-8, but the file it appends to is not necessarily its own: a
-# `~/.niubashrc` (or a profile) created from an older Windows PowerShell is still UTF-16LE, its
-# `>>` wrote that. Appending UTF-8 bytes to a UTF-16LE file corrupts it: the appended line is
-# read back as CJK gibberish and every shell start fails with `The term '...' is not recognized
-# as the name of a cmdlet`.
+# `~/.niubashrc` (or a profile) created from an older Windows PowerShell is still UTF-16LE, its `>>`
+# wrote that. Appending UTF-8 bytes to a UTF-16LE file corrupts it: the appended line is read back
+# as CJK gibberish and every shell start fails with "The term '...' is not recognized as the name of
+# a cmdlet".
 function GetProfileEncoding([string]$path)
 {
   $head = New-Object byte[] 3
@@ -664,16 +616,16 @@ function GetProfileEncoding([string]$path)
   return [System.Text.UTF8Encoding]::new($false)
 }
 
-# Append the `# dotfiles` marker and one source line to a shell startup file, unless the
-# source line is already in there.
+# Append the `# dotfiles` marker and one source line to a shell startup file, unless the source line
+# is already in there.
 #
-# `-newLine` defaults to CRLF, which is what the PowerShell profiles take; a bash rc gets
-# LF instead, so writing into `~/.niubashrc` does not mix line endings in one file.
+# `-newLine` defaults to CRLF, which is what the PowerShell profiles take; a bash rc gets LF
+# instead, so writing into `~/.niubashrc` does not mix line endings in one file.
 #
 # `-probe` is an optional regex that also counts as "already there", for an rc that was
-# hand-configured before this script had a line for it: `~/.niubashrc` may already carry a
-# bare `. ~/.dotfiles/dotfiles.sh`, which is not this exact line but would source the file
-# a second time -- and `dotfiles.sh` prepends PATH entries, so they would stack.
+# hand-configured before this script had a line for it: `~/.niubashrc` may already carry a bare
+# `. ~/.dotfiles/dotfiles.sh`, which is not this exact line but would source the file a second
+# time -- and `dotfiles.sh` prepends PATH entries, so they would stack.
 function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n", [string]$probe = '')
 {
   New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
@@ -686,20 +638,20 @@ function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n
     $content = [System.IO.File]::ReadAllText($path, $encoding)
   }
 
-  # Probe before appending: the block used to be written unconditionally, so every re-run
-  # added another copy and `dotfiles.ps1` got sourced once more per run, stacking the PATH
-  # entries it appends.
+  # Probe before appending: the block used to be written unconditionally, so every re-run added
+  # another copy and `dotfiles.ps1` got sourced once more per run, stacking the PATH entries it
+  # appends.
   foreach ($existing in $content -split "\r?\n")
   {
     $trimmed = $existing.Trim()
     if ($trimmed -eq $line)
     {
-      Info "source '${line}' is already in '${path}', skip..."
+      Info "source '$line' is already in '$path', skip..."
       return
     }
     if ($probe -and $trimmed -match $probe)
     {
-      Info "'${path}' already sources dotfiles ('${trimmed}'), skip..."
+      Info "'$path' already sources dotfiles ('$trimmed'), skip..."
       return
     }
   }
@@ -708,8 +660,8 @@ function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n
   # `Add-Content`, because the target file's encoding has to be preserved: `Add-Content -Encoding
   # utf8` writes a BOM when it has to create the file.
   #
-  # `AppendAllText` does not terminate the previous line, so close it first when the file
-  # does not end with a newline; keep the blank separator line the old version wrote.
+  # `AppendAllText` does not terminate the previous line, so close it first when the file does not
+  # end with a newline; keep the blank separator line the old version wrote.
   $prefix = ''
   if ($content.Length -gt 0)
   {
@@ -720,21 +672,21 @@ function AddProfileSource([string]$path, [string]$line, [string]$newLine = "`r`n
     $prefix += $newLine
   }
 
-  # Write back in the encoding the file already uses, so an old UTF-16LE profile stays
-  # readable instead of turning into half UTF-8.
-  $block = "${prefix}# dotfiles${newLine}${line}${newLine}"
+  # Write back in the encoding the file already uses, so an old UTF-16LE profile stays readable
+  # instead of turning into half UTF-8.
+  $block = "$prefix# dotfiles$newLine$line$newLine"
   [System.IO.File]::AppendAllText($path, $block, $encoding)
 }
 
 # Install the skills kept in `dsh-skills/` into `~/.dsh/skills`, one link per skill.
 #
-# The Unix installer (`inst/install.sh`, function `dsh_skills`) links them, and this does the
-# same: a link rather than a copy keeps the installed skills equal to the checkout, so editing
-# or pulling a skill takes effect without re-running the installer. The reason `ghostty_configs`
-# links its directory instead of copying it is the same.
+# The Unix installer (`inst/install.sh`, function `dsh_skills`) links them, and this does the same: a
+# link rather than a copy keeps the installed skills equal to the checkout, so editing or pulling a
+# skill takes effect without re-running the installer. The reason `ghostty_configs` links its
+# directory instead of copying it is the same.
 #
-# dsh discovers a skill from its directory, so each top-level directory under `dsh-skills/` is
-# one skill; files such as `.gitkeep` are skipped.
+# dsh discovers a skill from its directory, so each top-level directory under `dsh-skills/` is one
+# skill; files such as `.gitkeep` are skipped.
 function DshSkills()
 {
   Info "install dsh skills for windows"
@@ -749,7 +701,7 @@ function DshSkills()
 
   if (-not (Test-Path -LiteralPath $sourceDir -PathType Container))
   {
-    Info "'${sourceDir}' is not a directory, skip..."
+    Info "'$sourceDir' is not a directory, skip..."
     return
   }
 
@@ -759,12 +711,12 @@ function DshSkills()
   {
     $source = $skill.FullName
     $target = Join-Path $targetDir $skill.Name
-
     $existing = Get-Item -LiteralPath $target -Force -ErrorAction SilentlyContinue
 
     if ($existing -and $existing.LinkType)
     {
-      # A link from a previous run that already points at this checkout: nothing to redo.
+      # A link from a previous run that already points at this checkout: nothing to redo. A stale
+      # link is removed as a link, not as the directory it points at.
       $linkTarget = @($existing.Target)[0]
       if ($linkTarget)
       {
@@ -780,23 +732,21 @@ function DshSkills()
         }
       }
 
-      # A stale link: remove the link itself, not the directory it points at.
       Info "remove the stale link '$target'"
       Remove-Item -LiteralPath $target -Force
-      $existing = $null
     }
     elseif ($existing)
     {
-      # A real directory from a manual install: the repository stays the source of truth,
-      # the same way the Unix installer replaces whatever is in the way.
+      # A real directory from a manual install: the repository stays the source of truth, the same
+      # way the Unix installer replaces whatever is in the way.
       Info "remove '$target' (replaced by the link to the checkout)"
       Remove-Item -LiteralPath $target -Recurse -Force
     }
 
-    # A symbolic link first, because that is what the Unix installer creates and what dsh's
-    # skill loader documents. Creating one needs developer mode (which `Deps` turns on) or an
-    # elevated shell; a directory junction is the fallback for a machine that has neither --
-    # it needs no elevation, and dsh resolves both the same way.
+    # A symbolic link first, because that is what the Unix installer creates and what dsh's skill
+    # loader documents. Creating one needs developer mode (which `Deps` turns on) or an elevated
+    # shell; a directory junction is the fallback for a machine that has neither -- it needs no
+    # elevation, and dsh resolves both the same way.
     try
     {
       New-Item -ItemType SymbolicLink -Path $target -Target $source -ErrorAction Stop | Out-Null
@@ -818,9 +768,9 @@ function ProfileConfigs()
   $line = '. $env:USERPROFILE\.dotfiles\dotfiles.ps1'
 
   # Only the PowerShell 7 profile: this script runs under pwsh 7 (`install.ps1` in the repository
-  # root starts it there and never under `powershell.exe` 5.1), so `$PROFILE` names exactly the
-  # file that `pwsh` reads on startup -- including on a machine whose Documents folder was
-  # relocated (OneDrive), where `$HOME\Documents` is not the answer.
+  # root starts it there and never under `powershell.exe` 5.1), so `$PROFILE` names exactly the file
+  # that `pwsh` reads on startup -- including on a machine whose Documents folder was relocated
+  # (OneDrive), where `$HOME\Documents` is not the answer.
   AddProfileSource -path $PROFILE -line $line
 
   # `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` (README.md) covers 5.1 only: it writes
@@ -829,9 +779,8 @@ function ProfileConfigs()
   # `$PSHOME\powershell.config.json`, so there is nothing to set up here.
 
   # Add source `dotfiles.sh` for `~/.niubashrc`.
-  $niubashrc = Join-Path $env:USERPROFILE ".niubashrc"
   AddProfileSource `
-    -path $niubashrc `
+    -path (Join-Path $env:USERPROFILE ".niubashrc") `
     -line '[ -f ~/.dotfiles/dotfiles.sh ] && source ~/.dotfiles/dotfiles.sh' `
     -newLine "`n" `
     -probe '^(?:\.|source)\s+\S*dotfiles\.sh$'

@@ -17,42 +17,56 @@ function Info([string]$content)
   Write-Host "[dotfiles] - $content"
 }
 
-# The `pwsh.exe` on PATH, or `$null` when there is none.
+# Whether `$exe` is a usable `pwsh.exe`, i.e. one that runs and exits 0.
 #
 # `Get-Command` alone is not enough: a winget / Microsoft Store install registers an *app execution
-# alias* in `%LOCALAPPDATA%\Microsoft\WindowsApps`, a reparse point that `Get-Command` happily
-# reports even when the package behind it is gone, in which case running it opens the Store
-# instead of a shell. Requiring a non-zero exit code from `-Version` proves the binary is real.
-function FindPwsh()
+# alias* in `%LOCALAPPDATA%\Microsoft\WindowsApps`, a reparse point that `Get-Command` reports even
+# when the package behind it is gone, in which case running it opens the Store instead of a shell.
+function TestPwsh([string]$exe)
 {
-  $exe = Get-Command -Name "pwsh.exe" -CommandType Application -ErrorAction SilentlyContinue |
-    Select-Object -First 1
-  if (-not $exe)
-  {
-    return $null
-  }
-
   $previous = $ErrorActionPreference
   $ErrorActionPreference = 'Continue'
   try
   {
-    & $exe.Source -NoLogo -NoProfile -Command '$PSVersionTable.PSVersion.Major' 2>&1 | Out-Null
+    & $exe -NoLogo -NoProfile -Command 'exit 0' 2>&1 | Out-Null
   } finally
   {
     $ErrorActionPreference = $previous
   }
-  if ($LASTEXITCODE -ne 0)
+  return $LASTEXITCODE -eq 0
+}
+
+# The `pwsh.exe` to run `inst/install.ps1` with, or `$null` when there is none.
+#
+# The well-known locations cover a fresh install: it updates the *user* PATH, which this process does
+# not pick up.
+function ResolvePwsh()
+{
+  $exe = Get-Command -Name "pwsh.exe" -CommandType Application -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+  if ($exe -and (TestPwsh $exe.Source))
   {
-    return $null
+    return $exe.Source
   }
-  return $exe.Source
+
+  foreach ($candidate in @(
+      (Join-Path $env:ProgramFiles "PowerShell\7\pwsh.exe"),
+      (Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps\pwsh.exe")
+    ))
+  {
+    if ((Test-Path -Path $candidate) -and (TestPwsh $candidate))
+    {
+      return $candidate
+    }
+  }
+
+  return $null
 }
 
 # Install PowerShell 7 through winget unless `pwsh.exe` already works.
 #
-# `--no-upgrade` keeps this an *installation*, not an upgrade: an older 7.x that already runs is
-# left alone, the same "already there, leave it alone" rule the rest of the installation follows
-# (and the reason `winget upgrade -a` is not the way to move it forward).
+# `--no-upgrade` keeps this an *installation*, not an upgrade: an older 7.x that already runs is left
+# alone, the same "already there, leave it alone" rule the rest of the installation follows.
 # `--source winget` keeps it from picking a same-named package out of the msstore source, which
 # would ask for a Microsoft Store account.
 function InstallPwsh()
@@ -76,9 +90,9 @@ function InstallPwsh()
   }
 
   # 0 is "installed"; -1978335135 (0x8A150061, `APPINSTALLER_CLI_ERROR_UPDATE_NOT_APPLICABLE`) is
-  # "the package version is already installed, installation cancelled". The second one turns up
-  # when winget sees a Microsoft.PowerShell that this process cannot find on PATH -- an ARM64
-  # machine with an x64 7.x, say -- so it means "there is one, go find it", not "this failed".
+  # "the package version is already installed, installation cancelled". The second one turns up when
+  # winget sees a Microsoft.PowerShell that this process cannot find on PATH -- an ARM64 machine with
+  # an x64 7.x, say -- so it means "there is one, go find it", not "this failed".
   if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne -1978335135)
   {
     throw "winget failed to install 'Microsoft.PowerShell' (exit ${LASTEXITCODE})"
@@ -86,36 +100,10 @@ function InstallPwsh()
   Info "install 'Microsoft.PowerShell' with winget - done"
 }
 
-# The `pwsh.exe` to run `inst/install.ps1` with, after `InstallPwsh` had its chance.
-function ResolvePwsh()
-{
-  $exe = FindPwsh
-  if ($exe)
-  {
-    return $exe
-  }
-
-  # A fresh install updates the *user* PATH, which this process does not pick up: probe the well
-  # known location before giving up.
-  foreach ($candidate in @(
-      (Join-Path $env:ProgramFiles "PowerShell\7\pwsh.exe"),
-      (Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps\pwsh.exe")
-    ))
-  {
-    if (Test-Path -Path $candidate)
-    {
-      return $candidate
-    }
-  }
-
-  return $null
-}
-
 # Run `inst/install.ps1` under `pwsh.exe` and exit with its code.
 #
 # `-NoProfile`: the profile of a fresh machine is not configured yet (this very script writes it),
 # and one left over from an earlier installation would source `dotfiles.ps1` into the installer.
-# Extra arguments are passed through, so `install.ps1 -Foo` reaches the real script.
 function InvokeInstaller([string]$pwsh)
 {
   $installer = Join-Path $PSScriptRoot "inst\install.ps1"
@@ -131,17 +119,16 @@ function InvokeInstaller([string]$pwsh)
 
 try
 {
-  # Everything below (and in `inst/install.ps1`) resolves paths relative to the repository, so it
-  # must not depend on where the caller happened to be.
+  # Everything below (and in `inst/install.ps1`) resolves paths relative to the checkout, so it must
+  # not depend on where the caller happened to be.
   #
   # `Push-Location` rather than `Set-Location`: this script exits from `InvokeInstaller`, and a
-  # `Set-Location` would take effect in the *caller's* session too -- someone who starts it from an
-  # open shell would be left standing in the checkout afterwards.
-  # `-LiteralPath`: a checkout whose path contains `[` would otherwise be read as a wildcard.
+  # `Set-Location` would take effect in the *caller's* session too. `-LiteralPath`: a checkout whose
+  # path contains `[` would otherwise be read as a wildcard.
   Push-Location -LiteralPath $PSScriptRoot
   try
   {
-    $pwsh = FindPwsh
+    $pwsh = ResolvePwsh
     if ($pwsh)
     {
       Info "'pwsh.exe' is already installed ('${pwsh}'), skip..."
